@@ -24,7 +24,7 @@ export function Navigation({ className }: NavigationProps) {
 
   const navigationItems = [
     { name: "Products", href: "/products" },
-    { name: "Design Services", href: "/design-services" },
+    { name: "Design Services", href: "/services" },
     { name: "Portfolio", href: "/portfolio" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },

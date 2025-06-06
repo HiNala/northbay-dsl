@@ -1,3 +1,5 @@
+"use client";
+
 import { LuxuryHero } from "@/components/luxury/hero";
 import { LuxuryDivider } from "@/components/luxury/divider";
 import { ProductCard } from "@/components/luxury/product-card";
