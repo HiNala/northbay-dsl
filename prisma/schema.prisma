@@ -60,6 +60,7 @@ model UserRole {
 model User {
   id        String    @id @db.Uuid
   email     String?   @unique
+  password  String?   // Hashed password for credentials auth
   roles     UserRole[]
   Profile   Profile?
   Wishlists Wishlist[]

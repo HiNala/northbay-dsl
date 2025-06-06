@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Search, Filter, Phone, Mail, MessageSquare } from 'lucide-react'
 
-export default function ProductsPage() {
+export default function ProductsPageSimple() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
