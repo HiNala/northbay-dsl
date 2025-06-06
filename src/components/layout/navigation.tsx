@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Search } from "@/components/ui/search";
 import { cn, TYPOGRAPHY } from "@/lib/design-system";
 
 interface NavigationProps {
@@ -73,8 +74,12 @@ export function Navigation({ className }: NavigationProps) {
             ))}
           </div>
 
-          {/* Desktop CTA */}
+          {/* Desktop Search & CTA */}
           <div className="hidden lg:flex items-center space-x-4">
+            <Search 
+              className="w-64" 
+              placeholder="Search..." 
+            />
             <Button
               variant={isScrolled ? "outline" : "elegant"}
               color="gold"
