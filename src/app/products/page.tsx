@@ -1,136 +1,151 @@
 "use client";
 
-import React from "react";
+import { useState } from "react";
+import { Navigation } from "@/components/layout/navigation";
 import { ProductCard } from "@/components/luxury/product-card";
-import { LuxuryDivider } from "@/components/luxury/divider";
-import { Button } from "@/components/ui/button";
-import { TYPOGRAPHY } from "@/lib/design-system";
+import { cn, SPACING, TYPOGRAPHY, PATTERNS } from "@/lib/design-system";
+import { Search, Filter, Grid3X3, List, ArrowRight, ChevronDown } from "lucide-react";
 
-// Sample product data - would come from database in real app
-const sampleProducts = [
+// Sample product data
+const allProducts = [
   {
     id: "1",
     name: "Carrara Marble Kitchen Island",
     price: 4500,
     comparePrice: 5200,
-    images: ["/images/products/marble-island-1.jpg", "/images/products/marble-island-2.jpg"],
-    description: "Handcrafted Italian Carrara marble island with integrated breakfast bar and premium brass fixtures.",
+    images: ["/images/products/marble-island-1.jpg"],
+    description: "Handcrafted Italian Carrara marble island with integrated breakfast bar.",
     inStock: true,
     category: "Kitchen Islands",
     brand: "North Bay Designs",
+    finish: "Natural Stone",
   },
   {
-    id: "2", 
+    id: "2",
     name: "Professional Series Range",
     price: 8900,
     images: ["/images/products/range-1.jpg"],
-    description: "48-inch professional dual-fuel range with convection ovens and precision temperature control.",
+    description: "48-inch professional dual-fuel range with convection ovens.",
     inStock: true,
     category: "Appliances",
-    brand: "Wolf",
+    brand: "Sub-Zero Wolf",
+    finish: "Stainless Steel",
   },
   {
     id: "3",
     name: "Custom Walnut Cabinetry",
     price: 12500,
-    images: ["/images/products/cabinets-1.jpg"],
-    description: "Handcrafted solid walnut cabinetry with soft-close hinges and integrated LED lighting.",
-    inStock: false,
+    images: ["/images/products/walnut-cabinets-1.jpg"],
+    description: "Handcrafted American walnut cabinets with soft-close hardware.",
+    inStock: true,
     category: "Cabinetry",
     brand: "North Bay Designs",
+    finish: "Natural Wood",
   },
   {
     id: "4",
-    name: "Luxury Brass Faucet",
-    price: 1299,
-    comparePrice: 1499,
-    images: ["/images/products/faucet-1.jpg"],
-    description: "Professional-grade kitchen faucet with pull-down sprayer and ceramic disc valves.",
+    name: "Luxury Bathroom Vanity",
+    price: 6800,
+    images: ["/images/products/vanity-1.jpg"],
+    description: "Double vanity with marble countertop and gold fixtures.",
     inStock: true,
-    category: "Fixtures",
+    category: "Bathroom Vanities",
     brand: "Waterworks",
+    finish: "Natural Stone",
   },
   {
     id: "5",
-    name: "Marble Farmhouse Sink",
-    price: 3200,
-    images: ["/images/products/sink-1.jpg"],
-    description: "Single-bowl farmhouse sink carved from solid Carrara marble with integrated drainboard.",
-    inStock: true,
-    category: "Sinks",
-    brand: "North Bay Designs",
+    name: "Designer Pendant Lighting",
+    price: 1200,
+    comparePrice: 1500,
+    images: ["/images/products/pendant-1.jpg"],
+    description: "Artisan-crafted brass pendant lights with glass shades.",
+    inStock: false,
+    category: "Lighting",
+    brand: "Visual Comfort",
+    finish: "Brass",
   },
   {
     id: "6",
-    name: "Designer Bar Stools",
-    price: 450,
-    images: ["/images/products/stools-1.jpg"],
-    description: "Set of 2 leather and walnut bar stools with adjustable height and swivel function.",
+    name: "Farmhouse Kitchen Sink",
+    price: 2800,
+    images: ["/images/products/sink-1.jpg"],
+    description: "Apron-front fireclay sink with luxury faucet package.",
     inStock: true,
-    category: "Seating",
-    brand: "RH",
+    category: "Kitchen Sinks",
+    brand: "Rohl",
+    finish: "Fireclay",
   },
 ];
 
 const categories = [
   "All Products",
-  "Kitchen Islands", 
-  "Appliances",
+  "Kitchen Islands",
+  "Appliances", 
   "Cabinetry",
-  "Fixtures",
-  "Sinks",
-  "Seating",
+  "Bathroom Vanities",
+  "Lighting",
+  "Kitchen Sinks",
 ];
 
-const brands = [
-  "All Brands",
-  "North Bay Designs",
-  "Wolf",
-  "Sub-Zero", 
-  "Waterworks",
-  "RH",
-  "Bulthaup",
+const finishes = [
+  "All Finishes",
+  "Natural Stone",
+  "Stainless Steel",
+  "Natural Wood",
+  "Brass",
+  "Fireclay",
 ];
 
 const priceRanges = [
   "All Prices",
-  "Under $1,000",
-  "$1,000 - $5,000", 
+  "Under $2,000",
+  "$2,000 - $5,000",
   "$5,000 - $10,000",
   "Over $10,000",
 ];
 
 export default function ProductsPage() {
-  const [filteredProducts, setFilteredProducts] = React.useState(sampleProducts);
-  const [selectedCategory, setSelectedCategory] = React.useState("All Products");
-  const [selectedBrand, setSelectedBrand] = React.useState("All Brands");
-  const [selectedPriceRange, setSelectedPriceRange] = React.useState("All Prices");
-  const [searchQuery, setSearchQuery] = React.useState("");
-  // const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
+  const [filteredProducts, setFilteredProducts] = useState(allProducts);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All Products");
+  const [selectedFinish, setSelectedFinish] = useState("All Finishes");
+  const [selectedPriceRange, setSelectedPriceRange] = useState("All Prices");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  // Filter products based on selected filters
-  React.useEffect(() => {
-    let filtered = sampleProducts;
+  // Filter products based on selections
+  const filterProducts = () => {
+    let filtered = allProducts;
+
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.brand.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
 
     // Category filter
     if (selectedCategory !== "All Products") {
       filtered = filtered.filter(product => product.category === selectedCategory);
     }
 
-    // Brand filter  
-    if (selectedBrand !== "All Brands") {
-      filtered = filtered.filter(product => product.brand === selectedBrand);
+    // Finish filter
+    if (selectedFinish !== "All Finishes") {
+      filtered = filtered.filter(product => product.finish === selectedFinish);
     }
 
-    // Price range filter
+    // Price filter
     if (selectedPriceRange !== "All Prices") {
       filtered = filtered.filter(product => {
-        const price = product.price || 0;
+        const price = product.price;
         switch (selectedPriceRange) {
-          case "Under $1,000":
-            return price < 1000;
-          case "$1,000 - $5,000":
-            return price >= 1000 && price <= 5000;
+          case "Under $2,000":
+            return price < 2000;
+          case "$2,000 - $5,000":
+            return price >= 2000 && price <= 5000;
           case "$5,000 - $10,000":
             return price >= 5000 && price <= 10000;
           case "Over $10,000":
@@ -141,170 +156,278 @@ export default function ProductsPage() {
       });
     }
 
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter(product => 
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
     setFilteredProducts(filtered);
-  }, [selectedCategory, selectedBrand, selectedPriceRange, searchQuery]);
-
-  const handleProductDetails = (productId: string) => {
-    console.log("View product details:", productId);
   };
 
-  const handleAddToWishlist = (productId: string) => {
-    console.log("Add to wishlist:", productId);
-  };
-
-  const clearFilters = () => {
-    setSelectedCategory("All Products");
-    setSelectedBrand("All Brands");
-    setSelectedPriceRange("All Prices");
-    setSearchQuery("");
-  };
+  // Apply filters when any filter changes
+  useState(() => {
+    filterProducts();
+  });
 
   return (
-    <main className="min-h-screen pt-20">
-      {/* Page Header */}
-      <section className="py-16 bg-gradient-to-br from-slate-50 to-slate-100">
-        <div className="container mx-auto px-6">
+    <div className="min-h-screen bg-background-light">
+      <Navigation />
+
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 bg-gradient-to-b from-navy-900 to-navy-800 text-white">
+        <div className={cn(SPACING.container.default)}>
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className={`${TYPOGRAPHY.heading} text-5xl md:text-6xl text-slate-900 mb-6`}>
+            <h1 className={cn(TYPOGRAPHY.heading, "text-5xl md:text-6xl mb-6 font-serif")}>
               Premium Products
             </h1>
-            <p className={`${TYPOGRAPHY.body} text-xl text-slate-600 mb-8`}>
-              Discover our curated collection of luxury kitchen and bath products from the world&apos;s finest manufacturers.
+            <p className={cn(TYPOGRAPHY.bodyLarge, "text-gray-200 leading-relaxed")}>
+              Discover our curated collection of luxury kitchen and bath fixtures, handpicked for their 
+              exceptional quality, timeless design, and superior craftsmanship.
             </p>
-            
-            <LuxuryDivider variant="ornate" color="gold" width="center" withIcon />
           </div>
         </div>
       </section>
 
-      {/* Filters Section */}
-      <section className="py-8 bg-white border-b border-slate-200">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
-            {/* Search Bar */}
-            <div className="flex-1 max-w-md">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] focus:outline-none"
-                />
-                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+      <section className={cn(PATTERNS.section.standard, SPACING.container.default)}>
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Sidebar Filters */}
+          <div className={cn(
+            "lg:w-80 flex-shrink-0",
+            showMobileFilters ? "block" : "hidden lg:block"
+          )}>
+            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-32">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className={cn(TYPOGRAPHY.subheading, "text-xl text-navy-900 font-serif")}>
+                  Filters
+                </h3>
+                <button
+                  onClick={() => setShowMobileFilters(false)}
+                  className="lg:hidden text-gray-500 hover:text-navy-900"
+                >
+                  ×
+                </button>
               </div>
-            </div>
 
-            {/* Filter Dropdowns */}
-            <div className="flex flex-wrap gap-4">
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-4 py-2 border border-slate-300 rounded-none focus:border-[#d4af37] focus:outline-none"
-              >
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
+              {/* Search */}
+              <div className="mb-6">
+                <label className={cn(TYPOGRAPHY.body, "block text-navy-700 mb-3 font-medium")}>
+                  Search Products
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by name, brand, or description..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      filterProducts();
+                    }}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-md focus:border-gold-600 focus:ring-1 focus:ring-gold-600 transition-colors"
+                  />
+                </div>
+              </div>
 
-              <select
-                value={selectedBrand}
-                onChange={(e) => setSelectedBrand(e.target.value)}
-                className="px-4 py-2 border border-slate-300 rounded-none focus:border-[#d4af37] focus:outline-none"
-              >
-                {brands.map(brand => (
-                  <option key={brand} value={brand}>{brand}</option>
-                ))}
-              </select>
+              {/* Category Filter */}
+              <div className="mb-6">
+                <label className={cn(TYPOGRAPHY.body, "block text-navy-700 mb-3 font-medium")}>
+                  Category
+                </label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => {
+                    setSelectedCategory(e.target.value);
+                    filterProducts();
+                  }}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md focus:border-gold-600 focus:ring-1 focus:ring-gold-600 transition-colors"
+                >
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <select
-                value={selectedPriceRange}
-                onChange={(e) => setSelectedPriceRange(e.target.value)}
-                className="px-4 py-2 border border-slate-300 rounded-none focus:border-[#d4af37] focus:outline-none"
-              >
-                {priceRanges.map(range => (
-                  <option key={range} value={range}>{range}</option>
-                ))}
-              </select>
-            </div>
+              {/* Finish Filter */}
+              <div className="mb-6">
+                <label className={cn(TYPOGRAPHY.body, "block text-navy-700 mb-3 font-medium")}>
+                  Finish
+                </label>
+                <select
+                  value={selectedFinish}
+                  onChange={(e) => {
+                    setSelectedFinish(e.target.value);
+                    filterProducts();
+                  }}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md focus:border-gold-600 focus:ring-1 focus:ring-gold-600 transition-colors"
+                >
+                  {finishes.map((finish) => (
+                    <option key={finish} value={finish}>
+                      {finish}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            {/* View Toggle & Clear */}
-            <div className="flex items-center gap-4">
+              {/* Price Range Filter */}
+              <div className="mb-6">
+                <label className={cn(TYPOGRAPHY.body, "block text-navy-700 mb-3 font-medium")}>
+                  Price Range
+                </label>
+                <select
+                  value={selectedPriceRange}
+                  onChange={(e) => {
+                    setSelectedPriceRange(e.target.value);
+                    filterProducts();
+                  }}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md focus:border-gold-600 focus:ring-1 focus:ring-gold-600 transition-colors"
+                >
+                  {priceRanges.map((range) => (
+                    <option key={range} value={range}>
+                      {range}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Clear Filters */}
               <button
-                onClick={clearFilters}
-                className="text-sm text-slate-600 hover:text-[#d4af37] transition-colors"
+                onClick={() => {
+                  setSearchTerm("");
+                  setSelectedCategory("All Products");
+                  setSelectedFinish("All Finishes");
+                  setSelectedPriceRange("All Prices");
+                  setFilteredProducts(allProducts);
+                }}
+                className="w-full px-4 py-3 text-gold-600 border border-gold-600 rounded-md hover:bg-gold-50 transition-colors font-medium"
               >
-                Clear Filters
+                Clear All Filters
               </button>
             </div>
           </div>
 
-          {/* Results Info */}
-          <div className="mt-6 flex items-center justify-between text-sm text-slate-600">
-            <span>
-              Showing {filteredProducts.length} of {sampleProducts.length} products
-            </span>
+          {/* Main Content */}
+          <div className="flex-1">
+            {/* Header with view controls */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+              <div>
+                <h2 className={cn(TYPOGRAPHY.heading, "text-2xl text-navy-900 font-serif mb-2")}>
+                  {filteredProducts.length} Products Found
+                </h2>
+                <p className={cn(TYPOGRAPHY.body, "text-gray-600")}>
+                  Showing results for {selectedCategory !== "All Products" ? selectedCategory : "all categories"}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4">
+                {/* Mobile filter toggle */}
+                <button
+                  onClick={() => setShowMobileFilters(true)}
+                  className="lg:hidden flex items-center px-4 py-2 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+                >
+                  <Filter className="w-4 h-4 mr-2" />
+                  Filters
+                </button>
+
+                {/* View mode toggle */}
+                <div className="flex border border-gray-200 rounded-md overflow-hidden">
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    className={cn(
+                      "p-2 transition-colors",
+                      viewMode === "grid" 
+                        ? "bg-gold-600 text-white" 
+                        : "text-gray-600 hover:bg-gray-50"
+                    )}
+                  >
+                    <Grid3X3 className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={cn(
+                      "p-2 transition-colors",
+                      viewMode === "list" 
+                        ? "bg-gold-600 text-white" 
+                        : "text-gray-600 hover:bg-gray-50"
+                    )}
+                  >
+                    <List className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Products Grid */}
+            {filteredProducts.length > 0 ? (
+              <div className={cn(
+                viewMode === "grid" 
+                  ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8"
+                  : "space-y-6"
+              )}>
+                {filteredProducts.map((product) => (
+                  <ProductCard 
+                    key={product.id} 
+                    product={product}
+                    className={viewMode === "list" ? "flex flex-row" : ""}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className={cn(TYPOGRAPHY.subheading, "text-xl text-navy-900 mb-2 font-serif")}>
+                  No products found
+                </h3>
+                <p className={cn(TYPOGRAPHY.body, "text-gray-600 mb-6")}>
+                  Try adjusting your filters or search terms to find what you're looking for.
+                </p>
+                <button
+                  onClick={() => {
+                    setSearchTerm("");
+                    setSelectedCategory("All Products");
+                    setSelectedFinish("All Finishes");
+                    setSelectedPriceRange("All Prices");
+                    setFilteredProducts(allProducts);
+                  }}
+                  className="px-6 py-3 bg-gold-600 hover:bg-gold-700 text-white rounded-md font-medium transition-colors"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            )}
+
+            {/* Load More / Pagination */}
+            {filteredProducts.length > 0 && (
+              <div className="text-center mt-12">
+                <button className={cn(
+                  "inline-flex items-center px-8 py-4 bg-gold-600 hover:bg-gold-700 text-white rounded-md font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5",
+                  TYPOGRAPHY.button
+                )}>
+                  Load More Products
+                  <ArrowRight className="ml-3 w-5 h-5" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Products Grid */}
-      <section className="py-16">
-        <div className="container mx-auto px-6">
-          {filteredProducts.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-6xl mb-4">🔍</div>
-              <h3 className={`${TYPOGRAPHY.subheading} text-2xl text-slate-900 mb-2`}>
-                No products found
-              </h3>
-              <p className={`${TYPOGRAPHY.body} text-slate-600 mb-6`}>
-                Try adjusting your filters or search terms
-              </p>
-              <Button variant="outline" color="gold" onClick={clearFilters}>
-                Clear All Filters
-              </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onViewDetails={handleProductDetails}
-                  onAddToWishlist={handleAddToWishlist}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
       {/* CTA Section */}
-      <section className="py-16 bg-slate-900 text-white">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className={`${TYPOGRAPHY.heading} text-3xl md:text-4xl mb-6`}>
+      <section className={cn(PATTERNS.section.dark, SPACING.container.default, "text-center")}>
+        <div className="max-w-4xl mx-auto">
+          <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-white mb-6 font-serif")}>
             Need Help Choosing?
           </h2>
-          <p className={`${TYPOGRAPHY.body} text-xl text-slate-300 max-w-2xl mx-auto mb-8`}>
+          <p className={cn(TYPOGRAPHY.bodyLarge, "text-gray-300 mb-8 leading-relaxed")}>
             Our design experts are here to help you select the perfect products for your project.
           </p>
-          <Button variant="primary" color="gold" size="lg">
+          <button className={cn(
+            "px-8 py-4 bg-gold-600 hover:bg-gold-700 text-white rounded-md font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1",
+            TYPOGRAPHY.button
+          )}>
             Schedule Design Consultation
-          </Button>
+            <ArrowRight className="ml-3 w-5 h-5" />
+          </button>
         </div>
       </section>
-    </main>
+    </div>
   );
 } 

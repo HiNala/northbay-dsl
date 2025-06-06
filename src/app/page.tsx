@@ -1,11 +1,10 @@
 "use client";
 
+import { Navigation } from "@/components/layout/navigation";
 import { LuxuryHero } from "@/components/luxury/hero";
-import { LuxuryDivider } from "@/components/luxury/divider";
 import { ProductCard } from "@/components/luxury/product-card";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { TYPOGRAPHY } from "@/lib/design-system";
+import { cn, SPACING, TYPOGRAPHY, PATTERNS } from "@/lib/design-system";
+import { Sparkles, Home, Users, Palette, Award, Star, ArrowRight, CheckCircle, Quote } from "lucide-react";
 
 // Sample data for demonstration
 const sampleProducts = [
@@ -28,208 +27,283 @@ const sampleProducts = [
     description: "48-inch professional dual-fuel range with convection ovens and precision temperature control.",
     inStock: true,
     category: "Appliances",
-    brand: "Wolf",
+    brand: "Sub-Zero Wolf",
   },
   {
     id: "3",
     name: "Custom Walnut Cabinetry",
     price: 12500,
-    images: ["/images/products/cabinets-1.jpg"],
-    description: "Handcrafted solid walnut cabinetry with soft-close hinges and integrated LED lighting.",
-    inStock: false,
+    images: ["/images/products/walnut-cabinets-1.jpg"],
+    description: "Handcrafted American walnut cabinets with soft-close hardware and premium finishes.",
+    inStock: true,
     category: "Cabinetry",
     brand: "North Bay Designs",
   },
 ];
 
-const designServices = [
+const stats = [
+  { number: "500+", label: "Projects Completed", icon: Home },
+  { number: "15+", label: "Years Experience", icon: Award },
+  { number: "98%", label: "Client Satisfaction", icon: Users },
+  { number: "50+", label: "Design Awards", icon: Palette },
+];
+
+const valueProps = [
   {
-    title: "Kitchen Design",
-    description: "Transform your kitchen into a culinary masterpiece with our complete design and renovation services.",
-    features: ["3D Design Visualization", "Premium Material Selection", "Professional Installation", "1-Year Warranty"],
-    icon: "🏠",
+    title: "Curated Products",
+    description: "Exclusive, high-end selections from premier luxury brands and artisan craftspeople.",
+    icon: Palette,
   },
   {
-    title: "Bathroom Design",
-    description: "Create your personal spa retreat with luxury bathroom designs that combine function and elegance.",
-    features: ["Spa-Inspired Layouts", "Premium Fixtures", "Custom Vanities", "Lifetime Support"],
-    icon: "🛁",
+    title: "Custom Design Services", 
+    description: "Full-service design consultation from concept to completion with expert guidance.",
+    icon: Users,
   },
   {
-    title: "Whole Home",
-    description: "Complete home transformations that reflect your unique style and enhance your living experience.",
-    features: ["Full Home Planning", "Cohesive Design Language", "Project Management", "Concierge Service"],
-    icon: "✨",
+    title: "Bay Area Showroom",
+    description: "Visit our Napa Valley showroom to experience luxury materials and finishes firsthand.",
+    icon: Home,
   },
 ];
 
-export default function Home() {
-  const handleScheduleConsultation = () => {
-    // Navigate to design services page or open contact form
-    console.log("Schedule consultation clicked");
-  };
-
-  const handleViewPortfolio = () => {
-    // Navigate to portfolio page
-    console.log("View portfolio clicked");
-  };
-
-  const handleProductDetails = (productId: string) => {
-    console.log("View product details:", productId);
-  };
-
-  const handleAddToWishlist = (productId: string) => {
-    console.log("Add to wishlist:", productId);
-  };
-
+export default function HomePage() {
   return (
-    <main className="min-h-screen">
-      {/* Hero Section */}
+    <div className="min-h-screen bg-background-light">
+      <Navigation />
+
+      {/* 1. Edge-to-edge hero (100vh) */}
       <LuxuryHero
         title="Transform Your"
         subtitle="Living Space"
         description="Luxury kitchen and bath design that reflects your unique style and elevates your everyday living experience."
-        primaryCTA={{
-          text: "Schedule Consultation",
-          onClick: handleScheduleConsultation,
-        }}
-        secondaryCTA={{
-          text: "View Portfolio", 
-          onClick: handleViewPortfolio,
-        }}
         badge={{
           text: "Premium Design Services",
-          icon: <span className="text-[#d4af37]">⭐</span>,
+          icon: <Sparkles className="w-4 h-4" />,
+        }}
+        primaryCTA={{
+          text: "Schedule Consultation",
+          onClick: () => window.location.href = "/contact",
+        }}
+        secondaryCTA={{
+          text: "View Portfolio",
+          onClick: () => window.location.href = "/portfolio",
         }}
       />
 
-      {/* Stats Section */}
-      <section className="py-20 bg-slate-50">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { number: "500+", label: "Projects Completed" },
-              { number: "15+", label: "Years Experience" },
-              { number: "98%", label: "Client Satisfaction" },
-              { number: "50+", label: "Design Awards" },
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-4xl font-light text-slate-900 mb-2">{stat.number}</div>
-                <div className="text-slate-600 font-medium">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Products Section */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className={`${TYPOGRAPHY.heading} text-4xl md:text-5xl text-slate-900 mb-6`}>
-              Featured Products
-            </h2>
-            <p className={`${TYPOGRAPHY.body} text-xl text-slate-600 max-w-3xl mx-auto`}>
-              Discover our curated selection of premium kitchen and bath products from the world&apos;s finest manufacturers.
-            </p>
-          </div>
-
-          <LuxuryDivider variant="ornate" color="gold" width="center" withIcon />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {sampleProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onViewDetails={handleProductDetails}
-                onAddToWishlist={handleAddToWishlist}
-              />
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Button variant="outline" color="gold" size="lg">
-              View All Products
-              <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Design Services Section */}
-      <section className="py-24 bg-gradient-to-br from-slate-50 to-slate-100">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className={`${TYPOGRAPHY.heading} text-4xl md:text-5xl text-slate-900 mb-6`}>
-              Design Services
-            </h2>
-            <p className={`${TYPOGRAPHY.body} text-xl text-slate-600 max-w-3xl mx-auto`}>
-              From concept to completion, we guide you through every step of your transformation journey.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {designServices.map((service, index) => (
-              <Card key={index} variant="elevated" className="text-center hover:shadow-2xl transition-all duration-300">
-                <CardHeader>
-                  <div className="text-4xl mb-4">{service.icon}</div>
-                  <CardTitle className={TYPOGRAPHY.subheading}>{service.title}</CardTitle>
-                  <CardDescription className={TYPOGRAPHY.body}>
-                    {service.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 mb-6">
-                    {service.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center text-slate-700">
-                        <div className="w-2 h-2 bg-[#d4af37] rounded-full mr-3" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button variant="outline" color="gold" className="w-full">
-                    Learn More
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Button variant="primary" color="gold" size="lg" onClick={handleScheduleConsultation}>
-              Schedule Free Consultation
-              <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Call-to-Action Section */}
-      <section className="py-24 bg-slate-900 text-white">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className={`${TYPOGRAPHY.heading} text-4xl md:text-5xl mb-6`}>
-            Ready to Transform Your Space?
+      {/* 2. Value-prop trio */}
+      <section className={cn(PATTERNS.section.standard, SPACING.container.default)}>
+        <div className="text-center mb-16">
+          <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-6 font-serif")}>
+            Why Choose North Bay
           </h2>
-          <p className={`${TYPOGRAPHY.body} text-xl text-slate-300 max-w-3xl mx-auto mb-12`}>
-            Let our award-winning design team bring your vision to life with uncompromising quality and attention to detail.
+          <div className="w-24 h-1 bg-gold-600 mx-auto" />
+        </div>
+
+        <div className={PATTERNS.grid.services}>
+          {valueProps.map((prop, index) => (
+            <div key={index} className="text-center group">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gold-100 rounded-full mb-6 group-hover:bg-gold-200 transition-colors duration-300">
+                <prop.icon className="w-10 h-10 text-gold-600" />
+              </div>
+              <h3 className={cn(TYPOGRAPHY.subheading, "text-2xl text-navy-900 mb-4 font-serif")}>
+                {prop.title}
+              </h3>
+              <p className={cn(TYPOGRAPHY.body, "text-gray-600 leading-relaxed max-w-sm mx-auto")}>
+                {prop.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 3. Stats section */}
+      <section className={cn(PATTERNS.section.alternate, SPACING.container.default)}>
+        <div className={PATTERNS.grid.services}>
+          {stats.map((stat, index) => (
+            <div key={index} className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gold-100 rounded-full mb-4">
+                <stat.icon className="w-8 h-8 text-gold-600" />
+              </div>
+              <div className={cn(TYPOGRAPHY.heading, "text-4xl font-bold text-navy-900 mb-2 font-serif")}>
+                {stat.number}
+              </div>
+              <div className={cn(TYPOGRAPHY.body, "text-navy-600 font-medium")}>
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 4. Interactive product slider */}
+      <section className={cn(PATTERNS.section.standard, SPACING.container.default)}>
+        <div className="text-center mb-16">
+          <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-6 font-serif")}>
+            Featured Products
+          </h2>
+          <p className={cn(TYPOGRAPHY.body, "text-xl text-gray-600 max-w-3xl mx-auto mb-8")}>
+            Discover our curated collection of premium kitchen and bath fixtures, handpicked for their exceptional quality and timeless design.
           </p>
+          <div className="w-24 h-1 bg-gold-600 mx-auto" />
+        </div>
 
-          <LuxuryDivider variant="minimal" color="gold" width="center" withIcon />
+        <div className={PATTERNS.grid.products}>
+          {sampleProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="primary" color="gold" size="lg" onClick={handleScheduleConsultation}>
-              Get Started Today
-            </Button>
-            <Button variant="outline" color="gold" size="lg" className="border-white/30 text-white hover:bg-white/10">
-              Visit Our Showroom
-            </Button>
+        <div className="text-center mt-12">
+          <button className={cn(
+            "inline-flex items-center px-8 py-4 bg-gold-600 hover:bg-gold-700 text-white rounded-md font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5",
+            TYPOGRAPHY.button
+          )}>
+            View All Products
+            <ArrowRight className="ml-3 w-5 h-5" />
+          </button>
+        </div>
+      </section>
+
+      {/* 5. Design Services CTA block (RH split-panel style) */}
+      <section className={cn(PATTERNS.section.luxury, "relative overflow-hidden")}>
+        <div className={cn(SPACING.container.wide, "grid lg:grid-cols-2 gap-16 items-center")}>
+          {/* Left: Image */}
+          <div className="relative">
+            <div className="aspect-[4/3] bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gold-600 rounded-full flex items-center justify-center mb-4 mx-auto">
+                  <Home className="w-8 h-8 text-white" />
+                </div>
+                <p className="text-gray-500 font-medium">Luxury Kitchen Design</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Content */}
+          <div>
+            <div className="inline-flex items-center px-4 py-2 bg-gold-100 rounded-full mb-6">
+              <Award className="w-4 h-4 mr-2 text-gold-600" />
+              <span className={cn(TYPOGRAPHY.accent, "text-gold-600")}>
+                Full Service Design
+              </span>
+            </div>
+
+            <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-6 font-serif")}>
+              From Concept to Completion
+            </h2>
+
+            <p className={cn(TYPOGRAPHY.bodyLarge, "text-gray-600 mb-8 leading-relaxed")}>
+              Our expert design team guides you through every step of your transformation journey. 
+              From initial consultation to final installation, we ensure every detail exceeds your expectations.
+            </p>
+
+            <div className="space-y-4 mb-8">
+              {[
+                "3D Design Visualization",
+                "Premium Material Selection", 
+                "Professional Installation",
+                "1-Year Warranty"
+              ].map((feature, index) => (
+                <div key={index} className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span className={cn(TYPOGRAPHY.body, "text-navy-700")}>{feature}</span>
+                </div>
+              ))}
+            </div>
+
+            <button className={cn(
+              "inline-flex items-center px-8 py-4 bg-gold-600 hover:bg-gold-700 text-white rounded-md font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5",
+              TYPOGRAPHY.button
+            )}>
+              Start Your Project
+              <ArrowRight className="ml-3 w-5 h-5" />
+            </button>
           </div>
         </div>
       </section>
-    </main>
+
+      {/* 6. Testimonial section */}
+      <section className={cn(PATTERNS.section.standard, SPACING.container.default)}>
+        <div className="text-center mb-16">
+          <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-6 font-serif")}>
+            What Our Clients Say
+          </h2>
+          <div className="w-24 h-1 bg-gold-600 mx-auto" />
+        </div>
+
+        <div className={PATTERNS.grid.testimonials}>
+          <div className="bg-white rounded-xl shadow-lg p-8 border border-gold-100">
+            <div className="flex items-center mb-6">
+              <Quote className="w-8 h-8 text-gold-600 mr-3" />
+              <div className="flex">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-gold-400 text-gold-400" />
+                ))}
+              </div>
+            </div>
+            <blockquote className={cn(TYPOGRAPHY.quote, "text-lg text-navy-700 mb-6 leading-relaxed")}>
+              "North Bay Kitchen & Bath transformed our outdated kitchen into a stunning centerpiece. 
+              Their attention to detail and quality craftsmanship exceeded our expectations."
+            </blockquote>
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-gold-400 to-gold-600 rounded-full mr-4" />
+              <div>
+                <div className={cn(TYPOGRAPHY.body, "font-semibold text-navy-900")}>Sarah Johnson</div>
+                <div className={cn(TYPOGRAPHY.caption, "text-gray-600")}>Homeowner, Napa Valley</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-8 border border-gold-100">
+            <div className="flex items-center mb-6">
+              <Quote className="w-8 h-8 text-gold-600 mr-3" />
+              <div className="flex">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-gold-400 text-gold-400" />
+                ))}
+              </div>
+            </div>
+            <blockquote className={cn(TYPOGRAPHY.quote, "text-lg text-navy-700 mb-6 leading-relaxed")}>
+              "The team's expertise and professionalism made our renovation stress-free. 
+              The finished kitchen is both beautiful and functional."
+            </blockquote>
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-gold-400 to-gold-600 rounded-full mr-4" />
+              <div>
+                <div className={cn(TYPOGRAPHY.body, "font-semibold text-navy-900")}>Michael Roberts</div>
+                <div className={cn(TYPOGRAPHY.caption, "text-gray-600")}>Client, Sonoma</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Final CTA section */}
+      <section className={cn(PATTERNS.section.dark, SPACING.container.default, "text-center")}>
+        <div className="max-w-4xl mx-auto">
+          <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-white mb-6 font-serif")}>
+            Ready to Start Your Dream Project?
+          </h2>
+          <p className={cn(TYPOGRAPHY.bodyLarge, "text-gray-300 mb-8 leading-relaxed")}>
+            Schedule a free consultation with our design experts and discover how we can transform your space.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <button className={cn(
+              "px-8 py-4 bg-gold-600 hover:bg-gold-700 text-white rounded-md font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1",
+              TYPOGRAPHY.button
+            )}>
+              Schedule Free Consultation
+              <ArrowRight className="ml-3 w-5 h-5" />
+            </button>
+            <button className={cn(
+              "px-8 py-4 border-2 border-white/30 text-white hover:bg-white/10 rounded-md font-medium transition-all duration-300",
+              TYPOGRAPHY.button
+            )}>
+              (707) 555-0123
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 } 

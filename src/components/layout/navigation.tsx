@@ -1,20 +1,24 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Search } from "@/components/ui/search";
-import { cn, TYPOGRAPHY } from "@/lib/design-system";
+import { cn, TYPOGRAPHY, SPACING } from "@/lib/design-system";
+import { Search, Menu, X, Phone, MapPin } from "lucide-react";
 
-interface NavigationProps {
-  className?: string;
-}
+const navigationItems = [
+  { name: "Products", href: "/products" },
+  { name: "Design Services", href: "/design-services" },
+  { name: "Portfolio", href: "/portfolio" },
+  { name: "About", href: "/about" },
+  { name: "Contact", href: "/contact" },
+];
 
-export function Navigation({ className }: NavigationProps) {
-  const [isScrolled, setIsScrolled] = React.useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+export function Navigation() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  React.useEffect(() => {
+  // Handle scroll effect for sticky navigation
+  useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
@@ -23,41 +27,64 @@ export function Navigation({ className }: NavigationProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navigationItems = [
-    { name: "Products", href: "/products" },
-    { name: "Design Services", href: "/services" },
-    { name: "Portfolio", href: "/portfolio" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
-  ];
-
   return (
-    <nav className={cn(
-      "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-      isScrolled 
-        ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200/50" 
-        : "bg-transparent",
-      className
-    )}>
-      <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-[#d4af37] rounded flex items-center justify-center">
-              <span className="text-white font-bold text-sm">NB</span>
+    <>
+      {/* Top contact bar - hidden on mobile */}
+      <div className="hidden lg:block bg-navy-900 text-white py-2">
+        <div className={cn(SPACING.container.default, "flex justify-between items-center text-sm")}>
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center">
+              <Phone className="w-4 h-4 mr-2" />
+              <span>(707) 555-0123</span>
             </div>
-            <div className="hidden sm:block">
+            <div className="flex items-center">
+              <MapPin className="w-4 h-4 mr-2" />
+              <span>Napa Valley Showroom</span>
+            </div>
+          </div>
+          <div className="text-gold-400">
+            <span className={TYPOGRAPHY.accent}>Premium Design Services</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main navigation */}
+      <nav
+        className={cn(
+          "fixed top-0 w-full z-50 transition-all duration-300",
+          isScrolled
+            ? "bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100"
+            : "bg-transparent"
+        )}
+        style={{ marginTop: isScrolled ? "0" : "40px" }}
+      >
+        <div className={cn(SPACING.container.default, "flex items-center justify-between h-20")}>
+          {/* Logo */}
+          <Link 
+            href="/" 
+            className="flex items-center space-x-3 group transition-opacity duration-200 hover:opacity-80"
+          >
+            <div className="w-12 h-12 bg-gradient-to-br from-gold-600 to-gold-700 rounded-lg flex items-center justify-center">
+              <span className="text-white font-serif font-bold text-xl">NB</span>
+            </div>
+            <div className="hidden md:block">
               <div className={cn(
-                TYPOGRAPHY.subheading,
-                isScrolled ? "text-slate-900" : "text-white",
-                "text-lg"
+                TYPOGRAPHY.heading, 
+                "text-xl font-serif",
+                isScrolled ? "text-navy-900" : "text-white"
               )}>
-                North Bay Kitchen & Bath
+                North Bay
+              </div>
+              <div className={cn(
+                TYPOGRAPHY.caption,
+                "text-gold-600"
+              )}>
+                Kitchen & Bath
               </div>
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop navigation */}
           <div className="hidden lg:flex items-center space-x-8">
             {navigationItems.map((item) => (
               <Link
@@ -65,86 +92,113 @@ export function Navigation({ className }: NavigationProps) {
                 href={item.href}
                 className={cn(
                   TYPOGRAPHY.body,
-                  "transition-colors duration-300 hover:text-[#d4af37]",
-                  isScrolled ? "text-slate-700" : "text-white"
+                  "font-medium transition-colors duration-200 hover:text-gold-600 relative group",
+                  isScrolled ? "text-navy-700" : "text-white"
                 )}
               >
                 {item.name}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-600 transition-all duration-200 group-hover:w-full" />
               </Link>
             ))}
           </div>
 
-          {/* Desktop Search & CTA */}
-          <div className="hidden lg:flex items-center space-x-4">
-            <Search 
-              className="w-64" 
-              placeholder="Search..." 
-            />
-            <Button
-              variant={isScrolled ? "outline" : "elegant"}
-              color="gold"
-              size="sm"
-              className={!isScrolled ? "border-white/30 text-white hover:bg-white/10" : ""}
+          {/* Right side actions */}
+          <div className="flex items-center space-x-4">
+            {/* Search button */}
+            <button
+              className={cn(
+                "p-2 rounded-full transition-colors duration-200",
+                isScrolled 
+                  ? "text-navy-700 hover:bg-gold-50 hover:text-gold-600" 
+                  : "text-white hover:bg-white/10"
+              )}
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
+            {/* CTA button */}
+            <Link
+              href="/contact"
+              className={cn(
+                "hidden md:inline-flex px-6 py-3 bg-gold-600 hover:bg-gold-700 text-white rounded-md font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5",
+                TYPOGRAPHY.button
+              )}
             >
               Schedule Consultation
-            </Button>
-          </div>
+            </Link>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden p-2"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            <svg 
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={cn(
-                "w-6 h-6 transition-colors",
-                isScrolled ? "text-slate-900" : "text-white"
-              )} 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
+                "lg:hidden p-2 rounded-md transition-colors duration-200",
+                isScrolled 
+                  ? "text-navy-700 hover:bg-gold-50" 
+                  : "text-white hover:bg-white/10"
+              )}
             >
               {isMobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <X className="w-6 h-6" />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <Menu className="w-6 h-6" />
               )}
-            </svg>
-          </button>
+            </button>
+          </div>
         </div>
+      </nav>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200/50 bg-white/95 backdrop-blur-md">
-            <div className="py-6 space-y-4">
-              {navigationItems.map((item) => (
+      {/* Mobile menu overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className="fixed top-0 right-0 w-80 h-full bg-white shadow-xl">
+            <div className="p-6 pt-24">
+              {/* Mobile navigation links */}
+              <div className="space-y-6">
+                {navigationItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      TYPOGRAPHY.bodyLarge,
+                      "block text-navy-700 hover:text-gold-600 transition-colors duration-200 pb-2 border-b border-gray-100"
+                    )}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Mobile contact info */}
+              <div className="mt-8 pt-8 border-t border-gray-200 space-y-4">
+                <div className="flex items-center text-navy-700">
+                  <Phone className="w-5 h-5 mr-3 text-gold-600" />
+                  <span>(707) 555-0123</span>
+                </div>
+                <div className="flex items-center text-navy-700">
+                  <MapPin className="w-5 h-5 mr-3 text-gold-600" />
+                  <span>Napa Valley Showroom</span>
+                </div>
+              </div>
+
+              {/* Mobile CTA */}
+              <div className="mt-8">
                 <Link
-                  key={item.name}
-                  href={item.href}
+                  href="/contact"
                   className={cn(
-                    TYPOGRAPHY.body,
-                    "block px-4 py-2 text-slate-700 hover:text-[#d4af37] transition-colors"
+                    "block w-full text-center px-6 py-4 bg-gold-600 hover:bg-gold-700 text-white rounded-md font-medium transition-colors duration-300",
+                    TYPOGRAPHY.button
                   )}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  {item.name}
-                </Link>
-              ))}
-              <div className="px-4 pt-4">
-                <Button
-                  variant="primary"
-                  color="gold"
-                  className="w-full"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
                   Schedule Consultation
-                </Button>
+                </Link>
               </div>
             </div>
           </div>
-        )}
-      </div>
-    </nav>
+        </div>
+      )}
+    </>
   );
 } 

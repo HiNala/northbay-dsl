@@ -1,13 +1,10 @@
 import React from "react";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { cn, TYPOGRAPHY } from "@/lib/design-system";
+import { cn, TYPOGRAPHY, PATTERNS, SPACING } from "@/lib/design-system";
 
 interface HeroProps {
   title: string;
   subtitle?: string;
   description?: string;
-  backgroundImage?: string;
   primaryCTA?: {
     text: string;
     href?: string;
@@ -29,35 +26,40 @@ export function LuxuryHero({
   title,
   subtitle,
   description,
-  backgroundImage = "/images/luxury-kitchen-hero.jpg",
   primaryCTA,
   secondaryCTA,
   badge,
   className,
 }: HeroProps) {
   return (
-    <section className={cn("relative h-screen flex items-center justify-center overflow-hidden", className)}>
-      {/* Background Image */}
-      <div className="absolute inset-0">
-        <Image
-          src={backgroundImage}
-          alt="Luxury Kitchen & Bath Design"
-          fill
-          className="object-cover"
-          priority
-          quality={90}
+    <section className={cn(PATTERNS.hero.fullscreen, className)}>
+      {/* Luxury gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900" />
+      
+      {/* Subtle pattern overlay */}
+      <div className="absolute inset-0 opacity-10">
+        <div 
+          className="w-full h-full"
+          style={{
+            backgroundImage: `
+              radial-gradient(circle at 25% 25%, #B79A6B 2px, transparent 2px),
+              radial-gradient(circle at 75% 75%, #B79A6B 2px, transparent 2px)
+            `,
+            backgroundSize: '60px 60px'
+          }}
         />
-        {/* Overlay for text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/50" />
       </div>
+      
+      {/* Content overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black/20" />
 
-      {/* Content */}
-      <div className="relative z-10 text-center text-white max-w-6xl px-6">
-        {/* Badge */}
+      {/* Hero content */}
+      <div className={cn(PATTERNS.hero.content, SPACING.container.default)}>
+        {/* Premium badge */}
         {badge && (
-          <div className="mb-6">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
-              {badge.icon && <span className="mr-2">{badge.icon}</span>}
+          <div className="mb-8">
+            <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
+              {badge.icon && <span className="mr-3">{badge.icon}</span>}
               <span className={cn(TYPOGRAPHY.accent, "text-white text-xs")}>
                 {badge.text}
               </span>
@@ -65,14 +67,14 @@ export function LuxuryHero({
           </div>
         )}
 
-        {/* Main Heading */}
+        {/* Main heading with luxury typography */}
         <h1 className={cn(
-          TYPOGRAPHY.heading,
-          "text-5xl md:text-7xl lg:text-8xl mb-8 leading-tight"
+          TYPOGRAPHY.hero,
+          "text-5xl md:text-7xl lg:text-8xl mb-8 leading-tight font-serif"
         )}>
           {title}
           {subtitle && (
-            <span className="block bg-gradient-to-r from-[#d4af37] to-[#f7e9c3] bg-clip-text text-transparent">
+            <span className="block bg-gradient-to-r from-gold-400 to-gold-200 bg-clip-text text-transparent">
               {subtitle}
             </span>
           )}
@@ -81,49 +83,49 @@ export function LuxuryHero({
         {/* Description */}
         {description && (
           <p className={cn(
-            TYPOGRAPHY.body,
-            "text-xl md:text-2xl mb-12 text-gray-200 max-w-3xl mx-auto"
+            TYPOGRAPHY.bodyLarge,
+            "text-xl md:text-2xl mb-12 text-gray-200 max-w-4xl mx-auto leading-relaxed"
           )}>
             {description}
           </p>
         )}
 
-        {/* Call-to-Action Buttons */}
+        {/* CTA buttons */}
         {(primaryCTA || secondaryCTA) && (
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
             {primaryCTA && (
-              <Button
-                size="lg"
-                variant="primary"
-                color="gold"
-                className="px-8 py-4 text-lg"
+              <button
+                className={cn(
+                  "px-8 py-4 bg-gold-600 hover:bg-gold-700 text-white rounded-md font-medium text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1",
+                  TYPOGRAPHY.button
+                )}
                 onClick={primaryCTA.onClick}
               >
                 {primaryCTA.text}
-                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg className="ml-3 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
-              </Button>
+              </button>
             )}
             {secondaryCTA && (
-              <Button
-                size="lg"
-                variant="outline"
-                color="gold"
-                className="border-white/30 text-white hover:bg-white/10 px-8 py-4 text-lg"
+              <button
+                className={cn(
+                  "px-8 py-4 border-2 border-white/30 text-white hover:bg-white/10 rounded-md font-medium text-lg transition-all duration-300",
+                  TYPOGRAPHY.button
+                )}
                 onClick={secondaryCTA.onClick}
               >
                 {secondaryCTA.text}
-              </Button>
+              </button>
             )}
           </div>
         )}
       </div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-        <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-white/60 rounded-full mt-2 animate-bounce" />
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <div className="w-8 h-12 border-2 border-white/30 rounded-full flex justify-center p-2">
+          <div className="w-1 h-3 bg-white/60 rounded-full animate-pulse" />
         </div>
       </div>
     </section>

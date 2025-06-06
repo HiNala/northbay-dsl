@@ -1,8 +1,4 @@
 import React from "react";
-import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { cn, TYPOGRAPHY } from "@/lib/design-system";
 
 interface ProductCardProps {
   product: {
@@ -27,18 +23,7 @@ export function ProductCard({
   onViewDetails,
   className,
 }: ProductCardProps) {
-  const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
   const [isHovered, setIsHovered] = React.useState(false);
-
-  const handleImageHover = () => {
-    if (product.images.length > 1) {
-      setCurrentImageIndex(1);
-    }
-  };
-
-  const handleImageLeave = () => {
-    setCurrentImageIndex(0);
-  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -49,30 +34,32 @@ export function ProductCard({
   };
 
   return (
-    <Card 
-      variant="elevated" 
-      className={cn("group overflow-hidden hover:shadow-2xl transition-all duration-500", className)}
+    <div 
+      className={`bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 ${className || ''}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Product Image */}
-      <div className="relative overflow-hidden aspect-[4/5]">
-        <Image
-          src={product.images[currentImageIndex] || "/placeholder-product.jpg"}
-          alt={product.name}
-          fill
-          className="object-cover group-hover:scale-110 transition-transform duration-700"
-          onMouseEnter={handleImageHover}
-          onMouseLeave={handleImageLeave}
-        />
+      {/* Product Image Placeholder */}
+      <div className="relative overflow-hidden aspect-[4/5] bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200">
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gold-500 rounded-full flex items-center justify-center mb-4 mx-auto">
+              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M21 16V4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM5 4h14v8.36l-2.59-2.59a1 1 0 0 0-1.41 0L12 12.77l-2.59-2.59a1 1 0 0 0-1.41 0L5 13.18V4zM5 16v-1.82l4-4 2.59 2.59a1 1 0 0 0 1.41 0L16 9.77l3 3V16H5z"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+              </svg>
+            </div>
+            <p className="text-slate-500 text-sm font-medium">{product.category}</p>
+          </div>
+        </div>
         
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`} />
         
         {/* Badge */}
         {product.comparePrice && product.price && product.comparePrice > product.price && (
           <div className="absolute top-4 right-4">
-            <div className="bg-[#d4af37] text-white px-2 py-1 text-xs font-medium rounded">
+            <div className="bg-gold-500 text-white px-2 py-1 text-xs font-medium rounded">
               Sale
             </div>
           </div>
@@ -88,39 +75,32 @@ export function ProductCard({
         )}
 
         {/* Hover Actions */}
-        <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
+        <div className={`absolute bottom-4 left-4 right-4 transition-all duration-300 ${isHovered ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
           <div className="flex gap-2">
-            <Button
-              variant="primary"
-              color="gold"
-              className="flex-1"
+            <button
+              className="flex-1 px-4 py-2 bg-gold-500 text-white rounded-lg font-semibold hover:bg-gold-600 transition-colors"
               onClick={() => onViewDetails?.(product.id)}
             >
-              View Details
-              <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Button>
-            <Button
-              variant="outline"
-              color="gold"
-              className="bg-white/90 backdrop-blur-sm"
+              View Details →
+            </button>
+            <button
+              className="px-4 py-2 bg-white/90 text-gray-700 rounded-lg hover:bg-white transition-colors"
               onClick={() => onAddToWishlist?.(product.id)}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
-            </Button>
+            </button>
           </div>
         </div>
       </div>
 
       {/* Product Details */}
-      <CardContent className="p-6">
+      <div className="p-6">
         {/* Category & Brand */}
         <div className="flex items-center justify-between mb-3">
           {product.category && (
-            <span className={cn(TYPOGRAPHY.accent, "text-[#d4af37]")}>
+            <span className="text-gold-500 text-sm font-medium">
               {product.category}
             </span>
           )}
@@ -132,16 +112,13 @@ export function ProductCard({
         </div>
 
         {/* Product Name */}
-        <h3 className={cn(
-          TYPOGRAPHY.subheading,
-          "text-xl text-slate-900 mb-2 group-hover:text-[#d4af37] transition-colors line-clamp-2"
-        )}>
+        <h3 className="text-xl font-bold text-slate-900 mb-2 hover:text-gold-500 transition-colors line-clamp-2">
           {product.name}
         </h3>
 
         {/* Description */}
         {product.description && (
-          <p className={cn(TYPOGRAPHY.body, "text-slate-600 text-sm mb-4 line-clamp-2")}>
+          <p className="text-slate-600 text-sm mb-4 line-clamp-2">
             {product.description}
           </p>
         )}
@@ -176,7 +153,7 @@ export function ProductCard({
             )}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 } 
