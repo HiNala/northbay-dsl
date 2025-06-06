@@ -2,7 +2,6 @@
 
 import React from "react";
 import { LuxuryDivider } from "@/components/luxury/divider";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TYPOGRAPHY } from "@/lib/design-system";
 

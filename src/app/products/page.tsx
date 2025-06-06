@@ -106,7 +106,7 @@ export default function ProductsPage() {
   const [selectedBrand, setSelectedBrand] = React.useState("All Brands");
   const [selectedPriceRange, setSelectedPriceRange] = React.useState("All Prices");
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
+  // const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
 
   // Filter products based on selected filters
   React.useEffect(() => {

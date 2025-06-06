@@ -3,11 +3,9 @@
 import React from "react";
 import { LuxuryDivider } from "@/components/luxury/divider";
 import { Button } from "@/components/ui/button";
-import { useLeadCapture } from "@/lib/lead-capture";
 import { TYPOGRAPHY } from "@/lib/design-system";
 
 export default function DesignServicesPage() {
-  const { captureLead } = useLeadCapture();
 
   return (
     <main className="min-h-screen pt-20">

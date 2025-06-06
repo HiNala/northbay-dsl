@@ -132,7 +132,7 @@ export class LeadCaptureService {
       try {
         const stored = localStorage.getItem('nb-leads');
         if (stored) {
-          this.leads = JSON.parse(stored).map((lead: any) => ({
+          this.leads = JSON.parse(stored).map((lead: LeadData & { timestamp: string }) => ({
             ...lead,
             timestamp: new Date(lead.timestamp)
           }));
