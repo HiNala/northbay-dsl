@@ -34,11 +34,12 @@
 
 @layer base {
   * {
-    @apply border-slate-200;
+    border-color: rgb(226 232 240);
   }
   
   body {
-    @apply bg-white text-slate-900;
+    background-color: white;
+    color: rgb(15 23 42);
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   
@@ -51,27 +52,6 @@
     font-family: var(--font-inter), sans-serif;
   }
 
-  /* Luxury typography classes */
-  .text-luxury-heading {
-    @apply font-playfair font-light tracking-tight;
-  }
-  
-  .text-luxury-subheading {
-    @apply font-inter font-medium tracking-wide;
-  }
-  
-  .text-luxury-body {
-    @apply font-inter font-normal leading-relaxed;
-  }
-  
-  .text-luxury-caption {
-    @apply font-inter font-light text-sm tracking-wide;
-  }
-  
-  .text-luxury-accent {
-    @apply font-inter font-medium uppercase tracking-widest text-xs;
-  }
-
   /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
@@ -79,7 +59,8 @@
 
   /* Image optimization */
   img {
-    @apply max-w-full h-auto;
+    max-width: 100%;
+    height: auto;
   }
 
   /* Focus styles for accessibility */
@@ -88,24 +69,46 @@
   input:focus-visible,
   textarea:focus-visible,
   select:focus-visible {
-    @apply outline-none ring-2 ring-[var(--gold-medium)] ring-offset-2;
+    outline: none;
+    box-shadow: 0 0 0 2px var(--gold-medium), 0 0 0 4px rgba(212, 175, 55, 0.1);
   }
 }
 
 @layer components {
   /* Luxury container */
   .container-luxury {
-    @apply max-w-7xl mx-auto px-6 lg:px-8;
+    max-width: 80rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  
+  @media (min-width: 1024px) {
+    .container-luxury {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
   }
   
   /* Luxury section spacing */
   .section-luxury {
-    @apply py-24 lg:py-32;
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+  
+  @media (min-width: 1024px) {
+    .section-luxury {
+      padding-top: 8rem;
+      padding-bottom: 8rem;
+    }
   }
   
   /* Glass effect for overlays */
   .glass {
-    @apply bg-white/10 backdrop-blur-md border border-white/20;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
   
   /* Luxury gradient backgrounds */
@@ -197,6 +200,7 @@
 /* Print styles */
 @media print {
   * {
-    @apply text-black bg-white;
+    color: black !important;
+    background-color: white !important;
   }
 }
