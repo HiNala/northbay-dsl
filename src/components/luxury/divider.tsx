@@ -20,9 +20,9 @@ export function LuxuryDivider({
 }: DividerProps) {
   // Map color names to actual color values
   const colorMap = {
-    gold: COLORS.gold.medium,
-    navy: COLORS.navy.medium,
-    walnut: COLORS.walnut.medium,
+    gold: COLORS.gold[500],
+    navy: COLORS.navy[500],
+    walnut: "#8B4513", // Rich walnut brown color
   };
 
   const selectedColor = colorMap[color];
