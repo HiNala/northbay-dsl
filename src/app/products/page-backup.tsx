@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -7,7 +8,7 @@ import { Search, Filter, Phone, Mail, MessageSquare, Star, ArrowRight, CheckCirc
 export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Enhanced Header */}
+      {/* Header */}
       <div className="bg-white border-b shadow-sm">
         <div className="container mx-auto px-6 py-12">
           <nav aria-label="Breadcrumb" className="mb-8">
@@ -74,16 +75,16 @@ export default function ProductsPage() {
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { name: 'Kitchen', description: 'Premium fixtures & appliances', emoji: '🍳' },
-              { name: 'Bathroom', description: 'Luxury vanities & accessories', emoji: '🛁' },
-              { name: 'Hardware', description: 'Designer knobs & handles', emoji: '🔧' }
+              { name: 'Kitchen', image: 'kitchen', description: 'Premium fixtures & appliances' },
+              { name: 'Bathroom', image: 'bathroom', description: 'Luxury vanities & accessories' },
+              { name: 'Hardware', image: 'hardware', description: 'Designer knobs & handles' }
             ].map((category) => (
               <Card key={category.name} className="group hover:shadow-xl transition-all duration-500 border-0 shadow-lg overflow-hidden">
-                <div className="relative h-64 bg-gradient-to-br from-amber-50 to-amber-100 flex flex-col items-center justify-center">
-                  <div className="text-6xl mb-4">{category.emoji}</div>
-                  <div className="text-center">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{category.name}</h3>
-                    <p className="text-gray-600">{category.description}</p>
+                <div className="relative h-64 bg-gradient-to-br from-gray-100 to-gray-200">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute bottom-6 left-6 text-white">
+                    <h3 className="text-2xl font-bold mb-2">{category.name}</h3>
+                    <p className="text-gray-200">{category.description}</p>
                   </div>
                 </div>
               </Card>
@@ -114,8 +115,7 @@ export default function ProductsPage() {
                 rating: 5,
                 inStock: true,
                 badge: "Sale",
-                emoji: "🏺",
-                features: ["Handcrafted Italian Carrara marble", "Integrated breakfast bar"]
+                features: ["Handcrafted Italian Carrara marble", "Integrated breakfast bar", "Premium brass fixtures"]
               },
               {
                 id: 2,
@@ -125,8 +125,7 @@ export default function ProductsPage() {
                 price: 8900,
                 rating: 5,
                 inStock: true,
-                emoji: "🔥",
-                features: ["48-inch professional dual-fuel", "Convection ovens"]
+                features: ["48-inch professional dual-fuel", "Convection ovens", "Precision temperature control"]
               },
               {
                 id: 3,
@@ -136,8 +135,7 @@ export default function ProductsPage() {
                 price: 12500,
                 rating: 5,
                 inStock: true,
-                emoji: "🚪",
-                features: ["Handcrafted American walnut", "Soft-close hardware"]
+                features: ["Handcrafted American walnut", "Soft-close hardware", "Premium finishes"]
               },
               {
                 id: 4,
@@ -149,8 +147,7 @@ export default function ProductsPage() {
                 rating: 5,
                 inStock: true,
                 badge: "New",
-                emoji: "💎",
-                features: ["Hand-forged iron construction", "Crystal accents"]
+                features: ["Hand-forged iron construction", "Crystal accents", "Dimmable LED compatibility"]
               },
               {
                 id: 5,
@@ -160,8 +157,7 @@ export default function ProductsPage() {
                 price: 5799,
                 rating: 5,
                 inStock: true,
-                emoji: "🛁",
-                features: ["Marble countertop", "Soft-close drawers"]
+                features: ["Marble countertop", "Soft-close drawers", "Under-mount lighting"]
               },
               {
                 id: 6,
@@ -171,20 +167,21 @@ export default function ProductsPage() {
                 price: 189,
                 rating: 5,
                 inStock: true,
-                emoji: "🎨",
-                features: ["Handmade ceramic", "Unique glazing"]
+                features: ["Handmade ceramic", "Unique glazing", "Multiple finish options"]
               }
             ].map((product) => (
               <Card key={product.id} className="group hover:shadow-2xl transition-all duration-500 border-0 shadow-lg overflow-hidden">
                 <div className="relative">
-                  <div className="h-80 bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center relative overflow-hidden">
-                    <div className="text-8xl transform group-hover:scale-110 transition-transform duration-500">
-                      {product.emoji}
+                  {/* Product Image Placeholder */}
+                  <div className="h-80 bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 flex items-center justify-center relative overflow-hidden">
+                    <div className="text-6xl text-gray-300 transform group-hover:scale-110 transition-transform duration-500">
+                      🏺
                     </div>
                     
+                    {/* Badges */}
                     <div className="absolute top-4 left-4 flex gap-2">
                       {product.badge && (
-                        <Badge className={product.badge === 'Sale' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'}>
+                        <Badge className={product.badge === 'Sale' ? 'bg-red-500' : 'bg-green-500'}>
                           {product.badge}
                         </Badge>
                       )}
@@ -195,6 +192,7 @@ export default function ProductsPage() {
                       )}
                     </div>
                     
+                    {/* Brand Badge */}
                     <div className="absolute top-4 right-4">
                       <Badge variant="outline" className="bg-white/90 backdrop-blur-sm">
                         {product.brand}
@@ -203,14 +201,14 @@ export default function ProductsPage() {
                   </div>
                 </div>
                 
-                <CardContent className="p-6">
-                  <div className="mb-2">
+                <CardContent className="p-8">
+                  <div className="mb-3">
                     <p className="text-sm text-amber-600 uppercase tracking-wide font-medium">
                       {product.category}
                     </p>
                   </div>
                   
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-amber-600 transition-colors">
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-amber-600 transition-colors">
                     {product.name}
                   </h3>
                   
@@ -226,7 +224,7 @@ export default function ProductsPage() {
                   
                   {/* Features */}
                   <ul className="space-y-2 mb-6">
-                    {product.features.map((feature, index) => (
+                    {product.features.slice(0, 2).map((feature, index) => (
                       <li key={index} className="flex items-center text-sm text-gray-600">
                         <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
                         {feature}
