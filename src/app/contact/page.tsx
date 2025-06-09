@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Navigation } from "@/components/layout/navigation";
 import { cn, SPACING, TYPOGRAPHY, PATTERNS } from "@/lib/design-system";
+import { SectionSeparator } from "@/components/ui/section-separator";
 import { 
   MapPin, 
   Phone, 
@@ -170,18 +171,6 @@ export default function ContactPage() {
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 bg-gradient-to-b from-navy-900 to-navy-800 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div 
-            className="w-full h-full"
-            style={{
-              backgroundImage: `
-                radial-gradient(circle at 25% 25%, #B79A6B 2px, transparent 2px),
-                radial-gradient(circle at 75% 75%, #B79A6B 2px, transparent 2px)
-              `,
-              backgroundSize: '60px 60px'
-            }}
-          />
-        </div>
 
         <div className={cn(SPACING.container.default, "relative z-10")}>
           <div className="text-center max-w-4xl mx-auto">
@@ -203,15 +192,18 @@ export default function ContactPage() {
         </div>
       </section>
 
+      <SectionSeparator variant="default" />
+
       {/* Contact Methods */}
-      <section className={cn(PATTERNS.section.standard, SPACING.container.default)}>
-        <div className="text-center mb-16">
-          <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-6 font-serif")}>
+      <section className={cn(PATTERNS.section.spacious, SPACING.container.default)}>
+        <div className="text-center mb-20">
+          <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-8 font-serif")}>
             How Can We Help?
           </h2>
-          <p className={cn(TYPOGRAPHY.body, "text-xl text-gray-600 max-w-3xl mx-auto")}>
+          <p className={cn(TYPOGRAPHY.bodyLarge, "text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed")}>
             Choose the method that works best for you. We're here to answer questions and discuss your project needs.
           </p>
+          <div className="w-24 h-1 bg-gold-600 mx-auto" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -252,9 +244,11 @@ export default function ContactPage() {
         </div>
       </section>
 
+      <SectionSeparator variant="dots" />
+
       {/* Contact Form & Info */}
-      <section className={cn(PATTERNS.section.alternate, SPACING.container.default)}>
-        <div className="grid lg:grid-cols-2 gap-16">
+      <section className={cn(PATTERNS.section.luxury, SPACING.container.default)}>
+        <div className="grid lg:grid-cols-2 gap-20">
           {/* Contact Form */}
           <div>
             <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-6 font-serif")}>

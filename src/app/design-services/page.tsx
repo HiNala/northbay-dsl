@@ -3,636 +3,405 @@
 import { useState } from "react";
 import { Navigation } from "@/components/layout/navigation";
 import { cn, SPACING, TYPOGRAPHY, PATTERNS } from "@/lib/design-system";
+import { SectionSeparator } from "@/components/ui/section-separator";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { 
-  Users, 
-  Palette, 
-  Home, 
-  CheckCircle, 
+  Award, 
   ArrowRight, 
-  Star,
-  Award,
-  Calendar,
-  DollarSign,
-  MapPin,
-  Clock
+  CheckCircle, 
+  Star, 
+  Home, 
+  Palette, 
+  Users, 
+  Shield, 
+  Compass, 
+  Target, 
+  Crown, 
+  Gem, 
+  Calendar, 
+  Phone, 
+  Mail,
+  ChevronRight
 } from "lucide-react";
 
-const processSteps = [
+// Service Tiers - RH Inspired
+const serviceTiers = [
   {
-    number: "01",
-    title: "Initial Consultation",
-    description: "We discuss your vision, needs, and budget to create a personalized design plan.",
-    details: [
-      "In-home or virtual consultation",
-      "Style preference assessment", 
-      "Budget and timeline discussion",
-      "Space measurement and analysis"
-    ],
-    icon: Users,
-    timeline: "1-2 hours"
-  },
-  {
-    number: "02", 
-    title: "Design Development",
-    description: "Our team creates detailed 3D renderings and material selections for your approval.",
-    details: [
-      "3D visualization and renderings",
-      "Material and finish selection",
-      "Detailed project specifications",
-      "Initial design presentation"
-    ],
-    icon: Palette,
-    timeline: "1-2 weeks"
-  },
-  {
-    number: "03",
-    title: "Project Curation",
-    description: "We source premium materials and coordinate with trusted craftspeople.",
-    details: [
-      "Product sourcing and ordering",
-      "Contractor coordination",
-      "Project timeline finalization",
-      "Permit assistance if needed"
-    ],
-    icon: Award,
-    timeline: "2-4 weeks"
-  },
-  {
-    number: "04",
-    title: "Installation & Completion", 
-    description: "Professional installation with quality craftsmanship and attention to detail.",
-    details: [
-      "Professional installation oversight",
-      "Quality control inspections",
-      "Final walkthrough and approval",
-      "1-year warranty activation"
+    name: "FOUNDATIONAL",
+    subtitle: "EXPEDITED AND ELEVATED DESIGN FOR ONE-ROOM PROJECTS",
+    price: "Starting at $3,500",
+    description: "Perfect for single-room transformations with professional guidance and curated selections.",
+    features: [
+      "Assistance with selecting North Bay and premium brand products, materials, colors and finishes",
+      "Includes design concepts, AutoCAD floor plans and material swatches",
+      "Support from our Design Consultants, virtually or at our Napa location", 
+      "Design turnaround in 1-3 days",
+      "All interior design services complimentary for North Bay Members"
     ],
     icon: Home,
-    timeline: "2-8 weeks"
-  },
-];
-
-const servicePackages = [
-  {
-    name: "Design Consultation",
-    price: "Starting at $500",
-    description: "Perfect for homeowners who want professional guidance on their project direction.",
-    features: [
-      "2-hour in-home consultation",
-      "Style assessment and recommendations", 
-      "Project scope and budget guidance",
-      "Resource list and next steps"
-    ],
-    popular: false
+    popular: false,
+    level: "OPTION 1"
   },
   {
-    name: "Complete Design Service",
-    price: "Starting at $5,000",
-    description: "Full-service design from concept to completion with 3D visualization.",
+    name: "COMPREHENSIVE", 
+    subtitle: "HOLISTIC DESIGN FOR TWO ROOMS TO AN ENTIRE HOME",
+    price: "Starting at $8,500",
+    description: "Complete design service for multiple rooms with detailed planning and coordination.",
     features: [
-      "Everything in Design Consultation",
-      "3D renderings and floor plans",
-      "Detailed specifications and materials list",
-      "Project coordination and oversight",
-      "1-year warranty on workmanship"
+      "Assistance with selecting products, materials, colors and finishes, including premium fixtures and fittings",
+      "Includes design concepts, floor plans, site measurement, swatches, detailed AutoCAD schematic designs, elevations and comprehensive design presentations",
+      "Project coordination",
+      "Support from our Designers, in-home, virtually or at our Napa location",
+      "All interior design services complimentary for North Bay Members"
     ],
-    popular: true
+    icon: Palette,
+    popular: true,
+    level: "OPTION 2"
   },
   {
-    name: "Luxury Concierge Service",
-    price: "Starting at $15,000", 
-    description: "White-glove service for discerning clients who want a seamless experience.",
+    name: "BESPOKE",
+    subtitle: "FULL-SERVICE DESIGN FOR WHOLE-HOME TRANSFORMATIONS", 
+    price: "Starting at $25,000",
+    description: "White-glove luxury service for discerning clients seeking complete home transformation.",
     features: [
-      "Everything in Complete Design Service",
-      "Dedicated project manager",
-      "Premium material sourcing",
-      "Express timeline (when possible)",
-      "Post-project maintenance service"
+      "Entire home projects, from concept to completion, with a minimum investment of $300K in North Bay furnishings",
+      "Assistance with selecting products, materials, colors and finishes",
+      "Includes entire suite of support: design concepts, floor plans, site measurement, swatches, detailed AutoCAD schematic designs, elevations, 3D renderings and comprehensive design presentations",
+      "Includes specialized interior architecture and finish selections, fine-art curation and premium custom kitchen and bathroom design, décor and styling via our exclusive partnerships",
+      "Project coordination, installation and styling support",
+      "Support from our most tenured Designers, in-home, virtually or at our Napa location",
+      "All interior design services complimentary for North Bay Members"
     ],
-    popular: false
+    icon: Crown,
+    popular: false,
+    level: "OPTION 3"
   }
 ];
 
-interface FormData {
-  projectType: string;
-  stylePreference: string;
-  budget: string;
-  timeline: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  projectDescription: string;
-}
+// North Bay Membership Benefits (RH-inspired)
+const membershipBenefits = [
+  {
+    title: "NORTH BAY MEMBERS PROGRAM",
+    subtitle: "SAVE 30% ON EVERYTHING NORTH BAY*",
+    additionalSave: "SAVE 35% ON OUTDOOR FOR A LIMITED TIME",
+    annualFee: "FOR $200 ANNUALLY, MEMBER BENEFITS INCLUDE:",
+    benefits: [
+      "30% SAVINGS ON ALL FULL-PRICED ITEMS", 
+      "ADDITIONAL 20% SAVINGS ON ALL SALE ITEMS",
+      "COMPLIMENTARY SERVICES WITH NORTH BAY INTERIOR DESIGN",
+      "SPECIAL FINANCING AVAILABLE WITH THE NORTH BAY CREDIT CARD*"
+    ],
+    ctaText: "JOIN NOW"
+  }
+];
+
+// Design Experience Process
+const designProcess = [
+  {
+    phase: "IDEATION",
+    title: "Discovery & Vision",
+    description: "We begin by understanding your lifestyle, preferences, and vision for your space.",
+    image: "/images/process/ideation.jpg"
+  },
+  {
+    phase: "DEVELOPMENT", 
+    title: "Design & Planning",
+    description: "Our team creates detailed plans, 3D renderings, and curated material selections.",
+    image: "/images/process/development.jpg"
+  },
+  {
+    phase: "CURATION",
+    title: "Sourcing & Coordination", 
+    description: "We source premium materials and coordinate with our network of skilled artisans.",
+    image: "/images/process/curation.jpg"
+  },
+  {
+    phase: "INSTALLATION",
+    title: "Completion & Styling",
+    description: "Professional installation with meticulous attention to detail and final styling.",
+    image: "/images/process/installation.jpg"
+  }
+];
 
 export default function DesignServicesPage() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [expandedStep, setExpandedStep] = useState<number | null>(null);
-  const [formData, setFormData] = useState<FormData>({
-    projectType: "",
-    stylePreference: "",
-    budget: "",
-    timeline: "",
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    address: "",
-    projectDescription: ""
-  });
-
-  const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const nextStep = () => {
-    if (currentStep < 4) setCurrentStep(currentStep + 1);
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) setCurrentStep(currentStep - 1);
-  };
+  const [selectedTier, setSelectedTier] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen bg-background-light">
       <Navigation />
 
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 bg-gradient-to-b from-navy-900 to-navy-800 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div 
-            className="w-full h-full"
-            style={{
-              backgroundImage: `
-                radial-gradient(circle at 25% 25%, #B79A6B 2px, transparent 2px),
-                radial-gradient(circle at 75% 75%, #B79A6B 2px, transparent 2px)
-              `,
-              backgroundSize: '60px 60px'
-            }}
-          />
+      {/* Hero Section - RH Inspired */}
+      <section className="relative min-h-[80vh] bg-gradient-to-b from-amber-900 via-amber-800 to-amber-900 text-white overflow-hidden">
+        {/* Background texture */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0 bg-[url('/textures/wood-grain.jpg')] bg-cover bg-center"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         </div>
+        
+        <div className="relative z-10 flex items-center justify-center min-h-[80vh]">
+          <div className={cn(SPACING.container.default, "text-center")}>
+            <div className="max-w-5xl mx-auto">
+              <div className="inline-flex items-center px-6 py-3 rounded-sm bg-white/10 backdrop-blur-sm border border-white/20 mb-12">
+                <Award className="w-4 h-4 mr-3" />
+                <span className={cn(TYPOGRAPHY.accent, "text-white tracking-wider")}>
+                  LUXURY DESIGN SERVICES
+                </span>
+              </div>
 
-        <div className={cn(SPACING.container.default, "relative z-10")}>
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8">
-              <Award className="w-4 h-4 mr-3" />
-              <span className={cn(TYPOGRAPHY.accent, "text-white text-xs")}>
-                Award-Winning Design Team
-              </span>
+              <h1 className="font-light text-6xl md:text-8xl tracking-wide text-white mb-8 leading-[0.9]">
+                OUR DESIGN SERVICES
+              </h1>
+              
+              <p className="text-xl md:text-2xl text-white/90 leading-relaxed max-w-4xl mx-auto mb-16">
+                We offer three levels of service that are tailored to your needs and 
+                the scope, timeline and budget of your project. This structure is 
+                flexible and allows us to scale to any project size – big or small, 
+                indoors or outdoors – working at the pace you require, anywhere 
+                in the world. All interior design services are complimentary for North Bay 
+                Members.
+              </p>
+
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="border-2 border-white text-white hover:bg-white hover:text-amber-900 px-12 py-4 text-lg tracking-wider"
+              >
+                REQUEST A DESIGN CONSULTATION
+              </Button>
             </div>
-
-            <h1 className={cn(TYPOGRAPHY.heading, "text-5xl md:text-6xl mb-6 font-serif")}>
-              From Concept to Completion
-            </h1>
-            <p className={cn(TYPOGRAPHY.bodyLarge, "text-gray-200 leading-relaxed max-w-3xl mx-auto")}>
-              Our expert design team guides you through every step of your transformation journey. 
-              From initial consultation to final installation, we ensure every detail exceeds your expectations.
-            </p>
           </div>
         </div>
       </section>
 
-      {/* Process Steps */}
-      <section className={cn(PATTERNS.section.standard, SPACING.container.default)}>
-        <div className="text-center mb-16">
-          <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-6 font-serif")}>
-            Our Design Process
-          </h2>
-          <p className={cn(TYPOGRAPHY.body, "text-xl text-gray-600 max-w-3xl mx-auto mb-8")}>
-            A proven methodology that transforms your vision into reality with precision and care.
-          </p>
-          <div className="w-24 h-1 bg-gold-600 mx-auto" />
-        </div>
+      <SectionSeparator variant="default" />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {processSteps.map((step, index) => (
-            <div key={index} className="relative group">
-              <div 
-                className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-gold-100"
-                onClick={() => setExpandedStep(expandedStep === index ? null : index)}
-              >
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gold-600 rounded-full mb-6">
-                    <step.icon className="w-8 h-8 text-white" />
+      {/* Service Tiers Section */}
+      <section className={cn(PATTERNS.section.luxury, SPACING.container.default)}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+          {serviceTiers.map((tier, index) => (
+            <div 
+              key={index}
+              className={cn(
+                "relative bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-500 overflow-hidden",
+                tier.popular ? "ring-2 ring-gold-600 transform scale-105" : ""
+              )}
+            >
+              {tier.popular && (
+                <div className="absolute top-0 left-0 right-0 bg-gold-600 text-white text-center py-2 text-sm font-medium tracking-wide">
+                  MOST POPULAR
+                </div>
+              )}
+              
+              <div className={cn("p-10", tier.popular ? "pt-16" : "pt-10")}>
+                {/* Tier Level */}
+                <div className="text-center mb-8">
+                  <div className="text-sm font-medium text-gray-500 tracking-widest mb-2">
+                    {tier.level}
                   </div>
-                  <div className="text-5xl font-bold text-gold-600/20 mb-4 font-serif">{step.number}</div>
-                  <h3 className={cn(TYPOGRAPHY.subheading, "text-xl text-navy-900 mb-4 font-serif")}>
-                    {step.title}
-                  </h3>
-                  <p className={cn(TYPOGRAPHY.body, "text-gray-600 mb-4")}>
-                    {step.description}
-                  </p>
-                  <div className="flex items-center justify-center text-gold-600 mb-4">
-                    <Clock className="w-4 h-4 mr-2" />
-                    <span className={cn(TYPOGRAPHY.caption, "font-medium")}>{step.timeline}</span>
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-b from-gold-400 to-gold-600 rounded-full mb-6">
+                    <tier.icon className="w-8 h-8 text-white" />
                   </div>
                 </div>
 
-                {/* Expanded Details */}
-                {expandedStep === index && (
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <ul className="space-y-2">
-                      {step.details.map((detail, detailIndex) => (
-                        <li key={detailIndex} className="flex items-start">
-                          <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                          <span className={cn(TYPOGRAPHY.caption, "text-gray-600")}>{detail}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
+                {/* Tier Name & Subtitle */}
+                <div className="text-center mb-8">
+                  <h3 className="text-3xl font-light tracking-wide text-navy-900 mb-4">
+                    {tier.name}
+                  </h3>
+                  <p className="text-sm font-medium text-gray-600 tracking-wide leading-relaxed mb-6">
+                    {tier.subtitle}
+                  </p>
+                  <p className="text-gray-600 leading-relaxed mb-6">
+                    {tier.description}
+                  </p>
+                </div>
 
-              {/* Connection Line */}
-              {index < processSteps.length - 1 && (
-                <div className="hidden lg:block absolute top-16 left-full w-full h-0.5 bg-gold-600/30 transform -translate-y-1/2 z-0" />
-              )}
+                {/* Features List */}
+                <div className="space-y-4 mb-8">
+                  {tier.features.map((feature, featureIndex) => (
+                    <div key={featureIndex} className="flex items-start">
+                      <div className="w-2 h-2 bg-gold-600 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                      <p className="text-gray-700 text-sm leading-relaxed">{feature}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* CTA Button */}
+                <div className="text-center">
+                  <Button 
+                    className={cn(
+                      "w-full py-4 text-sm tracking-wider font-medium transition-all duration-300",
+                      tier.popular 
+                        ? "bg-gold-600 hover:bg-gold-700 text-white"
+                        : "border-2 border-gold-600 text-gold-600 hover:bg-gold-50"
+                    )}
+                    onClick={() => setSelectedTier(tier.name)}
+                  >
+                    REQUEST A DESIGN CONSULTATION
+                  </Button>
+                </div>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Service Packages */}
-      <section className={cn(PATTERNS.section.alternate, SPACING.container.default)}>
-        <div className="text-center mb-16">
-          <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-6 font-serif")}>
-            Service Packages
-          </h2>
-          <p className={cn(TYPOGRAPHY.body, "text-xl text-gray-600 max-w-3xl mx-auto")}>
-            Choose the level of service that best fits your project needs and budget.
-          </p>
+      <SectionSeparator variant="dots" />
+
+      {/* Membership Program Section */}
+      <section className="relative py-32 bg-gradient-to-b from-amber-900 to-amber-800 text-white overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[url('/textures/luxury-pattern.jpg')] bg-repeat"></div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {servicePackages.map((pkg, index) => (
-            <div 
-              key={index} 
-              className={cn(
-                "relative bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-all duration-300",
-                pkg.popular ? "border-2 border-gold-600 transform scale-105" : "border border-gray-200"
-              )}
-            >
-              {pkg.popular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-gold-600 text-white px-6 py-2 rounded-full text-sm font-medium">
-                    Most Popular
-                  </div>
-                </div>
-              )}
-
-              <div className="text-center mb-6">
-                <h3 className={cn(TYPOGRAPHY.subheading, "text-2xl text-navy-900 mb-2 font-serif")}>
-                  {pkg.name}
+        
+        <div className={cn(SPACING.container.default, "relative z-10")}>
+          {membershipBenefits.map((membership, index) => (
+            <div key={index} className="text-center max-w-4xl mx-auto">
+              <h2 className="text-5xl md:text-6xl font-light tracking-wide mb-8">
+                {membership.title}
+              </h2>
+              
+              <div className="space-y-6 mb-12">
+                <h3 className="text-2xl md:text-3xl font-light tracking-wide">
+                  {membership.subtitle}
                 </h3>
-                <div className={cn(TYPOGRAPHY.heading, "text-3xl text-gold-600 mb-4 font-serif")}>
-                  {pkg.price}
-                </div>
-                <p className={cn(TYPOGRAPHY.body, "text-gray-600")}>
-                  {pkg.description}
+                <h4 className="text-xl md:text-2xl font-light tracking-wide">
+                  {membership.additionalSave}
+                </h4>
+                <p className="text-lg tracking-wide">
+                  {membership.annualFee}
                 </p>
               </div>
 
-              <ul className="space-y-3 mb-8">
-                {pkg.features.map((feature, featureIndex) => (
-                  <li key={featureIndex} className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <span className={cn(TYPOGRAPHY.body, "text-gray-700")}>{feature}</span>
-                  </li>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-3xl mx-auto">
+                {membership.benefits.map((benefit, benefitIndex) => (
+                  <div key={benefitIndex} className="flex items-start">
+                    <Crown className="w-5 h-5 text-gold-400 mr-3 mt-0.5 flex-shrink-0" />
+                    <p className="text-white/90 text-left text-sm font-medium tracking-wide">
+                      {benefit}
+                    </p>
+                  </div>
                 ))}
-              </ul>
+              </div>
 
-              <button className={cn(
-                "w-full py-3 rounded-md font-medium transition-all duration-300",
-                TYPOGRAPHY.button,
-                pkg.popular 
-                  ? "bg-gold-600 hover:bg-gold-700 text-white shadow-md hover:shadow-lg"
-                  : "border-2 border-gold-600 text-gold-600 hover:bg-gold-50"
-              )}>
-                Get Started
-              </button>
+              <Button 
+                size="lg"
+                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-amber-900 px-12 py-4 text-lg tracking-wider font-medium"
+              >
+                {membership.ctaText}
+              </Button>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Multi-Step Form */}
-      <section className={cn(PATTERNS.section.standard, SPACING.container.narrow)}>
-        <div className="text-center mb-12">
-          <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-6 font-serif")}>
-            Start Your Project
+      <SectionSeparator variant="default" />
+
+      {/* Design Experience Section */}
+      <section className={cn(PATTERNS.section.spacious, SPACING.container.default)}>
+        <div className="text-center mb-20">
+          <h2 className="text-5xl md:text-6xl font-light tracking-wide text-navy-900 mb-6">
+            YOUR DESIGN EXPERIENCE
           </h2>
-          <p className={cn(TYPOGRAPHY.body, "text-xl text-gray-600")}>
-            Tell us about your vision and we'll create a custom proposal for your project.
+          <p className="text-xl text-gray-600 tracking-wide">
+            FROM IDEATION TO INSTALLATION
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-xl p-8">
-          {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              {[1, 2, 3, 4].map((step) => (
-                <div
-                  key={step}
-                  className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center font-medium transition-colors",
-                    step === currentStep 
-                      ? "bg-gold-600 text-white" 
-                      : step < currentStep 
-                        ? "bg-green-500 text-white" 
-                        : "bg-gray-200 text-gray-500"
-                  )}
-                >
-                  {step < currentStep ? <CheckCircle className="w-5 h-5" /> : step}
-                </div>
-              ))}
-            </div>
-            <div className="h-2 bg-gray-200 rounded-full">
-              <div 
-                className="h-full bg-gold-600 rounded-full transition-all duration-300"
-                style={{ width: `${(currentStep / 4) * 100}%` }}
-              />
-            </div>
-            <div className="flex justify-between mt-2 text-sm text-gray-600">
-              <span>Project Details</span>
-              <span>Style & Budget</span>
-              <span>Timeline</span>
-              <span>Contact Info</span>
-            </div>
-          </div>
-
-          {/* Form Steps */}
-          <form className="space-y-6">
-            {/* Step 1: Project Details */}
-            {currentStep === 1 && (
-              <>
-                <h3 className={cn(TYPOGRAPHY.subheading, "text-2xl text-navy-900 mb-6 font-serif")}>
-                  Tell us about your project
-                </h3>
-                
-                <div>
-                  <label className={cn(TYPOGRAPHY.body, "block text-navy-700 mb-3 font-medium")}>
-                    What type of project are you planning?
-                  </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    {["Kitchen Remodel", "Bathroom Renovation", "Whole Home Design", "Other"].map((type) => (
-                      <button
-                        key={type}
-                        type="button"
-                        onClick={() => handleInputChange("projectType", type)}
-                        className={cn(
-                          "p-4 border-2 rounded-lg text-left transition-colors",
-                          formData.projectType === type 
-                            ? "border-gold-600 bg-gold-50 text-gold-700" 
-                            : "border-gray-200 hover:border-gold-300"
-                        )}
-                      >
-                        {type}
-                      </button>
-                    ))}
+        {/* Design Process Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+          {designProcess.map((phase, index) => (
+            <div key={index} className="text-center group">
+              <div className="relative mb-8 overflow-hidden rounded-lg">
+                <div className="aspect-square bg-gradient-to-br from-amber-100 via-amber-50 to-gold-100 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-gold-600 rounded-full flex items-center justify-center mb-4 mx-auto">
+                      <Palette className="w-8 h-8 text-white" />
+                    </div>
+                    <p className="text-gray-600 font-medium text-sm tracking-wide">
+                      {phase.phase}
+                    </p>
                   </div>
                 </div>
-
-                <div>
-                  <label className={cn(TYPOGRAPHY.body, "block text-navy-700 mb-3 font-medium")}>
-                    Describe your project vision
-                  </label>
-                  <textarea
-                    value={formData.projectDescription}
-                    onChange={(e) => handleInputChange("projectDescription", e.target.value)}
-                    placeholder="Tell us about your dream space..."
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-md focus:border-gold-600 focus:ring-1 focus:ring-gold-600 transition-colors"
-                  />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <Button size="sm" className="bg-white text-gray-900 hover:bg-gray-100">
+                    Learn More
+                  </Button>
                 </div>
-              </>
-            )}
-
-            {/* Step 2: Style & Budget */}
-            {currentStep === 2 && (
-              <>
-                <h3 className={cn(TYPOGRAPHY.subheading, "text-2xl text-navy-900 mb-6 font-serif")}>
-                  Style preferences and budget
-                </h3>
-                
-                <div>
-                  <label className={cn(TYPOGRAPHY.body, "block text-navy-700 mb-3 font-medium")}>
-                    What style appeals to you most?
-                  </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    {["Modern Luxury", "Classic Traditional", "Contemporary", "Transitional"].map((style) => (
-                      <button
-                        key={style}
-                        type="button"
-                        onClick={() => handleInputChange("stylePreference", style)}
-                        className={cn(
-                          "p-4 border-2 rounded-lg text-left transition-colors",
-                          formData.stylePreference === style 
-                            ? "border-gold-600 bg-gold-50 text-gold-700" 
-                            : "border-gray-200 hover:border-gold-300"
-                        )}
-                      >
-                        {style}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className={cn(TYPOGRAPHY.body, "block text-navy-700 mb-3 font-medium")}>
-                    What's your budget range?
-                  </label>
-                  <select
-                    value={formData.budget}
-                    onChange={(e) => handleInputChange("budget", e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-md focus:border-gold-600 focus:ring-1 focus:ring-gold-600 transition-colors"
-                  >
-                    <option value="">Select budget range</option>
-                    <option value="$50,000 - $100,000">$50,000 - $100,000</option>
-                    <option value="$100,000 - $200,000">$100,000 - $200,000</option>
-                    <option value="$200,000 - $500,000">$200,000 - $500,000</option>
-                    <option value="$500,000+">$500,000+</option>
-                  </select>
-                </div>
-              </>
-            )}
-
-            {/* Step 3: Timeline */}
-            {currentStep === 3 && (
-              <>
-                <h3 className={cn(TYPOGRAPHY.subheading, "text-2xl text-navy-900 mb-6 font-serif")}>
-                  Project timeline
-                </h3>
-                
-                <div>
-                  <label className={cn(TYPOGRAPHY.body, "block text-navy-700 mb-3 font-medium")}>
-                    When would you like to start?
-                  </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    {["ASAP", "Within 3 months", "3-6 months", "6+ months"].map((time) => (
-                      <button
-                        key={time}
-                        type="button"
-                        onClick={() => handleInputChange("timeline", time)}
-                        className={cn(
-                          "p-4 border-2 rounded-lg text-left transition-colors",
-                          formData.timeline === time 
-                            ? "border-gold-600 bg-gold-50 text-gold-700" 
-                            : "border-gray-200 hover:border-gold-300"
-                        )}
-                      >
-                        {time}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Step 4: Contact Info */}
-            {currentStep === 4 && (
-              <>
-                <h3 className={cn(TYPOGRAPHY.subheading, "text-2xl text-navy-900 mb-6 font-serif")}>
-                  Contact information
-                </h3>
-                
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <label className={cn(TYPOGRAPHY.body, "block text-navy-700 mb-2 font-medium")}>
-                      First Name
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.firstName}
-                      onChange={(e) => handleInputChange("firstName", e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-md focus:border-gold-600 focus:ring-1 focus:ring-gold-600 transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className={cn(TYPOGRAPHY.body, "block text-navy-700 mb-2 font-medium")}>
-                      Last Name
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.lastName}
-                      onChange={(e) => handleInputChange("lastName", e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-md focus:border-gold-600 focus:ring-1 focus:ring-gold-600 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className={cn(TYPOGRAPHY.body, "block text-navy-700 mb-2 font-medium")}>
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-md focus:border-gold-600 focus:ring-1 focus:ring-gold-600 transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className={cn(TYPOGRAPHY.body, "block text-navy-700 mb-2 font-medium")}>
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-md focus:border-gold-600 focus:ring-1 focus:ring-gold-600 transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className={cn(TYPOGRAPHY.body, "block text-navy-700 mb-2 font-medium")}>
-                    Project Address
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.address}
-                    onChange={(e) => handleInputChange("address", e.target.value)}
-                    placeholder="Street address, City, State"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-md focus:border-gold-600 focus:ring-1 focus:ring-gold-600 transition-colors"
-                  />
-                </div>
-              </>
-            )}
-
-            {/* Navigation Buttons */}
-            <div className="flex justify-between pt-6">
-              <button
-                type="button"
-                onClick={prevStep}
-                disabled={currentStep === 1}
-                className={cn(
-                  "px-6 py-3 rounded-md font-medium transition-colors",
-                  TYPOGRAPHY.button,
-                  currentStep === 1 
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
-                    : "border-2 border-gray-300 text-gray-700 hover:bg-gray-50"
-                )}
-              >
-                Previous
-              </button>
-
-              {currentStep < 4 ? (
-                <button
-                  type="button"
-                  onClick={nextStep}
-                  className={cn(
-                    "px-6 py-3 bg-gold-600 hover:bg-gold-700 text-white rounded-md font-medium transition-colors shadow-md hover:shadow-lg",
-                    TYPOGRAPHY.button
-                  )}
-                >
-                  Next Step
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  className={cn(
-                    "px-8 py-3 bg-gold-600 hover:bg-gold-700 text-white rounded-md font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5",
-                    TYPOGRAPHY.button
-                  )}
-                >
-                  Submit Project Request
-                  <Calendar className="ml-2 w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </form>
-        </div>
-      </section>
-
-      {/* Trust Badges */}
-      <section className={cn(PATTERNS.section.alternate, SPACING.container.default)}>
-        <div className="text-center mb-12">
-          <h2 className={cn(TYPOGRAPHY.heading, "text-3xl md:text-4xl text-navy-900 mb-6 font-serif")}>
-            Trusted by Bay Area Homeowners
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {[
-            { icon: Award, title: "NKBA Certified", subtitle: "Professional Members" },
-            { icon: Star, title: "5-Star Rating", subtitle: "98% Client Satisfaction" },
-            { icon: Home, title: "500+ Projects", subtitle: "Completed Successfully" },
-            { icon: CheckCircle, title: "1-Year Warranty", subtitle: "On All Workmanship" },
-          ].map((item, index) => (
-            <div key={index} className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gold-100 rounded-full mb-4">
-                <item.icon className="w-8 h-8 text-gold-600" />
               </div>
-              <h3 className={cn(TYPOGRAPHY.subheading, "text-lg text-navy-900 mb-1 font-serif")}>
-                {item.title}
+              
+              <h3 className="text-xl font-light text-navy-900 mb-4 tracking-wide">
+                {phase.title}
               </h3>
-              <p className={cn(TYPOGRAPHY.caption, "text-gray-600")}>
-                {item.subtitle}
+              <p className="text-gray-600 text-sm leading-relaxed">
+                {phase.description}
               </p>
             </div>
           ))}
+        </div>
+
+        {/* Materials & Textures Showcase */}
+        <div className="relative h-96 bg-gradient-to-r from-amber-100 via-gold-50 to-amber-100 rounded-xl overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center">
+              <div className="grid grid-cols-6 gap-4 mb-8">
+                {/* Material swatches placeholder */}
+                {[...Array(6)].map((_, i) => (
+                  <div 
+                    key={i}
+                    className={cn(
+                      "w-16 h-16 rounded-lg shadow-md",
+                      i % 3 === 0 ? "bg-gradient-to-br from-amber-800 to-amber-900" :
+                      i % 3 === 1 ? "bg-gradient-to-br from-gold-200 to-gold-300" :
+                      "bg-gradient-to-br from-navy-700 to-navy-800"
+                    )}
+                  />
+                ))}
+              </div>
+              <h3 className="text-2xl font-light text-navy-900 mb-4 tracking-wide">
+                Premium Materials & Finishes
+              </h3>
+              <p className="text-gray-600 max-w-md mx-auto">
+                Experience our curated collection of luxury materials, finishes, and textures.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <SectionSeparator variant="bold" />
+
+      {/* Final CTA Section */}
+      <section className={cn(PATTERNS.section.dark, SPACING.container.default, "text-center")}>
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-5xl md:text-6xl font-light tracking-wide text-white mb-8">
+            BEGIN YOUR DESIGN JOURNEY TODAY
+          </h2>
+          <p className="text-xl text-gray-300 mb-12 leading-relaxed tracking-wide">
+            Schedule a complimentary consultation with our design experts and 
+            discover how we can transform your space into something extraordinary.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <Button 
+              size="lg" 
+              className="bg-gold-600 hover:bg-gold-700 text-white px-12 py-4 text-lg tracking-wider transform hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              REQUEST A DESIGN CONSULTATION
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+            
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="border-2 border-white text-white hover:bg-white hover:text-navy-900 px-12 py-4 text-lg tracking-wider transition-all duration-300"
+            >
+              (707) 555-0123
+              <Phone className="w-5 h-5 ml-2" />
+            </Button>
+          </div>
         </div>
       </section>
     </div>

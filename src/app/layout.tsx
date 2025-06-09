@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { Footer } from "@/components/layout/footer";
 
 // Initialize luxury fonts from design system
 const inter = Inter({ 
@@ -32,7 +33,10 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${playfairDisplay.variable}`}>
       <body className={`${inter.className} antialiased bg-background-light text-text-primary`}>
         <Providers>
-          {children}
+          <main className="min-h-screen">
+            {children}
+          </main>
+          <Footer />
         </Providers>
       </body>
     </html>

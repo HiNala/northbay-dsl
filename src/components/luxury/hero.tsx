@@ -36,19 +36,7 @@ export function LuxuryHero({
       {/* Luxury gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900" />
       
-      {/* Subtle pattern overlay */}
-      <div className="absolute inset-0 opacity-10">
-        <div 
-          className="w-full h-full"
-          style={{
-            backgroundImage: `
-              radial-gradient(circle at 25% 25%, #B79A6B 2px, transparent 2px),
-              radial-gradient(circle at 75% 75%, #B79A6B 2px, transparent 2px)
-            `,
-            backgroundSize: '60px 60px'
-          }}
-        />
-      </div>
+
       
       {/* Content overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black/20" />

@@ -4,6 +4,7 @@ import React from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { cn, TYPOGRAPHY, SPACING, PATTERNS } from "@/lib/design-system"
 import {
   Calendar,
   MessageSquare,
@@ -175,21 +176,37 @@ function StatCard({ stat }: { stat: typeof employeeStats[0] }) {
   const Icon = stat.icon
   
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">
-          {stat.title}
-        </CardTitle>
-        <Icon className="h-4 w-4 text-muted-foreground" />
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{stat.value}</div>
-        <p className="text-xs text-muted-foreground">
-          <span className={`${stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'}`}>
+    <Card className="border-0 bg-white shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
+      {/* Gold accent bar */}
+      <div className="h-1 w-full bg-gradient-to-r from-gold-400 to-gold-600" />
+      
+      <CardContent className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <p className={cn(TYPOGRAPHY.caption, "text-gray-500 uppercase tracking-wider mb-2")}>
+              {stat.title}
+            </p>
+            <p className={cn(TYPOGRAPHY.heading, "text-3xl font-serif text-navy-900 mb-1")}>
+              {stat.value}
+            </p>
+          </div>
+          <div className="w-12 h-12 bg-gradient-to-br from-gold-100 to-gold-200 rounded-full flex items-center justify-center group-hover:from-gold-200 group-hover:to-gold-300 transition-all duration-300">
+            <Icon className="w-6 h-6 text-gold-600" />
+          </div>
+        </div>
+        
+        <div className="flex items-center">
+          <span className={cn(
+            TYPOGRAPHY.body,
+            "text-sm font-medium",
+            stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
+          )}>
             {stat.change}
-          </span>{' '}
-          {stat.description}
-        </p>
+          </span>
+          <span className={cn(TYPOGRAPHY.caption, "text-gray-500 ml-2")}>
+            {stat.description}
+          </span>
+        </div>
       </CardContent>
     </Card>
   )
@@ -203,26 +220,38 @@ export default function EmployeeDashboard() {
   })
 
   return (
-    <div className="space-y-6">
-      {/* Welcome Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Good morning, Sarah!</h2>
-          <p className="text-muted-foreground">
-            It's {currentTime} - You have 3 appointments and 5 follow-ups scheduled today.
-          </p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      <div className={cn(SPACING.container.default, "py-8")}>
+        {/* Welcome Header */}
+        <div className="mb-10">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className={cn(TYPOGRAPHY.heading, "text-4xl font-serif text-navy-900 mb-2")}>
+                Good morning, Sarah!
+              </h1>
+              <p className={cn(TYPOGRAPHY.body, "text-gray-600")}>
+                It's {currentTime} - You have 3 appointments and 5 follow-ups scheduled today.
+              </p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button variant="outline" className="border-gold-300 text-gold-600 hover:bg-gold-50">
+                <Calendar className="mr-2 h-4 w-4" />
+                My Calendar
+              </Button>
+              <Button className="bg-gold-600 hover:bg-gold-700 text-white">
+                <Plus className="mr-2 h-4 w-4" />
+                New Lead
+              </Button>
+            </div>
+          </div>
+          
+          {/* Elegant divider */}
+          <div className="flex items-center">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gold-300 to-gold-500"></div>
+            <span className="px-4 text-sm text-gray-500 font-medium">North Bay Kitchen & Bath</span>
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent via-gold-300 to-gold-500"></div>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline">
-            <Calendar className="mr-2 h-4 w-4" />
-            My Calendar
-          </Button>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            New Lead
-          </Button>
-        </div>
-      </div>
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -468,5 +497,6 @@ export default function EmployeeDashboard() {
         </Card>
       </div>
     </div>
+  </div>
   )
 } 

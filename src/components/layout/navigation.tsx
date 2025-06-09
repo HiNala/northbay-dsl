@@ -62,21 +62,20 @@ export function Navigation() {
           {/* Logo */}
           <Link 
             href="/" 
-            className="flex items-center space-x-3 group transition-opacity duration-200 hover:opacity-80"
+            className="flex items-center group transition-opacity duration-200 hover:opacity-80"
           >
-            <div className="w-12 h-12 bg-gradient-to-br from-gold-600 to-gold-700 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-gold-600 to-gold-700 rounded-lg flex items-center justify-center flex-shrink-0">
               <span className="text-white font-serif font-bold text-xl">NB</span>
             </div>
-            <div className="hidden md:block">
+            <div className="hidden md:block ml-3">
               <div className={cn(
-                TYPOGRAPHY.heading, 
-                "text-xl font-serif",
+                "text-xl font-serif font-medium leading-tight",
                 isScrolled ? "text-navy-900" : "text-white"
               )}>
                 North Bay
               </div>
               <div className={cn(
-                TYPOGRAPHY.caption,
+                "text-sm font-medium tracking-wide leading-tight",
                 "text-gold-600"
               )}>
                 Kitchen & Bath

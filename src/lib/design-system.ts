@@ -59,68 +59,110 @@ export const COLORS = {
 }
 
 // -----------------------------------------------
-// TYPOGRAPHY SYSTEM
+// TYPOGRAPHY SYSTEM (Enhanced with proper spacing)
 // -----------------------------------------------
 export const TYPOGRAPHY = {
-  // Headings - Playfair Display, luxury serif
-  heading: "font-serif font-light tracking-tight leading-tight",
-  subheading: "font-serif font-medium tracking-wide leading-snug",
+  // Headings - Playfair Display, luxury serif with proper spacing
+  heading: "font-serif font-light tracking-tight leading-[1.1] mb-6",
+  subheading: "font-serif font-medium tracking-wide leading-[1.3] mb-4",
   
-  // Body text - Inter, clean sans-serif
-  body: "font-sans font-normal leading-relaxed",
-  bodyLarge: "font-sans font-normal leading-relaxed text-lg",
+  // Body text - Inter, clean sans-serif with optimal line height
+  body: "font-sans font-normal leading-[1.7] mb-4",
+  bodyLarge: "font-sans font-normal leading-[1.6] text-lg mb-6",
   
   // UI elements
-  caption: "font-sans font-light text-sm tracking-wide",
-  accent: "font-sans font-medium uppercase tracking-widest text-xs",
+  caption: "font-sans font-light text-sm tracking-wide leading-[1.5] mb-2",
+  accent: "font-sans font-medium uppercase tracking-widest text-xs mb-2",
   button: "font-sans font-medium uppercase tracking-wider text-sm",
   
   // Special cases
-  hero: "font-serif font-light tracking-tight leading-none",
-  quote: "font-serif font-light italic leading-relaxed",
+  hero: "font-serif font-light tracking-tight leading-[0.9] mb-8",
+  quote: "font-serif font-light italic leading-[1.6] mb-6",
 }
 
 // -----------------------------------------------
-// SPACING SYSTEM (8pt grid)
+// ENHANCED SPACING SYSTEM (8pt grid + breathing room)
 // -----------------------------------------------
 export const SPACING = {
+  // Vertical rhythm for sections (much more generous)
   section: {
-    desktop: "py-24", // 96px
-    mobile: "py-12",  // 48px
+    hero: "py-32 lg:py-40",           // 128px-160px for hero sections
+    large: "py-28 lg:py-36",         // 112px-144px for major sections
+    standard: "py-20 lg:py-28",      // 80px-112px for regular sections
+    medium: "py-16 lg:py-20",        // 64px-80px for smaller sections
+    small: "py-12 lg:py-16",         // 48px-64px for compact sections
+    minimal: "py-8 lg:py-12",        // 32px-48px for tight sections
   },
+  
+  // Container spacing with better responsive margins
   container: {
-    default: "container mx-auto px-6",
-    narrow: "max-w-4xl mx-auto px-6",
-    wide: "max-w-7xl mx-auto px-6",
+    default: "container mx-auto px-6 lg:px-8",
+    narrow: "max-w-4xl mx-auto px-6 lg:px-8",
+    wide: "max-w-7xl mx-auto px-6 lg:px-8",
+    full: "w-full px-6 lg:px-8",
   },
-  element: {
-    xs: "p-2",    // 8px
-    sm: "p-4",    // 16px  
-    md: "p-6",    // 24px
-    lg: "p-8",    // 32px
-    xl: "p-12",   // 48px
-    "2xl": "p-16", // 64px
+  
+  // Component spacing (internal padding)
+  component: {
+    xs: "p-3",      // 12px
+    sm: "p-4",      // 16px  
+    md: "p-6",      // 24px
+    lg: "p-8",      // 32px
+    xl: "p-12",     // 48px
+    "2xl": "p-16",  // 64px
+    "3xl": "p-20",  // 80px
+  },
+  
+  // Margin spacing for better separation
+  margin: {
+    xs: "mb-2",     // 8px
+    sm: "mb-4",     // 16px
+    md: "mb-6",     // 24px
+    lg: "mb-8",     // 32px
+    xl: "mb-12",    // 48px
+    "2xl": "mb-16", // 64px
+    "3xl": "mb-20", // 80px
+    "4xl": "mb-24", // 96px
+  },
+  
+  // Content spacing for text elements
+  content: {
+    paragraph: "mb-6",              // Space between paragraphs
+    heading: "mb-6 mt-12",          // Space around headings
+    subheading: "mb-4 mt-8",        // Space around subheadings
+    list: "mb-6 space-y-3",         // Space for lists
+    card: "mb-8",                   // Space between cards
+    button: "mt-8 mb-4",            // Space around buttons
+  },
+  
+  // Grid gaps for different layouts
+  grid: {
+    tight: "gap-4",                 // 16px
+    normal: "gap-6",                // 24px
+    comfortable: "gap-8",           // 32px
+    spacious: "gap-12",             // 48px
+    luxury: "gap-16",               // 64px
   }
 }
 
 // -----------------------------------------------
-// COMPONENT VARIANTS
+// COMPONENT VARIANTS (Enhanced)
 // -----------------------------------------------
 export const VARIANTS = {
   button: {
-    primary: "bg-gold-600 hover:bg-gold-700 text-white shadow-sm hover:shadow-md",
-    outline: "border-2 border-gold-600 text-gold-600 hover:bg-gold-50",
-    ghost: "text-gold-600 hover:bg-gold-50",
-    elegant: "border border-gold-600 text-gold-600 hover:bg-gold-600 hover:text-white transform hover:-translate-y-0.5 transition-all duration-200",
+    primary: "bg-gold-600 hover:bg-gold-700 text-white shadow-sm hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300",
+    outline: "border-2 border-gold-600 text-gold-600 hover:bg-gold-50 transition-all duration-300",
+    ghost: "text-gold-600 hover:bg-gold-50 transition-all duration-300",
+    elegant: "border border-gold-600 text-gold-600 hover:bg-gold-600 hover:text-white transform hover:-translate-y-0.5 transition-all duration-300",
   },
   card: {
-    default: "bg-white rounded-lg shadow-sm border border-gray-100",
-    elevated: "bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300",
-    luxury: "bg-white rounded-xl shadow-xl border border-gold-100 overflow-hidden",
+    default: "bg-white rounded-lg shadow-sm border border-gray-100 p-6",
+    elevated: "bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 p-8",
+    luxury: "bg-white rounded-xl shadow-xl border border-gold-100 overflow-hidden p-8",
   },
   input: {
-    default: "border border-gray-200 rounded-md px-4 py-3 focus:border-gold-600 focus:ring-1 focus:ring-gold-600 transition-colors",
-    elegant: "border-b-2 border-gray-200 bg-transparent px-0 py-3 focus:border-gold-600 focus:ring-0 transition-colors",
+    default: "border border-gray-200 rounded-md px-4 py-3 focus:border-gold-600 focus:ring-2 focus:ring-gold-600/20 transition-all duration-300",
+    elegant: "border-b-2 border-gray-200 bg-transparent px-0 py-3 focus:border-gold-600 focus:ring-0 transition-all duration-300",
   }
 }
 
@@ -149,25 +191,47 @@ export const BREAKPOINTS = {
 }
 
 // -----------------------------------------------
-// LUXURY DESIGN PATTERNS
+// LUXURY DESIGN PATTERNS (Enhanced with better spacing)
 // -----------------------------------------------
 export const PATTERNS = {
   hero: {
-    fullscreen: "h-screen flex items-center justify-center relative overflow-hidden",
+    fullscreen: "min-h-screen flex items-center justify-center relative overflow-hidden",
     overlay: "absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/50",
-    content: "relative z-10 text-center text-white max-w-6xl px-6",
+    content: "relative z-10 text-center text-white max-w-6xl px-6 py-20",
   },
   section: {
-    standard: "py-24 bg-white",
-    alternate: "py-24 bg-gray-50", 
-    dark: "py-24 bg-navy-900 text-white",
-    luxury: "py-32 bg-gradient-to-b from-gray-50 to-white",
+    hero: "py-32 lg:py-40 bg-gradient-to-b from-navy-900 to-navy-800 text-white",
+    standard: "py-32 lg:py-40 bg-white",
+    alternate: "py-32 lg:py-40 bg-gray-50", 
+    dark: "py-32 lg:py-40 bg-navy-900 text-white",
+    luxury: "py-40 lg:py-48 bg-gradient-to-b from-gray-50 to-white",
+    spacious: "py-44 lg:py-52 bg-white",
+    premium: "py-48 lg:py-56 bg-white",
+  },
+  // Section Separators and Accents
+  separator: {
+    default: "h-px bg-gradient-to-r from-transparent via-gold-300 to-transparent my-20 lg:my-28",
+    bold: "h-1 bg-gradient-to-r from-gold-400 via-gold-600 to-gold-400 my-24 lg:my-32",
+    minimal: "h-px bg-gray-200 my-16 lg:my-20",
+  },
+  accent: {
+    divider: "w-24 h-1 bg-gold-600 mx-auto mb-8",
+    line: "w-16 h-0.5 bg-gold-400",
+    dots: "flex justify-center space-x-2 my-12",
   },
   grid: {
-    products: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8",
-    services: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12",
-    testimonials: "grid grid-cols-1 md:grid-cols-2 gap-8",
-    portfolio: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+    products: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12",
+    services: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16",
+    testimonials: "grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12",
+    portfolio: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12",
+    features: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12",
+  },
+  // Content structure patterns
+  structure: {
+    sectionHeader: "text-center mb-16 lg:mb-20",
+    sectionContent: "space-y-12 lg:space-y-16",
+    cardGrid: "grid gap-8 lg:gap-12 mb-16 lg:mb-20",
+    textContent: "space-y-6 lg:space-y-8",
   }
 }
 
@@ -176,7 +240,7 @@ export const PATTERNS = {
 // -----------------------------------------------
 export const createLuxuryButton = (variant: keyof typeof VARIANTS.button = "primary") => {
   return cn(
-    "inline-flex items-center justify-center px-6 py-3 rounded-md font-medium transition-all duration-200",
+    "inline-flex items-center justify-center px-8 py-4 rounded-md font-medium",
     TYPOGRAPHY.button,
     VARIANTS.button[variant]
   )
@@ -198,14 +262,14 @@ export const createLuxuryInput = (variant: keyof typeof VARIANTS.input = "defaul
 }
 
 // -----------------------------------------------
-// SECTION HEADER HELPER
+// SECTION HEADER HELPER (Enhanced)
 // -----------------------------------------------
 export const createSectionHeader = (centered: boolean = true) => {
   return {
-    container: cn("mb-16", centered ? "text-center" : ""),
-    title: cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-6"),
-    subtitle: cn(TYPOGRAPHY.body, "text-xl text-gray-600 max-w-3xl", centered ? "mx-auto" : ""),
-    divider: "w-24 h-1 bg-gold-600 mx-auto mt-8" + (centered ? "" : " ml-0")
+    container: cn("mb-16 lg:mb-20", centered ? "text-center" : ""),
+    title: cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl lg:text-6xl text-navy-900 mb-6"),
+    subtitle: cn(TYPOGRAPHY.bodyLarge, "text-xl lg:text-2xl text-gray-600 max-w-4xl", centered ? "mx-auto" : "", "mb-8"),
+    divider: cn("w-24 h-1 bg-gold-600 mt-8", centered ? "mx-auto" : "")
   }
 }
 
@@ -218,12 +282,17 @@ export const RESPONSIVE = {
     desktop: "block md:hidden", 
   },
   stack: {
-    mobile: "flex flex-col md:flex-row",
-    reverse: "flex flex-col-reverse md:flex-row",
+    mobile: "flex flex-col md:flex-row gap-6 md:gap-8",
+    reverse: "flex flex-col-reverse md:flex-row gap-6 md:gap-8",
   },
   text: {
     responsive: "text-sm md:text-base lg:text-lg",
-    heroResponsive: "text-4xl md:text-6xl lg:text-7xl",
+    heroResponsive: "text-4xl md:text-6xl lg:text-7xl xl:text-8xl",
+  },
+  spacing: {
+    section: "py-12 md:py-20 lg:py-28",
+    container: "px-4 md:px-6 lg:px-8",
+    gap: "gap-4 md:gap-6 lg:gap-8",
   }
 }
 
