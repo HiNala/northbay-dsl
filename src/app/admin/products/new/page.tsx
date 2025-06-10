@@ -1,72 +1,125 @@
 "use client"
 
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import React, { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { Alert } from '@/components/ui/alert'
 import {
   ArrowLeft,
-  Upload,
-  X,
-  Plus,
   Save,
   Eye,
-  Image as ImageIcon,
-} from "lucide-react"
-import Link from "next/link"
+  Bot,
+  Plus,
+  X,
+  Upload,
+  CheckCircle,
+  AlertTriangle
+} from 'lucide-react'
 
-// Mock data for dropdowns - will be replaced with Prisma queries
-const categories = [
-  { id: "cat-1", name: "Kitchen" },
-  { id: "cat-2", name: "Bathroom" },
-  { id: "cat-3", name: "Hardware" },
-  { id: "cat-4", name: "Lighting" },
-  { id: "cat-5", name: "Tile" },
-]
+interface Category {
+  id: string
+  name: string
+}
 
-const brands = [
-  { id: "brand-1", name: "Waterworks" },
-  { id: "brand-2", name: "Restoration Hardware" },
-  { id: "brand-3", name: "Emtek" },
-  { id: "brand-4", name: "Visual Comfort" },
-  { id: "brand-5", name: "Porcelanosa" },
-]
+interface Brand {
+  id: string
+  name: string
+}
 
-const finishes = [
-  { id: "finish-1", name: "Brushed Brass", hexColor: "#D4AF37" },
-  { id: "finish-2", name: "Matte Black", hexColor: "#000000" },
-  { id: "finish-3", name: "Polished Chrome", hexColor: "#C0C0C0" },
-  { id: "finish-4", name: "Oil Rubbed Bronze", hexColor: "#3C2414" },
-  { id: "finish-5", name: "Brushed Nickel", hexColor: "#8C7853" },
-]
-
-export default function NewProduct() {
+export default function NewProductPage() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  
+  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [aiGenerating, setAiGenerating] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [brands, setBrands] = useState<Brand[]>([])
+  
   const [formData, setFormData] = useState({
-    name: "",
-    sku: "",
-    description: "",
-    price: "",
-    comparePrice: "",
-    categoryId: "",
-    brandId: "",
-    status: "draft",
-    trackInventory: false,
-    stockQuantity: "",
+    name: '',
+    description: '',
+    price: '',
+    comparePrice: '',
+    sku: '',
+    categoryId: '',
+    brandId: '',
     tags: [] as string[],
-    seoTitle: "",
-    seoDescription: "",
-    specifications: "",
+    specifications: {} as Record<string, string>,
+    inStock: true,
+    stockQuantity: '',
+    trackInventory: false,
+    status: 'draft' as 'draft' | 'published',
+    type: 'physical',
+    seoTitle: '',
+    seoDescription: '',
   })
+  
+  const [tagInput, setTagInput] = useState('')
+  const [specKey, setSpecKey] = useState('')
+  const [specValue, setSpecValue] = useState('')
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const [selectedFinishes, setSelectedFinishes] = useState<string[]>([])
-  const [images, setImages] = useState<File[]>([])
-  const [tagInput, setTagInput] = useState("")
+  // Check authentication
+  useEffect(() => {
+    if (status === 'loading') return
+    
+    if (!session?.user) {
+      router.push('/auth/login')
+      return
+    }
 
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }))
+    const hasAccess = session.user.roles?.some(role => 
+      ['admin', 'manager', 'employee', 'super_admin'].includes(role)
+    )
+
+    if (!hasAccess) {
+      router.push('/')
+      return
+    }
+    
+    fetchCategories()
+    fetchBrands()
+  }, [session, status, router])
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories')
+      if (response.ok) {
+        const data = await response.json()
+        setCategories(data.categories || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch categories:', error)
+    }
+  }
+
+  const fetchBrands = async () => {
+    try {
+      const response = await fetch('/api/brands')
+      if (response.ok) {
+        const data = await response.json()
+        setBrands(data.brands || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch brands:', error)
+    }
+  }
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }))
+    }
   }
 
   const addTag = () => {
@@ -75,7 +128,7 @@ export default function NewProduct() {
         ...prev,
         tags: [...prev.tags, tagInput.trim()]
       }))
-      setTagInput("")
+      setTagInput('')
     }
   }
 
@@ -86,417 +139,526 @@ export default function NewProduct() {
     }))
   }
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files
-    if (files) {
-      setImages(prev => [...prev, ...Array.from(files)])
+  const addSpecification = () => {
+    if (specKey.trim() && specValue.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        specifications: {
+          ...prev.specifications,
+          [specKey.trim()]: specValue.trim()
+        }
+      }))
+      setSpecKey('')
+      setSpecValue('')
     }
   }
 
-  const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index))
+  const removeSpecification = (keyToRemove: string) => {
+    setFormData(prev => ({
+      ...prev,
+      specifications: Object.fromEntries(
+        Object.entries(prev.specifications).filter(([key]) => key !== keyToRemove)
+      )
+    }))
   }
 
-  const toggleFinish = (finishId: string) => {
-    setSelectedFinishes(prev => 
-      prev.includes(finishId)
-        ? prev.filter(id => id !== finishId)
-        : [...prev, finishId]
-    )
+  const generateAIDescription = async () => {
+    if (!formData.name) {
+      setErrors(prev => ({ ...prev, name: 'Product name is required for AI generation' }))
+      return
+    }
+
+    setAiGenerating(true)
+    try {
+      // Create a temporary product for AI generation
+      const tempProduct = await fetch('/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          price: formData.price ? parseFloat(formData.price) : null,
+          categoryId: formData.categoryId || null,
+          brandId: formData.brandId || null,
+          specifications: formData.specifications,
+          tags: formData.tags,
+          status: 'draft',
+        }),
+      })
+
+      if (!tempProduct.ok) {
+        throw new Error('Failed to create temporary product')
+      }
+
+      const productData = await tempProduct.json()
+      
+      // Generate AI description
+      const aiResponse = await fetch('/api/products/generate-description', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId: productData.product.id,
+          options: {
+            type: 'luxury',
+            length: 'medium',
+            includeFeatures: true,
+            includeBenefits: true,
+          },
+          updateProduct: false, // Don't update the temp product
+        }),
+      })
+
+      if (aiResponse.ok) {
+        const aiResult = await aiResponse.json()
+        setFormData(prev => ({
+          ...prev,
+          description: aiResult.data.description,
+          seoTitle: aiResult.data.seoTitle || prev.seoTitle,
+          seoDescription: aiResult.data.seoDescription || prev.seoDescription,
+        }))
+        
+        // Clean up temporary product
+        await fetch(`/api/products/${productData.product.id}`, {
+          method: 'DELETE',
+        })
+        
+        alert(`✨ AI description generated! Quality Score: ${aiResult.data.quality_score}/100`)
+      } else {
+        const error = await aiResponse.json()
+        alert(`Failed to generate description: ${error.error}`)
+      }
+    } catch (error) {
+      console.error('AI generation error:', error)
+      alert('Failed to generate description. Please try again.')
+    } finally {
+      setAiGenerating(false)
+    }
   }
 
-  const handleSubmit = (status: 'draft' | 'active') => {
-    // Here we would submit to the API
-    console.log('Submitting product:', { ...formData, status, selectedFinishes, images })
-    // For now, just show success message
-    alert(`Product ${status === 'draft' ? 'saved as draft' : 'published'} successfully!`)
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {}
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Product name is required'
+    }
+
+    if (formData.price && (isNaN(parseFloat(formData.price)) || parseFloat(formData.price) < 0)) {
+      newErrors.price = 'Price must be a valid positive number'
+    }
+
+    if (formData.comparePrice && (isNaN(parseFloat(formData.comparePrice)) || parseFloat(formData.comparePrice) < 0)) {
+      newErrors.comparePrice = 'Compare price must be a valid positive number'
+    }
+
+    if (formData.price && formData.comparePrice && parseFloat(formData.comparePrice) < parseFloat(formData.price)) {
+      newErrors.comparePrice = 'Compare price should be higher than regular price'
+    }
+
+    if (formData.stockQuantity && (isNaN(parseInt(formData.stockQuantity)) || parseInt(formData.stockQuantity) < 0)) {
+      newErrors.stockQuantity = 'Stock quantity must be a valid non-negative number'
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const saveProduct = async (status: 'draft' | 'published') => {
+    if (!validateForm()) return
+
+    setSaving(true)
+    try {
+      const productData = {
+        name: formData.name.trim(),
+        description: formData.description.trim() || undefined,
+        price: formData.price ? parseFloat(formData.price) : undefined,
+        comparePrice: formData.comparePrice ? parseFloat(formData.comparePrice) : undefined,
+        sku: formData.sku.trim() || undefined,
+        categoryId: formData.categoryId || undefined,
+        brandId: formData.brandId || undefined,
+        tags: formData.tags,
+        specifications: Object.keys(formData.specifications).length > 0 ? formData.specifications : undefined,
+        inStock: formData.inStock,
+        stockQuantity: formData.stockQuantity ? parseInt(formData.stockQuantity) : undefined,
+        trackInventory: formData.trackInventory,
+        status: status,
+        type: formData.type,
+        seoTitle: formData.seoTitle.trim() || undefined,
+        seoDescription: formData.seoDescription.trim() || undefined,
+      }
+
+      const response = await fetch('/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productData),
+      })
+
+      if (response.ok) {
+        alert(`✅ Product ${status === 'published' ? 'created and published' : 'saved as draft'} successfully!`)
+        router.push('/admin/products')
+      } else {
+        const error = await response.json()
+        alert(`Failed to save product: ${error.error || 'Unknown error'}`)
+      }
+    } catch (error) {
+      console.error('Save error:', error)
+      alert('Failed to save product. Please try again.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Link href="/admin/products">
-            <Button variant="outline" size="icon">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">Add New Product</h2>
-            <p className="text-muted-foreground">
-              Create a new product for your catalog
-            </p>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center mb-4">
+            <Link href="/admin/products">
+              <Button variant="outline" size="sm" className="mr-4">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Products
+              </Button>
+            </Link>
+            <h1 className="text-3xl font-bold text-gray-900">➕ Create New Product</h1>
           </div>
+          <p className="text-gray-600">
+            Add a new product to your catalog with AI-powered descriptions
+          </p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={() => handleSubmit('draft')}>
-            <Save className="mr-2 h-4 w-4" />
-            Save Draft
-          </Button>
-          <Button onClick={() => handleSubmit('active')}>
-            <Eye className="mr-2 h-4 w-4" />
-            Publish
-          </Button>
-        </div>
-      </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6">
           {/* Basic Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
-              <CardDescription>
-                Enter the basic details for your product
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">📝 Basic Information</h3>
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Product Name *</label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="Enter product name"
+                <Label htmlFor="name">Product Name *</Label>
+                <Input
+                  id="name"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
+                  placeholder="Enter product name"
+                  className={errors.name ? 'border-red-500' : ''}
+                />
+                {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name}</p>}
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={generateAIDescription}
+                    disabled={aiGenerating || !formData.name}
+                  >
+                    {aiGenerating ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600 mr-2"></div>
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Bot className="w-4 h-4 mr-2" />
+                        Generate AI Description
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  placeholder="Enter product description or generate with AI"
+                  rows={4}
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">SKU</label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="Auto-generated if empty"
-                    value={formData.sku}
-                    onChange={(e) => handleInputChange('sku', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Status</label>
+                  <Label htmlFor="category">Category</Label>
                   <select
-                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                    value={formData.status}
-                    onChange={(e) => handleInputChange('status', e.target.value)}
+                    id="category"
+                    value={formData.categoryId}
+                    onChange={(e) => handleInputChange('categoryId', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-amber-500 focus:border-amber-500"
                   >
-                    <option value="draft">Draft</option>
-                    <option value="active">Active</option>
-                    <option value="archived">Archived</option>
+                    <option value="">Select category</option>
+                    {categories.map(category => (
+                      <option key={category.id} value={category.id}>{category.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <Label htmlFor="brand">Brand</Label>
+                  <select
+                    id="brand"
+                    value={formData.brandId}
+                    onChange={(e) => handleInputChange('brandId', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-amber-500 focus:border-amber-500"
+                  >
+                    <option value="">Select brand</option>
+                    {brands.map(brand => (
+                      <option key={brand.id} value={brand.id}>{brand.name}</option>
+                    ))}
                   </select>
                 </div>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Description</label>
-                <textarea
-                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                  rows={4}
-                  placeholder="Enter product description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Specifications</label>
-                <textarea
-                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                  rows={3}
-                  placeholder="Enter technical specifications (JSON format)"
-                  value={formData.specifications}
-                  onChange={(e) => handleInputChange('specifications', e.target.value)}
-                />
-              </div>
-            </CardContent>
+            </div>
           </Card>
 
           {/* Pricing */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Pricing</CardTitle>
-              <CardDescription>
-                Set pricing information for your product
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Price *</label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">$</span>
-                    <input
-                      type="number"
-                      step="0.01"
-                      className="w-full pl-8 pr-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                      placeholder="0.00"
-                      value={formData.price}
-                      onChange={(e) => handleInputChange('price', e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Compare Price (MSRP)</label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">$</span>
-                    <input
-                      type="number"
-                      step="0.01"
-                      className="w-full pl-8 pr-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                      placeholder="0.00"
-                      value={formData.comparePrice}
-                      onChange={(e) => handleInputChange('comparePrice', e.target.value)}
-                    />
-                  </div>
-                </div>
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">💰 Pricing</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="price">Price ($)</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  value={formData.price}
+                  onChange={(e) => handleInputChange('price', e.target.value)}
+                  placeholder="0.00"
+                  className={errors.price ? 'border-red-500' : ''}
+                />
+                {errors.price && <p className="text-sm text-red-600 mt-1">{errors.price}</p>}
               </div>
-            </CardContent>
+
+              <div>
+                <Label htmlFor="comparePrice">Compare Price ($)</Label>
+                <Input
+                  id="comparePrice"
+                  type="number"
+                  step="0.01"
+                  value={formData.comparePrice}
+                  onChange={(e) => handleInputChange('comparePrice', e.target.value)}
+                  placeholder="0.00"
+                  className={errors.comparePrice ? 'border-red-500' : ''}
+                />
+                {errors.comparePrice && <p className="text-sm text-red-600 mt-1">{errors.comparePrice}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="sku">SKU</Label>
+                <Input
+                  id="sku"
+                  value={formData.sku}
+                  onChange={(e) => handleInputChange('sku', e.target.value)}
+                  placeholder="Product SKU"
+                />
+              </div>
+            </div>
           </Card>
 
           {/* Inventory */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Inventory</CardTitle>
-              <CardDescription>
-                Manage stock and inventory tracking
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="trackInventory"
-                  checked={formData.trackInventory}
-                  onChange={(e) => handleInputChange('trackInventory', e.target.checked)}
-                  className="h-4 w-4"
-                />
-                <label htmlFor="trackInventory" className="text-sm font-medium">
-                  Track inventory for this product
-                </label>
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">📦 Inventory</h3>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="inStock"
+                    checked={formData.inStock}
+                    onChange={(e) => handleInputChange('inStock', e.target.checked)}
+                    className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                  />
+                  <label htmlFor="inStock" className="ml-2 text-sm text-gray-900">
+                    In Stock
+                  </label>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="trackInventory"
+                    checked={formData.trackInventory}
+                    onChange={(e) => handleInputChange('trackInventory', e.target.checked)}
+                    className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                  />
+                  <label htmlFor="trackInventory" className="ml-2 text-sm text-gray-900">
+                    Track Inventory
+                  </label>
+                </div>
               </div>
 
               {formData.trackInventory && (
-                <div>
-                  <label className="block text-sm font-medium mb-2">Stock Quantity</label>
-                  <input
+                <div className="w-48">
+                  <Label htmlFor="stockQuantity">Stock Quantity</Label>
+                  <Input
+                    id="stockQuantity"
                     type="number"
-                    className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="0"
                     value={formData.stockQuantity}
                     onChange={(e) => handleInputChange('stockQuantity', e.target.value)}
+                    placeholder="0"
+                    className={errors.stockQuantity ? 'border-red-500' : ''}
                   />
+                  {errors.stockQuantity && <p className="text-sm text-red-600 mt-1">{errors.stockQuantity}</p>}
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          {/* Images */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Product Images</CardTitle>
-              <CardDescription>
-                Upload high-quality images of your product
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="border-2 border-dashed border-border rounded-lg p-6">
-                <div className="text-center">
-                  <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
-                  <div className="mt-4">
-                    <label htmlFor="image-upload" className="cursor-pointer">
-                      <span className="mt-2 block text-sm font-medium text-gray-900">
-                        Click to upload images
-                      </span>
-                      <span className="mt-1 block text-xs text-gray-500">
-                        PNG, JPG, GIF up to 10MB each
-                      </span>
-                    </label>
-                    <input
-                      id="image-upload"
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleImageUpload}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {images.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {images.map((image, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={URL.createObjectURL(image)}
-                        alt={`Product image ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-md"
-                      />
-                      <button
-                        onClick={() => removeImage(index)}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* SEO */}
-          <Card>
-            <CardHeader>
-              <CardTitle>SEO</CardTitle>
-              <CardDescription>
-                Optimize your product for search engines
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">SEO Title</label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="Auto-generated from product name if empty"
-                  value={formData.seoTitle}
-                  onChange={(e) => handleInputChange('seoTitle', e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">SEO Description</label>
-                <textarea
-                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                  rows={3}
-                  placeholder="Enter meta description for search engines"
-                  value={formData.seoDescription}
-                  onChange={(e) => handleInputChange('seoDescription', e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  {formData.seoDescription.length}/160 characters
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Category & Brand */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Organization</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Category *</label>
-                <select
-                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                  value={formData.categoryId}
-                  onChange={(e) => handleInputChange('categoryId', e.target.value)}
-                >
-                  <option value="">Select category</option>
-                  {categories.map(category => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Brand</label>
-                <select
-                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                  value={formData.brandId}
-                  onChange={(e) => handleInputChange('brandId', e.target.value)}
-                >
-                  <option value="">Select brand</option>
-                  {brands.map(brand => (
-                    <option key={brand.id} value={brand.id}>
-                      {brand.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Available Finishes */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Available Finishes</CardTitle>
-              <CardDescription>
-                Select which finishes are available for this product
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {finishes.map(finish => (
-                  <div key={finish.id} className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      id={finish.id}
-                      checked={selectedFinishes.includes(finish.id)}
-                      onChange={() => toggleFinish(finish.id)}
-                      className="h-4 w-4"
-                    />
-                    <div
-                      className="w-4 h-4 rounded-full border border-gray-300"
-                      style={{ backgroundColor: finish.hexColor }}
-                    />
-                    <label htmlFor={finish.id} className="text-sm flex-1">
-                      {finish.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
+            </div>
           </Card>
 
           {/* Tags */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Tags</CardTitle>
-              <CardDescription>
-                Add tags to help organize and filter products
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">🏷️ Tags</h3>
+            <div className="space-y-4">
               <div className="flex space-x-2">
-                <input
-                  type="text"
-                  className="flex-1 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="Add a tag"
+                <Input
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && addTag()}
+                  placeholder="Add a tag"
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                 />
-                <Button onClick={addTag} size="sm">
-                  <Plus className="h-4 w-4" />
+                <Button onClick={addTag} disabled={!tagInput.trim()}>
+                  <Plus className="w-4 h-4" />
                 </Button>
               </div>
-
+              
               {formData.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  {formData.tags.map(tag => (
-                    <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                  {formData.tags.map((tag, index) => (
+                    <Badge key={index} variant="outline" className="flex items-center gap-1">
                       {tag}
-                      <button
-                        onClick={() => removeTag(tag)}
-                        className="ml-1 hover:text-red-500"
-                      >
-                        <X className="h-3 w-3" />
+                      <button onClick={() => removeTag(tag)}>
+                        <X className="w-3 h-3" />
                       </button>
                     </Badge>
                   ))}
                 </div>
               )}
-            </CardContent>
+            </div>
+          </Card>
+
+          {/* Specifications */}
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">⚙️ Specifications</h3>
+            <div className="space-y-4">
+              <div className="flex space-x-2">
+                <Input
+                  value={specKey}
+                  onChange={(e) => setSpecKey(e.target.value)}
+                  placeholder="Specification name"
+                />
+                <Input
+                  value={specValue}
+                  onChange={(e) => setSpecValue(e.target.value)}
+                  placeholder="Value"
+                />
+                <Button onClick={addSpecification} disabled={!specKey.trim() || !specValue.trim()}>
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+              
+              {Object.keys(formData.specifications).length > 0 && (
+                <div className="space-y-2">
+                  {Object.entries(formData.specifications).map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <span className="font-medium">{key}:</span> {value}
+                      </div>
+                      <button onClick={() => removeSpecification(key)}>
+                        <X className="w-4 h-4 text-red-500" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* SEO */}
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">🔍 SEO</h3>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="seoTitle">SEO Title</Label>
+                <Input
+                  id="seoTitle"
+                  value={formData.seoTitle}
+                  onChange={(e) => handleInputChange('seoTitle', e.target.value)}
+                  placeholder="SEO-optimized title (60 characters or less)"
+                  maxLength={60}
+                />
+                <p className="text-sm text-gray-500 mt-1">{formData.seoTitle.length}/60 characters</p>
+              </div>
+
+              <div>
+                <Label htmlFor="seoDescription">SEO Description</Label>
+                <Textarea
+                  id="seoDescription"
+                  value={formData.seoDescription}
+                  onChange={(e) => handleInputChange('seoDescription', e.target.value)}
+                  placeholder="SEO meta description (160 characters or less)"
+                  maxLength={160}
+                  rows={3}
+                />
+                <p className="text-sm text-gray-500 mt-1">{formData.seoDescription.length}/160 characters</p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Actions */}
+          <Card className="p-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <Label htmlFor="status">Product Status</Label>
+                <select
+                  id="status"
+                  value={formData.status}
+                  onChange={(e) => handleInputChange('status', e.target.value)}
+                  className="block mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-amber-500 focus:border-amber-500"
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                </select>
+              </div>
+
+              <div className="flex space-x-3">
+                <Button
+                  variant="outline"
+                  onClick={() => saveProduct('draft')}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save as Draft
+                    </>
+                  )}
+                </Button>
+                
+                <Button
+                  onClick={() => saveProduct('published')}
+                  disabled={saving}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {saving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Publishing...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Publish Product
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
           </Card>
         </div>
       </div>
