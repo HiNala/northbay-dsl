@@ -217,6 +217,12 @@ export const Footer: React.FC<FooterProps> = ({
               {/* Legal links */}
               <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm">
                 <a
+                  href="/auth/login"
+                  className="text-gray-600 hover:text-gold-600 transition-colors duration-200 font-medium"
+                >
+                  Client Login
+                </a>
+                <a
                   href="/privacy"
                   className="text-gray-600 hover:text-gold-600 transition-colors duration-200"
                 >

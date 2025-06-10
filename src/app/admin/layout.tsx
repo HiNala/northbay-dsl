@@ -1,6 +1,7 @@
 "use client"
 
 import React from 'react'
+import { signOut } from 'next-auth/react'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -145,7 +146,7 @@ export default function AdminLayout({
   return (
     <>
       <Navigation />
-      <div className="pt-20">
+      <div className="pt-24 lg:pt-32">
         <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
           <div className="hidden border-r bg-gray-100/40 md:block">
             <div className="flex h-full max-h-screen flex-col gap-2">
@@ -190,7 +191,7 @@ export default function AdminLayout({
                         <DropdownMenuItem>Settings</DropdownMenuItem>
                         <DropdownMenuItem>Support</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })}>
                           <LogOut className="h-4 w-4 mr-2" />
                           Logout
                         </DropdownMenuItem>

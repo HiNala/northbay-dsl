@@ -1,6 +1,7 @@
 "use client"
 
 import React from 'react'
+import { signOut } from 'next-auth/react'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -135,7 +136,7 @@ function UserMenu() {
           My Schedule
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-red-600">
+        <DropdownMenuItem className="text-red-600" onClick={() => signOut({ callbackUrl: '/' })}>
           <LogOut className="mr-2 h-4 w-4" />
           Logout
         </DropdownMenuItem>

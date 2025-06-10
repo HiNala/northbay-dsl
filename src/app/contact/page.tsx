@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Navigation } from "@/components/layout/navigation";
 import { cn, SPACING, TYPOGRAPHY, PATTERNS } from "@/lib/design-system";
-import { SectionSeparator } from "@/components/ui/section-separator";
+
 import { 
   MapPin, 
   Phone, 
@@ -189,7 +189,7 @@ export default function ContactPage() {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 bg-gradient-to-b from-navy-900 to-navy-800 text-white overflow-hidden">
+      <section className="relative pt-24 lg:pt-32 pb-20 bg-gradient-to-b from-navy-900 to-navy-800 text-white overflow-hidden">
 
         <div className={cn(SPACING.container.default, "relative z-10")}>
           <div className="text-center max-w-4xl mx-auto">
@@ -211,10 +211,9 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <SectionSeparator variant="default" />
-
-      {/* Contact Methods */}
-      <section className={cn(PATTERNS.section.spacious, SPACING.container.default)}>
+      {/* Contact Methods - Smooth gradient transition from hero */}
+      <section className="py-32 bg-gradient-to-b from-navy-800 via-white to-white">
+        <div className={cn(SPACING.container.default)}>
         <div className="text-center mb-20">
           <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-8 font-serif")}>
             How Can We Help?
@@ -260,13 +259,13 @@ export default function ContactPage() {
               </button>
             </div>
           ))}
+          </div>
         </div>
       </section>
 
-      <SectionSeparator variant="dots" />
-
-      {/* Contact Form & Info */}
-      <section className={cn(PATTERNS.section.luxury, SPACING.container.default)}>
+      {/* Contact Form & Info - Elegant gradient spacer */}
+      <section className="py-32 bg-gradient-to-b from-gray-50 to-white">
+        <div className={cn(SPACING.container.default)}>
         <div className="grid lg:grid-cols-2 gap-20">
           {/* Contact Form */}
           <div>
@@ -544,6 +543,7 @@ export default function ContactPage() {
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </section>
