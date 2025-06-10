@@ -134,11 +134,17 @@ model Product {
   inStock         Boolean   @default(true)
   stockQuantity   Int?      @default(0)
   trackInventory  Boolean   @default(false)
-  status          String    @default("draft") // 'draft', 'active', 'archived'
+  status          String    @default("draft") // 'draft', 'published', 'archived'
   type            String    @default("physical") // 'physical', 'service', 'digital'
   tags            String[]  // Flexible tagging
   seoTitle        String?
   seoDescription  String?
+  
+  // AI & Bulk Import Features
+  aiGeneratedDescription Boolean   @default(false) // Track if description is AI-generated
+  bulkImportBatch        String?   // Track bulk upload batches
+  lastAiUpdate           DateTime? // When AI last updated the description  
+  metaData               Json?     // Flexible field for import data
   
   // Relationships
   categoryId      String?   @db.Uuid
