@@ -25,11 +25,12 @@ import {
   Bath,
   Wrench,
   Package,
-  Hammer
+  Hammer,
+  Loader2,
+  AlertCircle
 } from 'lucide-react'
-// Advanced filtering components will be added when available
 
-// Function to get product images based on category
+// Function to get product images based on category - fallback for products without images
 const getProductImage = (category: string) => {
   const imageMap: Record<string, string> = {
     "Kitchen Islands": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
@@ -57,18 +58,53 @@ const getCategoryIcon = (category: string) => {
   return iconMap[category] || iconMap.default;
 };
 
-// Product and Filter interfaces
+// Product interface matching the database schema
 interface Product {
-  id: number
+  id: string
   name: string
-  category: string
-  brand: string
-  price: number
-  originalPrice?: number
-  rating: number
+  slug: string
+  description: string | null
+  price: number | null
+  comparePrice: number | null
   inStock: boolean
-  badge?: string
-  features: string[]
+  status: string
+  type: string
+  tags: string[]
+  Category: {
+    id: string
+    name: string
+    slug: string
+  } | null
+  Brand: {
+    id: string
+    name: string
+    slug: string
+  } | null
+  Images: {
+    id: string
+    url: string
+    alt: string | null
+    isHero: boolean
+  }[]
+}
+
+interface ProductsResponse {
+  success: boolean
+  products: Product[]
+  pagination: {
+    page: number
+    limit: number
+    totalCount: number
+    totalPages: number
+    hasNextPage: boolean
+    hasPrevPage: boolean
+  }
+  meta: {
+    searchQuery: string | null
+    statusFilter: string | null
+    categoryFilter: string | null
+    brandFilter: string | null
+  }
 }
 
 export default function ProductsPage() {
@@ -77,89 +113,73 @@ export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [selectedBrand, setSelectedBrand] = useState<string>('')
   
+  // State for API data
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [categories, setCategories] = useState<string[]>([])
+  const [brands, setBrands] = useState<string[]>([])
+  
   // Ref for card hover effects
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
-  
-  // Sample product data
-  const products: Product[] = [
-    {
-      id: 1,
-      name: "Handcrafted Carrara Marble Island",
-      category: "Kitchen Islands",
-      brand: "North Bay Designs",
-      price: 4500,
-      originalPrice: 5200,
-      rating: 5,
-      inStock: true,
-      badge: "Sale",
-      features: ["Imported Italian Carrara marble with unique veining", "Integrated brass breakfast bar"]
-    },
-    {
-      id: 2,
-      name: "Professional Dual-Fuel Range",
-      category: "Appliances", 
-      brand: "Sub-Zero Wolf",
-      price: 8900,
-      rating: 5,
-      inStock: true,
-      features: ["48-inch professional series with precision control", "Dual convection ovens"]
-    },
-    {
-      id: 3,
-      name: "Bespoke Walnut Cabinetry",
-      category: "Cabinetry",
-      brand: "North Bay Designs", 
-      price: 12500,
-      rating: 5,
-      inStock: true,
-      features: ["Hand-crafted American black walnut", "Soft-close hardware with lifetime warranty"]
-    },
-    {
-      id: 4,
-      name: "Designer Crystal Chandelier",
-      category: "Lighting",
-      brand: "Visual Comfort",
-      price: 3299,
-      originalPrice: 3899,
-      rating: 5,
-      inStock: true,
-      badge: "New",
-      features: ["Hand-forged iron with artisan finish", "Premium crystal accents"]
-    },
-    {
-      id: 5,
-      name: "Luxury Spa Vanity Collection",
-      category: "Bathroom",
-      brand: "Waterworks",
-      price: 5799,
-      rating: 5,
-      inStock: true,
-      features: ["Marble countertop with undermount basin", "Soft-close drawers with premium hardware"]
-    },
-    {
-      id: 6,
-      name: "Artisan Ceramic Backsplash",
-      category: "Tile",
-      brand: "Porcelanosa",
-      price: 189,
-      rating: 5,
-      inStock: true,
-      features: ["Hand-glazed ceramic with unique patterns", "Artisan-crafted in small batches"]
-    }
-  ]
 
-  // Filter products based on search, category, and brand
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = searchQuery === '' || 
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.brand.toLowerCase().includes(searchQuery.toLowerCase())
-    
-    const matchesCategory = selectedCategory === '' || product.category === selectedCategory
-    const matchesBrand = selectedBrand === '' || product.brand === selectedBrand
-    
-    return matchesSearch && matchesCategory && matchesBrand
-  })
+  // Fetch products from API
+  const fetchProducts = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      const params = new URLSearchParams({
+        include: 'brand,category,images',
+        limit: '50', // Get more products for better display
+        status: 'published' // Only show published products
+      })
+      
+      if (searchQuery) params.append('search', searchQuery)
+      if (selectedCategory) params.append('category', selectedCategory)
+      if (selectedBrand) params.append('brand', selectedBrand)
+      
+      const response = await fetch(`/api/products?${params.toString()}`)
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch products: ${response.statusText}`)
+      }
+      
+      const data: ProductsResponse = await response.json()
+      
+      if (data.success) {
+        setProducts(data.products)
+        
+        // Extract unique categories and brands for filter options
+        const uniqueCategories = Array.from(new Set(
+          data.products
+            .filter(p => p.Category)
+            .map(p => p.Category!.name)
+        )).sort()
+        
+        const uniqueBrands = Array.from(new Set(
+          data.products
+            .filter(p => p.Brand)
+            .map(p => p.Brand!.name)
+        )).sort()
+        
+        setCategories(uniqueCategories)
+        setBrands(uniqueBrands)
+      } else {
+        throw new Error('Failed to fetch products')
+      }
+    } catch (err) {
+      console.error('Error fetching products:', err)
+      setError(err instanceof Error ? err.message : 'Failed to load products')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Effect to fetch products on component mount and when filters change
+  useEffect(() => {
+    fetchProducts()
+  }, [searchQuery, selectedCategory, selectedBrand])
 
   // Card hover effect
   useEffect(() => {
@@ -204,14 +224,29 @@ export default function ProductsPage() {
         card.removeEventListener('mouseleave', () => handleMouseLeave(index))
       })
     }
-  }, [filteredProducts.length])
+  }, [products.length])
+
+  // Get primary image for product
+  const getProductImageUrl = (product: Product) => {
+    const heroImage = product.Images?.find(img => img.isHero)
+    const firstImage = product.Images?.[0]
+    const categoryFallback = product.Category?.name || 'default'
+    
+    return heroImage?.url || firstImage?.url || getProductImage(categoryFallback)
+  }
+
+  // Format price display
+  const formatPrice = (price: number | null) => {
+    if (!price) return 'Price on request'
+    return `$${price.toLocaleString()}`
+  }
 
   return (
     <div className="min-h-screen bg-background-light">
       <Navigation />
       
       {/* Add top padding to account for fixed navigation */}
-              <div className="pt-24 lg:pt-32">
+                             <div className="pt-20 lg:pt-32">
         {/* Enhanced Header */}
         <div className="bg-white border-b shadow-sm pt-24">
           <div className={cn(SPACING.container.default, PATTERNS.section.standard)}>
@@ -258,27 +293,24 @@ export default function ProductsPage() {
                 className="px-6 py-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 text-lg bg-white transition-all duration-300"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
+                disabled={loading}
               >
                 <option value="">All Categories</option>
-                <option value="Kitchen Islands">Kitchen Islands</option>
-                <option value="Appliances">Appliances</option>
-                <option value="Cabinetry">Cabinetry</option>
-                <option value="Lighting">Lighting</option>
-                <option value="Bathroom">Bathroom</option>
-                <option value="Tile">Tile</option>
+                {categories.map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
               </select>
               
               <select 
                 className="px-6 py-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 text-lg bg-white transition-all duration-300"
                 value={selectedBrand}
                 onChange={(e) => setSelectedBrand(e.target.value)}
+                disabled={loading}
               >
                 <option value="">All Brands</option>
-                <option value="North Bay Designs">North Bay Designs</option>
-                <option value="Sub-Zero Wolf">Sub-Zero Wolf</option>
-                <option value="Visual Comfort">Visual Comfort</option>
-                <option value="Waterworks">Waterworks</option>
-                <option value="Porcelanosa">Porcelanosa</option>
+                {brands.map(brand => (
+                  <option key={brand} value={brand}>{brand}</option>
+                ))}
               </select>
             </div>
             
@@ -345,217 +377,239 @@ export default function ProductsPage() {
             )}
           </div>
 
-          {/* Spacer */}
-          <div className="h-16"></div>
+          {/* Loading State */}
+          {loading && (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-gold-600 mr-3" />
+              <span className="text-lg text-gray-600">Loading products...</span>
+            </div>
+          )}
 
-          {/* Featured Categories */}
-          <div className="mb-16 py-16 bg-gradient-to-b from-gray-50 to-white">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-12 font-serif">
-              Shop by Category
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                { 
-                  name: 'Kitchens', 
-                  description: 'Handcrafted fixtures & professional appliances', 
-                  icon: ChefHat,
-                  image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
-                },
-                { 
-                  name: 'Bathrooms', 
-                  description: 'Luxury vanities & spa-inspired accessories', 
-                  icon: Bath,
-                  image: 'https://images.unsplash.com/photo-1620626011761-996317b8d101?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1587&q=80'
-                },
-                { 
-                  name: 'Lighting', 
-                  description: 'Designer fixtures & artisan pendants', 
-                  icon: Lightbulb,
-                  image: 'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80'
-                }
-              ].map((category) => (
-                <Card key={category.name} className="group hover:shadow-xl transition-all duration-500 border-0 shadow-lg overflow-hidden">
-                  <div className="relative h-64 overflow-hidden">
-                    <img 
-                      src={category.image} 
-                      alt={category.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-all duration-300" />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                      <div className="w-16 h-16 bg-gold-600/90 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 group-hover:bg-gold-700/90 transition-all duration-300">
-                        <category.icon className="w-8 h-8 text-white" />
-                      </div>
-                      <div className="text-center">
-                        <h3 className="text-2xl font-bold mb-2 font-serif">{category.name}</h3>
-                        <p className="text-gray-200 text-sm">{category.description}</p>
+          {/* Error State */}
+          {error && !loading && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
+              <div className="flex items-center">
+                <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
+                <h3 className="text-red-800 font-medium">Error Loading Products</h3>
+              </div>
+              <p className="text-red-700 mt-2">{error}</p>
+              <Button 
+                onClick={fetchProducts}
+                variant="outline"
+                className="mt-4 border-red-300 text-red-700 hover:bg-red-50"
+              >
+                Try Again
+              </Button>
+            </div>
+          )}
+
+          {/* No results message */}
+          {!loading && !error && products.length === 0 && (
+            <div className="text-center py-16">
+              <Sparkles className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-2xl font-semibold text-navy-900 mb-2 font-serif">No products found</h3>
+              <p className="text-gray-600 mb-6">Try adjusting your search or filters to find what you're looking for.</p>
+              <Button 
+                onClick={() => {
+                  setSearchQuery('')
+                  setSelectedCategory('')
+                  setSelectedBrand('')
+                }}
+                variant="outline"
+                className="border-gold-600 text-gold-600 hover:bg-gold-50"
+              >
+                Clear All Filters
+              </Button>
+            </div>
+          )}
+
+          {/* Featured Categories - Only show when we have products and no active filters */}
+          {!loading && !error && products.length > 0 && !searchQuery && !selectedCategory && !selectedBrand && (
+            <div className="mb-16 py-16 bg-gradient-to-b from-gray-50 to-white">
+              <h2 className="text-3xl font-bold text-center text-gray-900 mb-12 font-serif">
+                Shop by Category
+              </h2>
+              <div className="grid md:grid-cols-3 gap-8">
+                {[
+                  { 
+                    name: 'Kitchens', 
+                    description: 'Handcrafted fixtures & professional appliances', 
+                    icon: ChefHat,
+                    image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
+                  },
+                  { 
+                    name: 'Bathrooms', 
+                    description: 'Luxury vanities & spa-inspired accessories', 
+                    icon: Bath,
+                    image: 'https://images.unsplash.com/photo-1620626011761-996317b8d101?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1587&q=80'
+                  },
+                  { 
+                    name: 'Lighting', 
+                    description: 'Designer fixtures & artisan pendants', 
+                    icon: Lightbulb,
+                    image: 'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80'
+                  }
+                ].map((category) => (
+                  <Card key={category.name} className="group hover:shadow-xl transition-all duration-500 border-0 shadow-lg overflow-hidden cursor-pointer" onClick={() => setSelectedCategory(category.name)}>
+                    <div className="relative h-64 overflow-hidden">
+                      <img 
+                        src={category.image} 
+                        alt={category.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-all duration-300" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                        <div className="w-16 h-16 bg-gold-600/90 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 group-hover:bg-gold-700/90 transition-all duration-300">
+                          <category.icon className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="text-center">
+                          <h3 className="text-2xl font-bold mb-2 font-serif">{category.name}</h3>
+                          <p className="text-gray-200 text-sm">{category.description}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-            
-            {/* No results message */}
-            {filteredProducts.length === 0 && (
-              <div className="text-center py-16">
-                <Sparkles className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-2xl font-semibold text-navy-900 mb-2 font-serif">No products found</h3>
-                <p className="text-gray-600 mb-6">Try adjusting your search or filters to find what you're looking for.</p>
-                <Button 
-                  onClick={() => {
-                    setSearchQuery('')
-                    setSelectedCategory('')
-                    setSelectedBrand('')
-                  }}
-                  variant="outline"
-                  className="border-gold-600 text-gold-600 hover:bg-gold-50"
-                >
-                  Clear All Filters
-                </Button>
+                  </Card>
+                ))}
               </div>
-            )}
-          </div>
-
-          {/* Spacer */}
-          <div className="h-16 bg-gradient-to-b from-white to-gray-50"></div>
+            </div>
+          )}
 
           {/* Featured Products Grid */}
-          <div className="mb-16 py-16 bg-white">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-navy-900 mb-4 font-serif tracking-tight">
-                Artisan Collections
-              </h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Hand-selected pieces from our most celebrated designers and craftspeople
-              </p>
-            </div>
+          {!loading && !error && products.length > 0 && (
+            <div className="mb-16 py-16 bg-white">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold text-navy-900 mb-4 font-serif tracking-tight">
+                  {searchQuery || selectedCategory || selectedBrand ? 'Search Results' : 'Artisan Collections'}
+                </h2>
+                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                  {searchQuery || selectedCategory || selectedBrand 
+                    ? `Found ${products.length} product${products.length !== 1 ? 's' : ''} matching your criteria`
+                    : 'Hand-selected pieces from our most celebrated designers and craftspeople'
+                  }
+                </p>
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProducts.map((product, index) => (
-                <Card 
-                  key={product.id} 
-                  className="group overflow-hidden border-0 shadow-md hover:shadow-2xl transition-all duration-500 bg-white"
-                  ref={el => { cardRefs.current[index] = el }}
-                  style={{ 
-                    transformStyle: 'preserve-3d',
-                    transition: 'transform 0.3s ease'
-                  }}
-                >
-                  <div className="relative">
-                    <div className="h-80 relative overflow-hidden">
-                      <img 
-                        src={getProductImage(product.category)} 
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                      />
-                      <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all duration-300" />
-                      
-                      {/* Professional icon overlay */}
-                      <div className="absolute bottom-4 right-4 w-16 h-16 bg-gold-600/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg group-hover:bg-gold-700/90 transition-all duration-300">
-                        {getCategoryIcon(product.category)}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {products.map((product, index) => (
+                  <Card 
+                    key={product.id} 
+                    className="group overflow-hidden border-0 shadow-md hover:shadow-2xl transition-all duration-500 bg-white cursor-pointer"
+                    ref={el => { cardRefs.current[index] = el }}
+                    style={{ 
+                      transformStyle: 'preserve-3d',
+                      transition: 'transform 0.3s ease'
+                    }}
+                    onClick={() => window.location.href = `/products/${product.slug}`}
+                  >
+                    <div className="relative">
+                      <div className="h-80 relative overflow-hidden">
+                        <img 
+                          src={getProductImageUrl(product)} 
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                          onError={(e) => {
+                            // Fallback to category image if product image fails
+                            (e.target as HTMLImageElement).src = getProductImage(product.Category?.name || 'default')
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all duration-300" />
+                        
+                        {/* Professional icon overlay */}
+                        <div className="absolute bottom-4 right-4 w-16 h-16 bg-gold-600/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg group-hover:bg-gold-700/90 transition-all duration-300">
+                          {getCategoryIcon(product.Category?.name || 'default')}
+                        </div>
+                        
+                        <div className="absolute top-4 left-4 flex gap-2">
+                          {product.comparePrice && product.price && product.comparePrice > product.price && (
+                            <Badge className="bg-red-500 hover:bg-red-600 text-white">
+                              Sale
+                            </Badge>
+                          )}
+                          {product.inStock ? (
+                            <Badge variant="outline" className="bg-white/90 backdrop-blur-sm border-green-200 text-green-700">
+                              In Stock
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-white/90 backdrop-blur-sm border-red-200 text-red-700">
+                              Out of Stock
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        <div className="absolute top-4 right-4">
+                          {product.Brand && (
+                            <Badge variant="outline" className="bg-white/90 backdrop-blur-sm">
+                              {product.Brand.name}
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        {/* Overlay effect on hover */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                       </div>
-                      
-                      <div className="absolute top-4 left-4 flex gap-2">
-                        {product.badge && (
-                          <Badge className={product.badge === 'Sale' 
-                            ? 'bg-red-500 hover:bg-red-600 text-white' 
-                            : 'bg-green-500 hover:bg-green-600 text-white'
-                          }>
-                            {product.badge}
-                          </Badge>
-                        )}
-                        {product.inStock && (
-                          <Badge variant="outline" className="bg-white/90 backdrop-blur-sm border-green-200 text-green-700">
-                            In Stock
-                          </Badge>
-                        )}
-                      </div>
-                      
-                      <div className="absolute top-4 right-4">
-                        <Badge variant="outline" className="bg-white/90 backdrop-blur-sm">
-                          {product.brand}
-                        </Badge>
-                      </div>
-                      
-                      {/* Overlay effect on hover */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    </div>
-                  </div>
-                  
-                  <CardContent className="p-6 relative z-10">
-                    <div className="mb-2">
-                      <p className="text-sm text-gold-600 uppercase tracking-wide font-medium">
-                        {product.category}
-                      </p>
-                    </div>
-                    
-                    <h3 className="text-xl font-semibold text-navy-900 mb-3 group-hover:text-gold-600 transition-colors font-serif">
-                      {product.name}
-                    </h3>
-                    
-                    {/* Rating */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="flex text-gold-400">
-                        {[...Array(product.rating)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-current" />
-                        ))}
-                      </div>
-                      <span className="text-sm text-gray-500">({product.rating}.0)</span>
                     </div>
                     
-                    {/* Features */}
-                    <ul className="space-y-2 mb-6">
-                      {product.features.map((feature, index) => (
-                        <li key={index} className="flex items-center text-sm text-gray-600">
-                          <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                    
-                    {/* Price */}
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-navy-900 font-serif">
-                          ${product.price.toLocaleString()}
-                        </span>
-                        {product.originalPrice && (
-                          <span className="text-lg text-gray-500 line-through">
-                            ${product.originalPrice.toLocaleString()}
+                    <CardContent className="p-6 relative z-10">
+                      <div className="mb-2">
+                        <p className="text-sm text-gold-600 uppercase tracking-wide font-medium">
+                          {product.Category?.name || 'Uncategorized'}
+                        </p>
+                      </div>
+                      
+                      <h3 className="text-xl font-semibold text-navy-900 mb-3 group-hover:text-gold-600 transition-colors font-serif line-clamp-2">
+                        {product.name}
+                      </h3>
+                      
+                      {/* Description */}
+                      {product.description && (
+                        <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                          {product.description}
+                        </p>
+                      )}
+                      
+                      {/* Price */}
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl font-bold text-navy-900 font-serif">
+                            {formatPrice(product.price)}
                           </span>
-                        )}
+                          {product.comparePrice && product.price && product.comparePrice > product.price && (
+                            <span className="text-lg text-gray-500 line-through">
+                              {formatPrice(product.comparePrice)}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    
-                    {/* Actions */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <Button 
-                        size="sm" 
-                        className="bg-gold-600 hover:bg-gold-700 text-white transition-all duration-300 hover:shadow-md"
-                        asChild
-                      >
-                        <Link href="/contact">
-                          Get Quote
-                        </Link>
-                      </Button>
                       
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="border-gray-300 hover:border-gold-500 hover:text-gold-600 transition-all duration-300"
-                      >
-                        View Details
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      {/* Actions */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <Button 
+                          size="sm" 
+                          className="bg-gold-600 hover:bg-gold-700 text-white transition-all duration-300 hover:shadow-md"
+                          asChild
+                        >
+                          <Link href="/contact">
+                            Get Quote
+                          </Link>
+                        </Button>
+                        
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="border-gray-300 hover:border-gold-500 hover:text-gold-600 transition-all duration-300"
+                          asChild
+                        >
+                          <Link href={`/products/${product.slug}`}>
+                            View Details
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
-          </div>
-
-          {/* Spacer */}
-          <div className="h-16 bg-gradient-to-b from-white to-gold-50"></div>
+          )}
 
           {/* Enhanced Contact CTA */}
           <Card className="bg-gradient-to-r from-gold-50 via-gold-25 to-gold-50 border-gold-200 shadow-xl mb-16">

@@ -24,28 +24,56 @@ const updateProductSchema = z.object({
   metaData: z.record(z.any()).optional(),
 });
 
+// Helper function to determine if the identifier is a UUID or slug
+const isUUID = (str: string) => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+};
+
 // GET single product
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const product = await prisma.product.findUnique({
-      where: { 
-        id: params.id,
-        deletedAt: null 
-      },
-      include: {
-        Brand: true,
-        Category: true,
-        Images: true,
-        Variants: true,
-        Finishes: {
+    const { searchParams } = new URL(request.url);
+    const includeParam = searchParams.get('include');
+    
+    // Build include object based on request
+    const includeOptions: any = {
+      Brand: true,
+      Category: true,
+      Images: {
+        orderBy: { position: 'asc' }
+      }
+    };
+    
+    if (includeParam) {
+      const includes = includeParam.split(',');
+      if (includes.includes('variants')) {
+        includeOptions.Variants = {
+          where: { isActive: true },
+          orderBy: { sortOrder: 'asc' }
+        };
+      }
+      if (includes.includes('finishes')) {
+        includeOptions.Finishes = {
           include: {
             Finish: true
           }
-        }
+        };
       }
+    }
+
+    // Determine if we're searching by ID or slug
+    const isId = isUUID(params.id);
+    const whereClause = isId 
+      ? { id: params.id, deletedAt: null }
+      : { slug: params.id, deletedAt: null };
+
+    const product = await prisma.product.findUnique({
+      where: whereClause,
+      include: includeOptions
     });
 
     if (!product) {
@@ -106,12 +134,15 @@ export async function PATCH(
     const body = await request.json();
     const updateData = updateProductSchema.parse(body);
 
+    // Determine if we're searching by ID or slug
+    const isId = isUUID(params.id);
+    const whereClause = isId 
+      ? { id: params.id, deletedAt: null }
+      : { slug: params.id, deletedAt: null };
+
     // Check if product exists
     const existingProduct = await prisma.product.findUnique({
-      where: { 
-        id: params.id,
-        deletedAt: null 
-      }
+      where: whereClause
     });
 
     if (!existingProduct) {
@@ -123,9 +154,9 @@ export async function PATCH(
       (updateData as any).slug = updateData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     }
 
-    // Update the product
+    // Update the product (always use ID for update)
     const updatedProduct = await prisma.product.update({
-      where: { id: params.id },
+      where: { id: existingProduct.id },
       data: {
         ...updateData,
         updatedAt: new Date(),
@@ -180,21 +211,24 @@ export async function DELETE(
       return NextResponse.json({ error: 'Forbidden - Admin access required for deletion' }, { status: 403 });
     }
 
+    // Determine if we're searching by ID or slug
+    const isId = isUUID(params.id);
+    const whereClause = isId 
+      ? { id: params.id, deletedAt: null }
+      : { slug: params.id, deletedAt: null };
+
     // Check if product exists
     const existingProduct = await prisma.product.findUnique({
-      where: { 
-        id: params.id,
-        deletedAt: null 
-      }
+      where: whereClause
     });
 
     if (!existingProduct) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
-    // Soft delete the product
+    // Soft delete the product (always use ID for update)
     await prisma.product.update({
-      where: { id: params.id },
+      where: { id: existingProduct.id },
       data: {
         deletedAt: new Date(),
         status: 'archived'

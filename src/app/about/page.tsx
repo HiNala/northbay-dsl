@@ -132,7 +132,7 @@ export default function AboutPage() {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="relative pt-24 lg:pt-32 pb-20 bg-gradient-to-b from-navy-900 to-navy-800 text-white overflow-hidden">
+      <section className="relative pt-20 lg:pt-32 pb-16 bg-gradient-to-b from-navy-900 to-navy-800 text-white overflow-hidden">
 
         <div className={cn(SPACING.container.default, "relative z-10")}>
           <div className="text-center max-w-4xl mx-auto">

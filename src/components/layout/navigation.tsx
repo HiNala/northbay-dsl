@@ -30,59 +30,37 @@ export function Navigation() {
 
   return (
     <>
-      {/* Unified Header - Top Contact Bar + Navigation */}
-      <header
-        className={cn(
-          "fixed w-full z-50 transition-all duration-300",
-          isScrolled
-            ? "bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100"
-            : "bg-navy-900/90 backdrop-blur-sm shadow-lg"
-        )}
-      >
-        {/* Top contact bar - hidden on mobile, integrated with main nav */}
+      {/* Unified Navigation - Top Bar + Main Nav */}
+      <header className="fixed w-full z-50 bg-navy-900 shadow-lg transition-all duration-300">
+        {/* Top contact bar - disappears on scroll */}
         <div className={cn(
-          "hidden lg:block border-b transition-colors duration-300",
-          isScrolled 
-            ? "border-gray-200/50 bg-white/95" 
-            : "border-white/10 bg-navy-900/90"
+          "transition-all duration-300 overflow-hidden",
+          isScrolled ? "h-0 opacity-0" : "h-12 opacity-100"
         )}>
-          <div className={cn(SPACING.container.default, "flex justify-between items-center py-3 text-sm")}>
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center">
-                <Phone className={cn(
-                  "w-4 h-4 mr-2 transition-colors duration-300",
-                  isScrolled ? "text-navy-600" : "text-white"
-                )} />
-                <span className={cn(
-                  "transition-colors duration-300",
-                  isScrolled ? "text-navy-700" : "text-white"
-                )}>
-                  (707) 555-0123
-                </span>
+          <div className="hidden lg:block h-12">
+            <div className={cn(SPACING.container.default, "flex justify-between items-center py-3 text-sm border-b border-white/10")}>
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center">
+                  <Phone className="w-4 h-4 mr-2 text-white" />
+                  <span className="text-white">
+                    (707) 555-0123
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <MapPin className="w-4 h-4 mr-2 text-white" />
+                  <span className="text-white">
+                    Napa Valley Showroom
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center">
-                <MapPin className={cn(
-                  "w-4 h-4 mr-2 transition-colors duration-300",
-                  isScrolled ? "text-navy-600" : "text-white"
-                )} />
-                <span className={cn(
-                  "transition-colors duration-300",
-                  isScrolled ? "text-navy-700" : "text-white"
-                )}>
-                  Napa Valley Showroom
-                </span>
+              <div className="text-gold-400">
+                <span className={TYPOGRAPHY.accent}>PREMIUM DESIGN SERVICES</span>
               </div>
-            </div>
-            <div className={cn(
-              "transition-colors duration-300",
-              isScrolled ? "text-gold-600" : "text-gold-400"
-            )}>
-              <span className={TYPOGRAPHY.accent}>Premium Design Services</span>
             </div>
           </div>
         </div>
 
-        {/* Main navigation - seamlessly integrated */}
+        {/* Main Navigation - seamlessly connected */}
         <nav className="relative">
           <div className={cn(SPACING.container.default, "flex items-center h-20")}>
             {/* Logo - Fixed width for consistent centering */}
@@ -95,16 +73,10 @@ export function Navigation() {
                   <span className="text-white font-serif font-bold text-xl">NB</span>
                 </div>
                 <div className="hidden md:block ml-3">
-                  <div className={cn(
-                    "text-xl font-serif font-medium leading-tight transition-colors duration-300",
-                    isScrolled ? "text-navy-900" : "text-white"
-                  )}>
+                  <div className="text-xl font-serif font-medium leading-tight text-white">
                     North Bay
                   </div>
-                  <div className={cn(
-                    "text-sm font-medium tracking-wide leading-tight transition-colors duration-300",
-                    isScrolled ? "text-gold-600" : "text-gold-400"
-                  )}>
+                  <div className="text-sm font-medium tracking-wide leading-tight text-gold-400">
                     Kitchen & Bath
                   </div>
                 </div>
@@ -119,8 +91,7 @@ export function Navigation() {
                   href={item.href}
                   className={cn(
                     TYPOGRAPHY.body,
-                    "font-medium transition-colors duration-300 hover:text-gold-600 relative group",
-                    isScrolled ? "text-navy-700" : "text-white"
+                    "font-medium transition-colors duration-300 hover:text-gold-400 relative group text-white"
                   )}
                 >
                   {item.name}
@@ -133,12 +104,7 @@ export function Navigation() {
             <div className="w-1/4 flex items-center justify-end space-x-4">
               {/* Search button */}
               <button
-                className={cn(
-                  "p-2 rounded-full transition-colors duration-300",
-                  isScrolled 
-                    ? "text-navy-700 hover:bg-gold-50 hover:text-gold-600" 
-                    : "text-white hover:bg-white/10"
-                )}
+                className="p-2 rounded-full transition-colors duration-300 text-white hover:bg-white/10"
               >
                 <Search className="w-5 h-5" />
               </button>
@@ -157,12 +123,7 @@ export function Navigation() {
               {/* Mobile menu button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className={cn(
-                  "lg:hidden p-2 rounded-md transition-colors duration-300",
-                  isScrolled 
-                    ? "text-navy-700 hover:bg-gold-50" 
-                    : "text-white hover:bg-white/10"
-                )}
+                className="lg:hidden p-2 rounded-md transition-colors duration-300 text-white hover:bg-white/10"
               >
                 {isMobileMenuOpen ? (
                   <X className="w-6 h-6" />

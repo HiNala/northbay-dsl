@@ -132,7 +132,7 @@ export default function DesignServicesPage() {
       <Navigation />
 
       {/* Add top padding to account for fixed navigation */}
-              <div className="pt-24 lg:pt-32">
+              <div className="pt-20 lg:pt-32">
         {/* Hero Section - Clean & Elegant */}
         <section className="relative min-h-[90vh] w-full flex items-center overflow-hidden bg-gradient-to-b from-background-light to-background py-24 lg:py-32">
           {/* Background decorative elements */}
