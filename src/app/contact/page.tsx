@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Navigation } from "@/components/layout/navigation";
+import EnhancedHeader from '@/components/layout/EnhancedHeader';
 import { cn, SPACING, TYPOGRAPHY, PATTERNS } from "@/lib/design-system";
 
 import { 
@@ -138,8 +138,8 @@ export default function ContactPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-background-light">
-        <Navigation />
+      <div className="min-h-screen bg-background-light overflow-x-hidden">
+        <EnhancedHeader />
         
         <section className="pt-32 pb-20">
           <div className={cn(SPACING.container.default)}>
@@ -185,8 +185,8 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background-light">
-      <Navigation />
+    <div className="min-h-screen bg-background-light overflow-x-hidden">
+      <EnhancedHeader />
 
       {/* Hero Section */}
       <section className="relative pt-20 lg:pt-32 pb-16 bg-gradient-to-b from-navy-900 to-navy-800 text-white overflow-hidden">

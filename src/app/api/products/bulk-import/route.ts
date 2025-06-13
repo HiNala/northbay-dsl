@@ -117,7 +117,11 @@ export async function POST(request: NextRequest) {
 
     // Generate batch ID for tracking
     const batchId = validatedMetadata.importOptions?.bulkImportBatch || `import-${uuidv4()}`;
-    const importOptions = validatedMetadata.importOptions || {};
+    const importOptions = validatedMetadata.importOptions || {
+      updateExisting: false,
+      skipDuplicates: true,
+      defaultStatus: 'draft' as const,
+    };
 
     // Process valid products for import
     const validProducts = importResult.data.filter((_, index) => {
@@ -163,8 +167,8 @@ export async function POST(request: NextRequest) {
                   price: product.price || existingProduct.price,
                   comparePrice: product.comparePrice || existingProduct.comparePrice,
                   sku: product.sku || existingProduct.sku,
-                  tags: product.tags || existingProduct.tags,
-                  specifications: product.specifications || existingProduct.specifications,
+                  tags: product.tags || existingProduct.tags || undefined,
+                  specifications: product.specifications || existingProduct.specifications || undefined,
                   inStock: product.inStock ?? existingProduct.inStock,
                   stockQuantity: product.stockQuantity ?? existingProduct.stockQuantity,
                   status: product.status || existingProduct.status,
@@ -173,10 +177,10 @@ export async function POST(request: NextRequest) {
                   brandId: importOptions.defaultBrandId || existingProduct.brandId,
                   bulkImportBatch: batchId,
                   metaData: {
-                    ...(existingProduct.metaData as any || {}),
+                    ...(typeof existingProduct.metaData === 'object' && existingProduct.metaData ? existingProduct.metaData as Record<string, any> : {}),
                     lastImport: new Date().toISOString(),
                     importBatch: batchId,
-                  },
+                  } as any,
                   updatedAt: new Date(),
                 }
               });

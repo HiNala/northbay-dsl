@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions, isAdmin } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { hash } from 'bcryptjs'
+import bcrypt from 'bcryptjs'
+import { z } from 'zod'
+import crypto from 'crypto'
 
+// GET /api/admin/users - List all users with filtering and pagination
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -11,55 +14,40 @@ export async function GET(request: NextRequest) {
     if (!session?.user || !isAdmin(session.user)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
     const search = searchParams.get('search') || ''
+    const status = searchParams.get('status') || ''
     const role = searchParams.get('role') || ''
 
     const skip = (page - 1) * limit
 
     // Build where clause
-    const where: any = {
-      AND: [
-        // Only show business users (not customers)
-        {
-          roles: {
-            some: {
-              Role: {
-                name: {
-                  in: ['admin', 'manager', 'employee', 'super_admin']
-                }
-              }
-            }
-          }
-        }
+    const where: any = {}
+    
+    if (search) {
+      where.OR = [
+        { email: { contains: search, mode: 'insensitive' } },
+        { Profile: { fullName: { contains: search, mode: 'insensitive' } } }
       ]
     }
-
-    // Add search filter
-    if (search) {
-      where.AND.push({
-        OR: [
-          { email: { contains: search, mode: 'insensitive' } },
-          { Profile: { fullName: { contains: search, mode: 'insensitive' } } }
-        ]
-      })
+    
+    if (status) {
+      where.status = status
     }
 
-    // Add role filter
     if (role) {
-      where.AND.push({
-        roles: {
-          some: {
-            Role: { name: role }
+      where.roles = {
+        some: {
+          Role: {
+            name: role
           }
         }
-      })
+      }
     }
 
-    const [users, totalCount] = await Promise.all([
+    const [users, total] = await Promise.all([
       prisma.user.findMany({
         where,
         skip,
@@ -70,45 +58,36 @@ export async function GET(request: NextRequest) {
             include: {
               Role: true
             }
+          },
+          _count: {
+            select: {
+              Orders: true,
+              DesignLeads: true,
+              Wishlists: true
+            }
           }
         },
-        orderBy: { Profile: { fullName: 'asc' } }
+        orderBy: {
+          createdAt: 'desc'
+        }
       }),
       prisma.user.count({ where })
     ])
 
-    // Transform user data for frontend
-    const transformedUsers = users.map(user => ({
-      id: user.id,
-      email: user.email,
-      fullName: user.Profile?.fullName || 'Unknown',
-      phone: user.Profile?.phone,
-      roles: user.roles.map(ur => ({
-        name: ur.Role.name,
-        displayName: ur.Role.displayName,
-        level: ur.Role.level
-      })),
-      highestRole: user.roles.reduce((highest, current) => 
-        current.Role.level > highest.level ? current.Role : highest, 
-        user.roles[0]?.Role || { name: 'customer', displayName: 'Customer', level: 0 }
-      ),
-      createdAt: user.Profile?.createdAt
-    }))
-
-    const totalPages = Math.ceil(totalCount / limit)
-
     return NextResponse.json({
-      users: transformedUsers,
+      users: users.map(user => ({
+        ...user,
+        password: undefined, // Don't expose password
+        passwordResetToken: undefined,
+        twoFactorSecret: undefined
+      })),
       pagination: {
         page,
         limit,
-        totalCount,
-        totalPages,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1
+        total,
+        pages: Math.ceil(total / limit)
       }
     })
-
   } catch (error) {
     console.error('Error fetching users:', error)
     return NextResponse.json(
@@ -118,6 +97,17 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST /api/admin/users - Create new user
+const createUserSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  fullName: z.string().optional(),
+  phone: z.string().optional(),
+  status: z.enum(['active', 'inactive', 'suspended', 'pending']).default('active'),
+  roleIds: z.array(z.string()).min(1, 'At least one role is required'),
+  emailVerified: z.boolean().default(false)
+})
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -126,20 +116,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const data = await request.json()
-    const { email, password, fullName, phone, role } = data
-
-    // Validate required fields
-    if (!email || !password || !fullName || !role) {
-      return NextResponse.json(
-        { error: 'Email, password, full name, and role are required' },
-        { status: 400 }
-      )
-    }
+    const body = await request.json()
+    const validatedData = createUserSchema.parse(body)
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email }
+      where: { email: validatedData.email }
     })
 
     if (existingUser) {
@@ -149,61 +131,54 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Find the role
-    const roleRecord = await prisma.role.findUnique({
-      where: { name: role }
+    // Hash password
+    const hashedPassword = await bcrypt.hash(validatedData.password, 12)
+
+    // Create user with profile and roles
+    const user = await prisma.user.create({
+      data: {
+        id: crypto.randomUUID(),
+        email: validatedData.email,
+        password: hashedPassword,
+        status: validatedData.status,
+        emailVerified: validatedData.emailVerified,
+        emailVerifiedAt: validatedData.emailVerified ? new Date() : null,
+        Profile: validatedData.fullName || validatedData.phone ? {
+          create: {
+            fullName: validatedData.fullName,
+            phone: validatedData.phone
+          }
+        } : undefined,
+        roles: {
+          create: validatedData.roleIds.map(roleId => ({
+            roleId
+          }))
+        }
+      },
+      include: {
+        Profile: true,
+        roles: {
+          include: {
+            Role: true
+          }
+        }
+      }
     })
 
-    if (!roleRecord) {
+    // Remove sensitive data from response
+    const { password, passwordResetToken, twoFactorSecret, ...safeUser } = user
+
+    return NextResponse.json(safeUser, { status: 201 })
+  } catch (error) {
+    console.error('Error creating user:', error)
+    
+    if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid role specified' },
+        { error: 'Validation error', details: error.errors },
         { status: 400 }
       )
     }
 
-    // Hash password
-    const hashedPassword = await hash(password, 12)
-
-    // Create user with profile and role in a transaction
-    const newUser = await prisma.$transaction(async (tx) => {
-      // Create user
-      const user = await tx.user.create({
-        data: {
-          id: crypto.randomUUID(),
-          email,
-          password: hashedPassword,
-        }
-      })
-
-      // Create profile
-      await tx.profile.create({
-        data: {
-          id: crypto.randomUUID(),
-          userId: user.id,
-          fullName,
-          phone: phone || null,
-        }
-      })
-
-      // Assign role
-      await tx.userRole.create({
-        data: {
-          userId: user.id,
-          roleId: roleRecord.id,
-        }
-      })
-
-      return user
-    })
-
-    return NextResponse.json({
-      success: true,
-      message: 'User created successfully',
-      userId: newUser.id
-    })
-
-  } catch (error) {
-    console.error('Error creating user:', error)
     return NextResponse.json(
       { error: 'Failed to create user' },
       { status: 500 }

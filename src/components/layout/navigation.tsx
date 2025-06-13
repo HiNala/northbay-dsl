@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn, TYPOGRAPHY, SPACING } from "@/lib/design-system";
 import { Search, Menu, X, Phone, MapPin } from "lucide-react";
 
@@ -17,25 +18,59 @@ const navigationItems = [
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
 
   // Handle scroll effect for sticky navigation
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const scrollY = window.scrollY;
+      setIsScrolled(scrollY > 50);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // For homepage, check if we're past the hero section for background transparency
+  const [isInHero, setIsInHero] = useState(true);
+
+  useEffect(() => {
+    const handleScrollForHomepage = () => {
+      if (isHomePage) {
+        // Consider past hero when scrolled more than 80% of viewport height
+        setIsInHero(window.scrollY < window.innerHeight * 0.8);
+      } else {
+        setIsInHero(false);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      handleScrollForHomepage(); // Check initial state
+      window.addEventListener("scroll", handleScrollForHomepage);
+      return () => window.removeEventListener("scroll", handleScrollForHomepage);
+    }
+  }, [isHomePage]);
+
+  // Determine navigation background
+  const getNavigationStyle = () => {
+    if (isHomePage && isInHero) {
+      return "bg-transparent"; // Transparent when in hero on homepage
+    }
+    return "bg-navy-900 shadow-lg"; // Solid navy when scrolled or on other pages
+  };
+
   return (
     <>
       {/* Unified Navigation - Top Bar + Main Nav */}
-      <header className="fixed w-full z-50 bg-navy-900 shadow-lg transition-all duration-300">
-        {/* Top contact bar - disappears on scroll */}
+      <header className={cn(
+        "fixed w-full z-50 transition-all duration-300 mt-4",
+        getNavigationStyle()
+      )}>
+        {/* Top contact bar - hidden on homepage, disappears on scroll on other pages */}
         <div className={cn(
           "transition-all duration-300 overflow-hidden",
-          isScrolled ? "h-0 opacity-0" : "h-12 opacity-100"
+          isHomePage ? "h-0 opacity-0" : (isScrolled ? "h-0 opacity-0" : "h-12 opacity-100")
         )}>
           <div className="hidden lg:block h-12">
             <div className={cn(SPACING.container.default, "flex justify-between items-center py-3 text-sm border-b border-white/10")}>

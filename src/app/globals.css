@@ -312,6 +312,191 @@ select:focus-visible {
   background: #9e7c0c;
 }
 
+/* Design services page specific scrollbar */
+.bg-warm-brown-900 ::-webkit-scrollbar-track {
+  background: #3D2914;
+}
+
+.bg-warm-brown-900 ::-webkit-scrollbar-thumb {
+  background: #D4AF37;
+  border-radius: 4px;
+}
+
+.bg-warm-brown-900 ::-webkit-scrollbar-thumb:hover {
+  background: #B8941F;
+}
+
+/* Ensure smooth font rendering */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Luxury homepage enhancements */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(212, 175, 55, 0.2);
+  color: #1a1d20;
+}
+
+/* Focus styles for accessibility */
+button:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid #d4af37;
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for all interactive elements */
+button,
+a,
+input,
+textarea,
+select {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Loading animation */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+/* Utility classes */
+.text-balance {
+  text-wrap: balance;
+}
+
+.container-padding {
+  padding-left: max(1.5rem, 50% - 672px);
+  padding-right: max(1.5rem, 50% - 672px);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .text-hero {
+    font-size: clamp(2rem, 10vw, 4rem);
+  }
+  
+  .text-display {
+    font-size: clamp(1.75rem, 8vw, 3rem);
+  }
+}
+
+/* Print styles */
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
+
+/* Portfolio page specific styles */
+
+/* Serif font for headings */
+.font-serif {
+  font-family: 'Playfair Display', 'Times New Roman', serif;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Custom select styling */
+select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  appearance: none;
+}
+
+/* Enhanced shimmer loading */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+/* Portfolio grid masonry enhancements */
+.masonry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-auto-rows: min-content;
+  gap: 2rem;
+}
+
+/* Form step transitions */
+.step-transition {
+  animation: stepSlide 0.4s ease-out;
+}
+
+@keyframes stepSlide {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Image hover effects for portfolio */
+.portfolio-image {
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.portfolio-image:hover {
+  transform: scale(1.05);
+}
+
+/* Enhanced focus styles for forms */
+.form-input:focus {
+  outline: none;
+  ring: 2px solid #d4af37;
+  ring-offset: 2px;
+  border-color: transparent;
+}
+
 /* Loading states */
 .skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);

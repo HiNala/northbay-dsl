@@ -9,6 +9,59 @@ module.exports = {
   theme: {
   	extend: {
   		colors: {
+  			'charcoal': {
+  				50: '#f8f9fa',
+  				100: '#e9ecef',
+  				200: '#dee2e6',
+  				300: '#ced4da',
+  				400: '#adb5bd',
+  				500: '#6c757d',
+  				600: '#495057',
+  				700: '#343a40',
+  				800: '#212529',
+  				900: '#1a1d20',
+  			},
+  			'warm-white': {
+  				50: '#fefefe',
+  				100: '#fdfdfc',
+  				200: '#faf9f7',
+  				300: '#f7f5f3',
+  				400: '#f4f1ee',
+  				500: '#f1ede9',
+  			},
+  			'luxury-gold': {
+  				50: '#fefdf8',
+  				100: '#fefbf0',
+  				200: '#fcf4d9',
+  				300: '#f9edc2',
+  				400: '#f3df94',
+  				500: '#d4af37',
+  				600: '#b8941f',
+  				700: '#9c7a1a',
+  				800: '#806015',
+  				900: '#664c11',
+  			},
+  			'stone': {
+  				50: '#fafaf9',
+  				100: '#f4f4f3',
+  				200: '#e5e5e4',
+  				300: '#d6d6d4',
+  				400: '#a8a8a6',
+  				500: '#7a7a78',
+  				600: '#6e6e6c',
+  				700: '#5c5c5a',
+  				800: '#4a4a48',
+  				900: '#3d3d3b',
+  			},
+  			'warm-brown': {
+  				'900': '#3D2914',
+  				'800': '#4A3319',
+  				'700': '#5D3F23',
+  				'600': '#6B4423',
+  				'500': '#8B5A2B'
+  			},
+  			'cream': '#F7F3E9',
+  			'accent-gold': '#D4AF37',
   			gold: {
   				'50': '#FEFCE8',
   				'100': '#FEF3C7',
@@ -83,6 +136,8 @@ module.exports = {
   			}
   		},
   		fontFamily: {
+  			'display': ['Inter', 'SF Pro Display', 'system-ui', 'sans-serif'],
+  			'body': ['Inter', 'system-ui', 'sans-serif'],
   			serif: [
   				'Playfair Display',
   				'Georgia',
@@ -95,13 +150,11 @@ module.exports = {
   			]
   		},
   		fontSize: {
-  			hero: [
-  				'4rem',
-  				{
-  					lineHeight: '1',
-  					letterSpacing: '-0.02em'
-  				}
-  			],
+  			'hero': ['clamp(3rem, 8vw, 7rem)', { lineHeight: '0.9', letterSpacing: '-0.02em' }],
+  			'display': ['clamp(2.5rem, 6vw, 5rem)', { lineHeight: '1.1', letterSpacing: '-0.01em' }],
+  			'headline': ['clamp(1.75rem, 4vw, 3rem)', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
+  			'subheading': ['clamp(1.25rem, 3vw, 1.75rem)', { lineHeight: '1.3' }],
+  			'body-large': ['clamp(1.125rem, 2.5vw, 1.375rem)', { lineHeight: '1.6' }],
   			'hero-sm': [
   				'3rem',
   				{
@@ -110,6 +163,12 @@ module.exports = {
   				}
   			]
   		},
+  		spacing: {
+  			'18': '4.5rem',
+  			'88': '22rem',
+  			'100': '25rem',
+  			'128': '32rem'
+  		},
   		letterSpacing: {
   			luxury: '0.025em',
   			wide: '0.05em',
@@ -117,9 +176,25 @@ module.exports = {
   			widest: '0.15em'
   		},
   		animation: {
-  			'fade-in': 'fadeIn 0.5s ease-in-out',
+  			'fade-in-up': 'fadeInUp 0.8s ease-out',
+  			'fade-in': 'fadeIn 0.6s ease-out',
+  			'slide-in': 'slideIn 1s ease-out',
   			'slide-up': 'slideUp 0.5s ease-out',
   			'scale-in': 'scaleIn 0.3s ease-out'
+  		},
+  		keyframes: {
+  			fadeInUp: {
+  				'0%': { opacity: '0', transform: 'translateY(30px)' },
+  				'100%': { opacity: '1', transform: 'translateY(0)' },
+  			},
+  			fadeIn: {
+  				'0%': { opacity: '0' },
+  				'100%': { opacity: '1' },
+  			},
+  			slideIn: {
+  				'0%': { opacity: '0', transform: 'translateX(-20px)' },
+  				'100%': { opacity: '1', transform: 'translateX(0)' },
+  			},
   		},
   		backdropBlur: {
   			xs: '2px'

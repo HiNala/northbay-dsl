@@ -1,9 +1,18 @@
 import OpenAI from 'openai';
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Check if OpenAI is properly configured
+const isOpenAIConfigured = () => {
+  const apiKey = process.env.OPENAI_API_KEY;
+  return apiKey && apiKey !== 'your-actual-openai-api-key-here-sk-proj-xxxx' && apiKey.startsWith('sk-');
+};
+
+// Initialize OpenAI client only if configured
+let openai: OpenAI | null = null;
+if (isOpenAIConfigured()) {
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
 
 export interface ProductData {
   name: string;
@@ -25,6 +34,56 @@ export interface AIDescriptionOptions {
   seoKeywords?: string[];
 }
 
+// Generate fallback description when AI is not available
+function generateFallbackDescription(productData: ProductData): {
+  description: string;
+  seoTitle: string;
+  seoDescription: string;
+  quality_score: number;
+  word_count: number;
+} {
+  const { name, category, brand, price, specifications } = productData;
+  
+  let description = `Experience the luxury of ${name}`;
+  
+  if (brand) {
+    description += ` by ${brand}`;
+  }
+  
+  if (category) {
+    description += `, a premium ${category.toLowerCase()}`;
+  }
+  
+  description += '. ';
+  
+  // Add specifications if available
+  if (specifications && Object.keys(specifications).length > 0) {
+    description += 'Features include ';
+    const features = Object.entries(specifications)
+      .slice(0, 3)
+      .map(([key, value]) => `${key.toLowerCase()}: ${value}`)
+      .join(', ');
+    description += features + '. ';
+  }
+  
+  description += 'Crafted with exceptional attention to detail, this piece brings sophistication and functionality to your space. Perfect for discerning homeowners who appreciate quality and style.';
+  
+  if (price) {
+    description += ` Available in our ${formatPriceRange(price)} collection.`;
+  }
+  
+  const seoTitle = `${name}${brand ? ` - ${brand}` : ''} | North Bay Kitchen & Bath`;
+  const seoDescription = `Discover ${name}${category ? ` - premium ${category.toLowerCase()}` : ''} at North Bay Kitchen & Bath. Luxury design meets exceptional craftsmanship.`;
+  
+  return {
+    description,
+    seoTitle: seoTitle.length > 60 ? seoTitle.substring(0, 57) + '...' : seoTitle,
+    seoDescription: seoDescription.length > 160 ? seoDescription.substring(0, 157) + '...' : seoDescription,
+    quality_score: 65, // Fallback quality score
+    word_count: description.split(' ').length
+  };
+}
+
 // Generate luxury-focused product description
 export async function generateProductDescription(
   productData: ProductData,
@@ -42,6 +101,12 @@ export async function generateProductDescription(
   quality_score: number;
   word_count: number;
 }> {
+  // Check if OpenAI is configured
+  if (!isOpenAIConfigured() || !openai) {
+    console.warn('⚠️ OpenAI not configured, using fallback description generation');
+    return generateFallbackDescription(productData);
+  }
+
   try {
     const prompt = buildPrompt(productData, options);
     
@@ -95,8 +160,38 @@ Always return valid JSON with this exact structure:
 
   } catch (error) {
     console.error('AI Description Generation Error:', error);
+    
+    // If OpenAI fails, provide fallback
+    if (error instanceof Error && (
+      error.message.includes('API key') || 
+      error.message.includes('authentication') ||
+      error.message.includes('quota')
+    )) {
+      console.warn('🔄 OpenAI API issue, using fallback description');
+      return generateFallbackDescription(productData);
+    }
+    
     throw new Error(`Failed to generate description: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
+}
+
+// Check AI configuration status
+export function getAIStatus(): {
+  configured: boolean;
+  available: boolean;
+  model: string;
+  message: string;
+} {
+  const configured = Boolean(isOpenAIConfigured());
+  
+  return {
+    configured,
+    available: configured && !!openai,
+    model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+    message: configured 
+      ? 'AI features are enabled and ready to use'
+      : 'OpenAI API key not configured. AI features will use fallback descriptions.'
+  };
 }
 
 // Build the prompt based on product data and options

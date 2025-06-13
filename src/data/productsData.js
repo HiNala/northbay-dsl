@@ -1,0 +1,305 @@
+// /data/productsData.js
+export const productCategories = [
+  {
+    id: 'kitchen',
+    name: 'Kitchen',
+    description: 'Transform your culinary space with our curated kitchen collections',
+    image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+    subcategories: [
+      { id: 'cabinetry', name: 'Custom Cabinetry', count: 24 },
+      { id: 'countertops', name: 'Countertops', count: 18 },
+      { id: 'backsplashes', name: 'Backsplashes', count: 32 },
+      { id: 'appliances', name: 'Premium Appliances', count: 45 },
+      { id: 'kitchen-hardware', name: 'Hardware & Fixtures', count: 67 },
+      { id: 'kitchen-sinks', name: 'Kitchen Sinks', count: 23 }
+    ]
+  },
+  {
+    id: 'bathroom',
+    name: 'Bathroom', 
+    description: 'Create your personal spa sanctuary with luxurious bathroom collections',
+    image: 'https://images.unsplash.com/photo-1620626011761-996317b8d101?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+    subcategories: [
+      { id: 'vanities', name: 'Vanities & Storage', count: 28 },
+      { id: 'bathtubs', name: 'Bathtubs & Soaking Tubs', count: 15 },
+      { id: 'showers', name: 'Shower Systems', count: 22 },
+      { id: 'bathroom-tile', name: 'Tile & Stone', count: 89 },
+      { id: 'bathroom-hardware', name: 'Hardware & Accessories', count: 54 },
+      { id: 'bathroom-lighting', name: 'Bathroom Lighting', count: 31 }
+    ]
+  },
+  {
+    id: 'lighting',
+    name: 'Lighting',
+    description: 'Illuminate your spaces with our designer lighting collections',
+    image: 'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+    subcategories: [
+      { id: 'chandeliers', name: 'Chandeliers', count: 34 },
+      { id: 'pendants', name: 'Pendant Lighting', count: 67 },
+      { id: 'sconces', name: 'Wall Sconces', count: 45 },
+      { id: 'recessed', name: 'Recessed Lighting', count: 23 },
+      { id: 'under-cabinet', name: 'Under Cabinet', count: 18 }
+    ]
+  },
+  {
+    id: 'hardware',
+    name: 'Hardware',
+    description: 'Premium hardware and fixtures that perfect every detail',
+    image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+    subcategories: [
+      { id: 'cabinet-hardware', name: 'Cabinet Hardware', count: 156 },
+      { id: 'door-hardware', name: 'Door Hardware', count: 43 },
+      { id: 'plumbing-fixtures', name: 'Plumbing Fixtures', count: 78 },
+      { id: 'decorative-hardware', name: 'Decorative Hardware', count: 34 }
+    ]
+  }
+];
+
+export const sampleProducts = [
+  {
+    id: 'carrara-marble-island',
+    name: 'Handcrafted Carrara Marble Island',
+    brand: 'North Bay Designs',
+    category: 'kitchen',
+    subcategory: 'countertops',
+    price: { type: 'custom', display: 'Starting at $4,500' },
+    availability: 'Made to Order',
+    leadTime: '8-12 weeks',
+    images: [
+      'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1556909048-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1556909048-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1556909048-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
+    ],
+    description: 'Imported Italian Carrara marble with integrated breakfast bar and premium brass hardware. Each piece unique with natural veining.',
+    features: [
+      'Genuine Carrara marble from Italy',
+      'Custom fabrication available',
+      'Integrated breakfast bar option',
+      'Premium brass hardware included',
+      'Lifetime warranty on craftsmanship',
+      'Professional installation included'
+    ],
+    specifications: {
+      material: 'Carrara Marble',
+      finish: 'Polished',
+      thickness: '1.25 inches',
+      edgeProfile: 'Eased edge standard',
+      dimensions: 'Custom sizing available',
+      weight: 'Approximately 18 lbs per sq ft'
+    },
+    careInstructions: 'Seal annually with marble sealer. Clean with pH-neutral stone cleaner only.',
+    featured: true,
+    newProduct: false,
+    tags: ['luxury', 'natural-stone', 'custom', 'italian'],
+    relatedProducts: ['brass-cabinet-hardware', 'undermount-sink', 'pendant-lighting']
+  },
+  {
+    id: 'professional-dual-fuel-range',
+    name: 'Professional Dual-Fuel Range',
+    brand: 'Sub-Zero Wolf',
+    category: 'kitchen',
+    subcategory: 'appliances',
+    price: { type: 'msrp', display: '$8,900' },
+    availability: 'In Stock',
+    leadTime: '2-4 weeks',
+    images: [
+      'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1556909048-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1556909048-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
+    ],
+    description: '48-inch professional series with convection ovens, precision temperature control, and commercial-grade performance for the home chef.',
+    features: [
+      '48-inch professional design',
+      'Dual convection ovens',
+      'Precision temperature control',
+      'Commercial-grade BTU output',
+      '10-year warranty',
+      'Professional installation required'
+    ],
+    specifications: {
+      width: '48 inches',
+      height: '36 inches', 
+      depth: '27 inches',
+      fuel: 'Dual-fuel (gas/electric)',
+      btu: '20,000 BTU sealed burners',
+      ovenCapacity: '4.6 cu ft per oven'
+    },
+    featured: true,
+    newProduct: true,
+    tags: ['professional', 'wolf', 'dual-fuel', 'luxury-appliance'],
+    relatedProducts: ['range-hood', 'custom-cabinetry', 'stone-countertop']
+  },
+  {
+    id: 'bespoke-walnut-cabinetry',
+    name: 'Bespoke Walnut Cabinetry',
+    brand: 'North Bay Designs',
+    category: 'kitchen',
+    subcategory: 'cabinetry',
+    price: { type: 'custom', display: 'From $12,500' },
+    availability: 'Made to Order',
+    leadTime: '10-14 weeks',
+    images: [
+      'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1556909048-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1556909048-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
+    ],
+    description: 'Hand-crafted American black walnut with soft-close hardware, custom finishes, and lifetime warranty on craftsmanship.',
+    features: [
+      'Hand-selected American black walnut',
+      'Soft-close Blum hardware',
+      'Custom sizing and configuration',
+      'Multiple finish options',
+      'Lifetime warranty on craftsmanship',
+      'Professional design consultation included'
+    ],
+    specifications: {
+      wood: 'American Black Walnut',
+      construction: 'Solid wood doors and frames',
+      hardware: 'Blum soft-close hinges and slides',
+      finish: 'Multiple options available',
+      customization: 'Full customization available'
+    },
+    featured: true,
+    newProduct: false,
+    tags: ['custom', 'walnut', 'handcrafted', 'luxury'],
+    relatedProducts: ['brass-hardware', 'quartz-countertop', 'under-cabinet-lighting']
+  },
+  {
+    id: 'luxury-spa-bathtub',
+    name: 'Luxury Spa Soaking Tub',
+    brand: 'Kohler',
+    category: 'bathroom',
+    subcategory: 'bathtubs',
+    price: { type: 'msrp', display: '$3,200' },
+    availability: 'In Stock',
+    leadTime: '3-5 weeks',
+    images: [
+      'https://images.unsplash.com/photo-1620626011761-996317b8d101?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1620626011761-996317b8d101?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
+    ],
+    description: 'Deep soaking tub with ergonomic design and premium acrylic construction for the ultimate spa experience at home.',
+    features: [
+      'Extra-deep soaking design',
+      'Ergonomic lumbar support',
+      'Premium acrylic construction',
+      'Slip-resistant surface',
+      '10-year limited warranty',
+      'Professional installation recommended'
+    ],
+    specifications: {
+      material: 'Premium Acrylic',
+      dimensions: '66" L x 36" W x 22" H',
+      capacity: '90 gallons',
+      weight: '120 lbs empty',
+      drainLocation: 'Center',
+      overflowDrain: 'Yes'
+    },
+    featured: true,
+    newProduct: false,
+    tags: ['spa', 'luxury', 'soaking', 'kohler'],
+    relatedProducts: ['bathroom-vanity', 'spa-lighting', 'heated-floors']
+  },
+  {
+    id: 'crystal-chandelier',
+    name: 'Hand-Cut Crystal Chandelier',
+    brand: 'Schonbek',
+    category: 'lighting',
+    subcategory: 'chandeliers',
+    price: { type: 'msrp', display: '$2,850' },
+    availability: 'Special Order',
+    leadTime: '6-8 weeks',
+    images: [
+      'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
+    ],
+    description: 'Exquisite hand-cut crystal chandelier with antique brass finish, perfect for dining rooms and foyers.',
+    features: [
+      'Hand-cut crystal elements',
+      'Antique brass finish',
+      'Dimmable LED compatible',
+      'Adjustable chain length',
+      'Lifetime warranty on crystal',
+      'Professional installation included'
+    ],
+    specifications: {
+      diameter: '28 inches',
+      height: '30 inches',
+      bulbs: '8 x E12 candelabra',
+      wattage: '480W maximum',
+      weight: '45 lbs',
+      finish: 'Antique Brass'
+    },
+    featured: true,
+    newProduct: true,
+    tags: ['crystal', 'luxury', 'dining', 'traditional'],
+    relatedProducts: ['dining-table', 'wall-sconces', 'mirror']
+  },
+  {
+    id: 'brass-cabinet-hardware',
+    name: 'Artisan Brass Cabinet Hardware Set',
+    brand: 'North Bay Designs',
+    category: 'hardware',
+    subcategory: 'cabinet-hardware',
+    price: { type: 'custom', display: 'From $85/piece' },
+    availability: 'Made to Order',
+    leadTime: '4-6 weeks',
+    images: [
+      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
+    ],
+    description: 'Hand-forged brass cabinet hardware with living finish that develops beautiful patina over time.',
+    features: [
+      'Hand-forged solid brass',
+      'Living finish develops patina',
+      'Multiple size options',
+      'Custom lengths available',
+      'Lifetime warranty',
+      'Matching accessories available'
+    ],
+    specifications: {
+      material: 'Solid Brass',
+      finish: 'Natural Brass (Living)',
+      mounting: 'Standard cabinet mounting',
+      sizes: '3", 4", 5", 6", 8", 12" centers',
+      thickness: '0.25 inches',
+      warranty: 'Lifetime'
+    },
+    featured: false,
+    newProduct: false,
+    tags: ['brass', 'handcrafted', 'living-finish', 'custom'],
+    relatedProducts: ['walnut-cabinetry', 'marble-countertop', 'pendant-lighting']
+  }
+];
+
+export const filterOptions = {
+  priceRange: [
+    { id: 'under-1k', label: 'Under $1,000', min: 0, max: 1000 },
+    { id: '1k-5k', label: '$1,000 - $5,000', min: 1000, max: 5000 },
+    { id: '5k-10k', label: '$5,000 - $10,000', min: 5000, max: 10000 },
+    { id: '10k-25k', label: '$10,000 - $25,000', min: 10000, max: 25000 },
+    { id: 'over-25k', label: '$25,000+', min: 25000, max: Infinity },
+    { id: 'custom', label: 'Custom Pricing', min: null, max: null }
+  ],
+  availability: [
+    { id: 'in-stock', label: 'In Stock' },
+    { id: 'made-to-order', label: 'Made to Order' },
+    { id: 'special-order', label: 'Special Order' }
+  ],
+  brands: [
+    { id: 'north-bay-designs', label: 'North Bay Designs' },
+    { id: 'sub-zero-wolf', label: 'Sub-Zero Wolf' },
+    { id: 'kohler', label: 'Kohler' },
+    { id: 'schonbek', label: 'Schonbek' },
+    { id: 'caesarstone', label: 'Caesarstone' },
+    { id: 'benjamin-moore', label: 'Benjamin Moore' }
+  ],
+  tags: [
+    { id: 'luxury', label: 'Luxury' },
+    { id: 'custom', label: 'Custom' },
+    { id: 'new', label: 'New Products' },
+    { id: 'featured', label: 'Featured' },
+    { id: 'sustainable', label: 'Sustainable' },
+    { id: 'handcrafted', label: 'Handcrafted' }
+  ]
+}; 

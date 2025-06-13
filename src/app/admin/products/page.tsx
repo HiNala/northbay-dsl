@@ -584,16 +584,23 @@ export default function AdminProductsPage() {
                           className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-medium transition-colors ${
                             aiGenerating.has(product.id)
                               ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : 'bg-purple-100 text-purple-800 hover:bg-purple-200'
+                              : process.env.NEXT_PUBLIC_AI_ENABLED === 'true'
+                              ? 'bg-purple-100 text-purple-800 hover:bg-purple-200'
+                              : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
                           }`}
+                          title={process.env.NEXT_PUBLIC_AI_ENABLED === 'true' 
+                            ? 'Generate AI description' 
+                            : 'AI not configured - will use fallback description'}
                         >
                           {aiGenerating.has(product.id) ? (
                             <>
                               <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-purple-600 mr-1"></div>
                               Generating...
                             </>
+                          ) : process.env.NEXT_PUBLIC_AI_ENABLED === 'true' ? (
+                            <>🤖 AI Generate</>
                           ) : (
-                            <>🤖 Generate</>
+                            <>⚡ Generate</>
                           )}
                         </button>
                         

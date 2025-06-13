@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Navigation } from "@/components/layout/navigation";
+import EnhancedHeader from '@/components/layout/EnhancedHeader';
 import { cn, SPACING, TYPOGRAPHY, PATTERNS } from "@/lib/design-system";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -87,8 +87,8 @@ const specialties = [
 
 export default function ServicesPage() {
   return (
-    <div className="min-h-screen bg-background-light">
-      <Navigation />
+    <div className="min-h-screen bg-background-light overflow-x-hidden">
+      <EnhancedHeader />
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 bg-gradient-to-b from-navy-900 to-navy-800 text-white overflow-hidden">
