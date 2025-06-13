@@ -9,6 +9,32 @@ module.exports = {
   theme: {
   	extend: {
   		colors: {
+  			// Unified Northbay Brand Colors
+  			'nb-gold': {
+  				50: '#fefcf8',
+  				100: '#fdf9f1',
+  				200: '#f8f0e4',
+  				300: '#f1e6d6',
+  				400: '#e6d4b8',
+  				500: '#d4af37',  // Primary brand gold
+  				600: '#b8941f',
+  				700: '#9c7a1a',
+  				800: '#806015',
+  				900: '#664c11',
+  			},
+  			'nb-neutral': {
+  				50: '#fafaf9',
+  				100: '#f5f5f4',
+  				200: '#e7e5e4',
+  				300: '#d6d3d1',
+  				400: '#a8a29e',
+  				500: '#78716c',
+  				600: '#57534e',
+  				700: '#44403c',
+  				800: '#292524',
+  				900: '#1c1917',
+  			},
+  			// Legacy colors (keep for backward compatibility)
   			'charcoal': {
   				50: '#f8f9fa',
   				100: '#e9ecef',

@@ -3,6 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { LoadingSpinner } from '@/components/ui/loading';
+import { AlertCircle, Eye, EyeOff, Mail, Lock } from 'lucide-react';
 
 interface LoginFormData {
   email: string;
@@ -23,6 +28,7 @@ const LoginForm = () => {
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -68,7 +74,7 @@ const LoginForm = () => {
       });
 
       if (result?.error) {
-        setErrors({ general: 'Invalid credentials. Please try again.' });
+        setErrors({ general: 'Invalid credentials. Please check your email and password.' });
       } else {
         // Successful login - redirect to dashboard
         router.push('/dashboard');
@@ -80,88 +86,144 @@ const LoginForm = () => {
     }
   };
 
+  const fillDemoCredentials = (role: 'admin' | 'manager' | 'employee') => {
+    const credentials = {
+      admin: { email: 'admin@northbay.com', password: 'demo123' },
+      manager: { email: 'manager@northbay.com', password: 'demo123' },
+      employee: { email: 'employee@northbay.com', password: 'demo123' },
+    };
+    
+    setFormData(credentials[role]);
+    setErrors({});
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* General Error */}
-      {errors.general && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
-          <div className="flex items-center">
-            <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p className="text-sm text-red-700">{errors.general}</p>
+    <Card variant="luxury" className="w-full max-w-md mx-auto shadow-luxury">
+      <CardHeader className="text-center space-y-4">
+        {/* Logo */}
+        <div className="mx-auto h-12 w-12 bg-nb-gold-500 rounded-lg flex items-center justify-center">
+          <div className="text-white font-bold text-xl">N</div>
+        </div>
+        
+        <div className="space-y-2">
+          <CardTitle className="text-2xl font-semibold text-nb-neutral-900">
+            Welcome Back
+          </CardTitle>
+          <CardDescription className="text-nb-neutral-600">
+            Sign in to access your dashboard
+          </CardDescription>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* General Error */}
+          {errors.general && (
+            <div className="flex items-start space-x-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-red-700">{errors.general}</p>
+            </div>
+          )}
+
+          {/* Email Field */}
+          <Input
+            label="Email Address"
+            type="email"
+            placeholder="Enter your email"
+            value={formData.email}
+            onChange={(e) => handleInputChange('email', e.target.value)}
+            error={errors.email}
+            leftIcon={<Mail className="h-4 w-4" />}
+            variant="luxury"
+            disabled={isLoading}
+          />
+
+          {/* Password Field */}
+          <div className="space-y-2">
+            <Input
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={(e) => handleInputChange('password', e.target.value)}
+              error={errors.password}
+              leftIcon={<Lock className="h-4 w-4" />}
+              rightIcon={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-nb-neutral-400 hover:text-nb-neutral-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              }
+              variant="luxury"
+              disabled={isLoading}
+            />
           </div>
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            variant="default"
+            size="lg"
+            loading={isLoading}
+            disabled={isLoading}
+            className="w-full"
+          >
+            {isLoading ? 'Signing in...' : 'Sign In to Dashboard'}
+          </Button>
+        </form>
+
+        {/* Demo Credentials */}
+        <Card variant="gradient" padding="sm" className="mt-6">
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-nb-neutral-700">
+              Quick Demo Access:
+            </p>
+            <div className="grid grid-cols-1 gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => fillDemoCredentials('admin')}
+                disabled={isLoading}
+                className="justify-start text-xs"
+              >
+                <span className="font-medium">Admin:</span>
+                <span className="ml-1 text-nb-neutral-600">Full access</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => fillDemoCredentials('manager')}
+                disabled={isLoading}
+                className="justify-start text-xs"
+              >
+                <span className="font-medium">Manager:</span>
+                <span className="ml-1 text-nb-neutral-600">Content & projects</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => fillDemoCredentials('employee')}
+                disabled={isLoading}
+                className="justify-start text-xs"
+              >
+                <span className="font-medium">Employee:</span>
+                <span className="ml-1 text-nb-neutral-600">View only</span>
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {/* Additional Links */}
+        <div className="text-center space-y-2">
+          <p className="text-xs text-nb-neutral-500">
+            Having trouble? Contact your administrator
+          </p>
         </div>
-      )}
-
-      {/* Email Field */}
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-charcoal-700 mb-2">
-          Email Address
-        </label>
-        <input
-          id="email"
-          type="email"
-          value={formData.email}
-          onChange={(e) => handleInputChange('email', e.target.value)}
-          className={`w-full h-12 px-4 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-luxury-gold-500 focus:border-transparent ${
-            errors.email ? 'border-red-400 bg-red-50' : 'border-stone-300'
-          }`}
-          placeholder="Enter your email address"
-          disabled={isLoading}
-        />
-        {errors.email && (
-          <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-        )}
-      </div>
-
-      {/* Password Field */}
-      <div>
-        <label htmlFor="password" className="block text-sm font-medium text-charcoal-700 mb-2">
-          Password
-        </label>
-        <input
-          id="password"
-          type="password"
-          value={formData.password}
-          onChange={(e) => handleInputChange('password', e.target.value)}
-          className={`w-full h-12 px-4 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-luxury-gold-500 focus:border-transparent ${
-            errors.password ? 'border-red-400 bg-red-50' : 'border-stone-300'
-          }`}
-          placeholder="Enter your password"
-          disabled={isLoading}
-        />
-        {errors.password && (
-          <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-        )}
-      </div>
-
-      {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full h-12 bg-luxury-gold-500 text-charcoal-900 rounded-lg font-medium hover:bg-luxury-gold-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-      >
-        {isLoading ? (
-          <>
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-charcoal-900 mr-2"></div>
-            Signing in...
-          </>
-        ) : (
-          'Sign In'
-        )}
-      </button>
-
-      {/* Demo Credentials */}
-      <div className="mt-6 p-4 bg-stone-50 rounded-lg">
-        <p className="text-sm text-charcoal-600 mb-2 font-medium">Demo Credentials:</p>
-        <div className="text-xs text-stone-600 space-y-1">
-          <div><strong>Admin:</strong> admin@nbkb.com / password123</div>
-          <div><strong>Manager:</strong> manager@nbkb.com / password123</div>
-          <div><strong>Employee:</strong> employee@nbkb.com / password123</div>
-        </div>
-      </div>
-    </form>
+      </CardContent>
+    </Card>
   );
 };
 

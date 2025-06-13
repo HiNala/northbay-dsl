@@ -43,7 +43,7 @@ const PortfolioPage = () => {
           />
           
           <PortfolioGrid 
-            projects={filteredProjects}
+            projects={filteredProjects as any}
             isLoading={isLoading}
           />
         </div>
