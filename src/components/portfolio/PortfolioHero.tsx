@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { ChevronRight } from 'lucide-react';
+
 
 const PortfolioHero = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -11,31 +13,33 @@ const PortfolioHero = () => {
   }, []);
 
   return (
-    <section className="pt-32 pb-16 bg-warm-white-50">
-      <div className="max-w-4xl mx-auto px-6 text-center">
+    <section className="pt-36 pb-24 bg-background">
+      <div className="max-w-5xl mx-auto px-6">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="flex flex-col items-center"
         >
           {/* Breadcrumb */}
-          <div className="text-stone-500 text-sm tracking-[0.2em] uppercase mb-8">
-            <span className="hover:text-luxury-gold-600 transition-colors duration-200 cursor-pointer">Home</span>
-            <span className="mx-3">•</span>
-            <span className="text-charcoal-700">Portfolio</span>
+          <div className="w-full mb-16 flex items-center text-sm text-muted-foreground">
+            <span className="hover:text-foreground transition-colors duration-200 cursor-pointer">
+              Home
+            </span>
+            <ChevronRight className="mx-2 h-4 w-4" />
+            <span className="text-foreground font-medium">Portfolio</span>
           </div>
           
-          <h1 className="text-6xl lg:text-7xl font-light text-charcoal-900 mb-8 font-serif">
-            Portfolio
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-foreground mb-8 tracking-tight text-center font-serif">
+            Our Portfolio
           </h1>
           
-          <p className="text-body-large text-charcoal-600 max-w-2xl mx-auto leading-relaxed">
+          <div className="w-16 h-px bg-primary/30 my-8"></div>
+          
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed text-center font-light">
             A curated collection of our most celebrated transformations, 
             each telling a unique story of luxury, craftsmanship, and timeless design.
           </p>
-          
-          {/* Elegant divider */}
-          <div className="w-24 h-px bg-luxury-gold-500 mx-auto mt-12"></div>
         </motion.div>
       </div>
     </section>
