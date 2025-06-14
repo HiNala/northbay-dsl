@@ -74,8 +74,8 @@ export async function GET(request: NextRequest) {
 
 // Update lead status/notes
 const updateLeadSchema = z.object({
-  status: z.enum(['new', 'contacted', 'qualified', 'proposal', 'won', 'lost']).optional(),
-  priority: z.enum(['low', 'medium', 'high']).optional(),
+  status: z.enum(['NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL', 'WON', 'LOST']).optional(),
+  priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).optional(),
   notes: z.string().optional(),
   assignedTo: z.string().uuid().optional(),
 });

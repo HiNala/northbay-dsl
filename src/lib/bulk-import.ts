@@ -13,7 +13,7 @@ export interface ImportedProduct {
   specifications?: Record<string, any>;
   inStock?: boolean;
   stockQuantity?: number;
-  status?: 'draft' | 'published' | 'archived';
+  status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
   type?: string;
 }
 
@@ -78,15 +78,14 @@ export function parseCSVFile(fileContent: string): any[] {
     const result = Papa.parse(fileContent, {
       header: true,
       skipEmptyLines: true,
-      trimHeaders: true,
       transform: (value: string) => value.trim(),
-    });
+    } as Papa.ParseConfig);
     
-    if (result.errors.length > 0) {
-      throw new Error(`CSV parsing errors: ${result.errors.map(e => e.message).join(', ')}`);
+    if (result.errors && result.errors.length > 0) {
+      throw new Error(`CSV parsing errors: ${result.errors.map((e: any) => e.message).join(', ')}`);
     }
     
-    return result.data;
+    return result.data as any[];
   } catch (error) {
     throw new Error(`Failed to parse CSV file: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -177,8 +176,12 @@ export function transformRawData(
         case 'status':
           if (value) {
             const statusValue = String(value).toLowerCase();
-            if (['draft', 'published', 'archived'].includes(statusValue)) {
-              product.status = statusValue as 'draft' | 'published' | 'archived';
+            if (statusValue === 'draft') {
+              product.status = 'DRAFT';
+            } else if (statusValue === 'published') {
+              product.status = 'PUBLISHED';
+            } else if (statusValue === 'archived') {
+              product.status = 'ARCHIVED';
             }
           }
           break;

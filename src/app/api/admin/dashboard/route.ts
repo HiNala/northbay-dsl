@@ -76,11 +76,11 @@ export async function GET(request: NextRequest) {
       // Leads
       prisma.designLead.count(),
       prisma.designLead.count({
-        where: { status: 'new' }
+        where: { status: 'NEW' }
       }),
       prisma.designLead.count({
         where: { 
-          status: { in: ['new', 'contacted'] },
+          status: { in: ['NEW', 'CONTACTED'] },
           followUpAt: { lte: now }
         }
       }),
@@ -96,16 +96,16 @@ export async function GET(request: NextRequest) {
       
       // Projects
       prisma.project.count({
-        where: { status: { in: ['planning', 'active'] } }
+        where: { status: { in: ['PLANNING', 'IN_PROGRESS'] } }
       }),
       prisma.project.count({
-        where: { status: 'completed' }
+        where: { status: 'COMPLETED' }
       }),
       
       // Products
       prisma.product.count(),
       prisma.product.count({
-        where: { status: 'active' }
+        where: { status: 'PUBLISHED' }
       }),
       prisma.product.count({
         where: { 

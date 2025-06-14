@@ -13,7 +13,7 @@ const bulkImportSchema = z.object({
   importOptions: z.object({
     updateExisting: z.boolean().default(false),
     skipDuplicates: z.boolean().default(true),
-    defaultStatus: z.enum(['draft', 'published']).default('draft'),
+    defaultStatus: z.enum(['DRAFT', 'PUBLISHED']).default('DRAFT'),
     defaultCategoryId: z.string().uuid().optional(),
     defaultBrandId: z.string().uuid().optional(),
     bulkImportBatch: z.string().optional(),
@@ -120,7 +120,9 @@ export async function POST(request: NextRequest) {
     const importOptions = validatedMetadata.importOptions || {
       updateExisting: false,
       skipDuplicates: true,
-      defaultStatus: 'draft' as const,
+      defaultStatus: 'DRAFT' as const,
+      defaultCategoryId: undefined,
+      defaultBrandId: undefined,
     };
 
     // Process valid products for import
@@ -171,7 +173,7 @@ export async function POST(request: NextRequest) {
                   specifications: product.specifications || existingProduct.specifications || undefined,
                   inStock: product.inStock ?? existingProduct.inStock,
                   stockQuantity: product.stockQuantity ?? existingProduct.stockQuantity,
-                  status: product.status || existingProduct.status,
+                  status: (product.status as any) || existingProduct.status,
                   type: product.type || existingProduct.type,
                   categoryId: importOptions.defaultCategoryId || existingProduct.categoryId,
                   brandId: importOptions.defaultBrandId || existingProduct.brandId,
@@ -210,7 +212,7 @@ export async function POST(request: NextRequest) {
                 inStock: product.inStock ?? true,
                 stockQuantity: product.stockQuantity ?? 0,
                 trackInventory: product.stockQuantity !== undefined,
-                status: product.status || importOptions.defaultStatus || 'draft',
+                status: (product.status as any) || importOptions.defaultStatus || 'DRAFT',
                 type: product.type || 'physical',
                 categoryId: importOptions.defaultCategoryId,
                 brandId: importOptions.defaultBrandId,

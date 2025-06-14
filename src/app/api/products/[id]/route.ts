@@ -13,7 +13,7 @@ const updateProductSchema = z.object({
   comparePrice: z.number().or(z.string().transform(Number)).optional(),
   inStock: z.boolean().optional(),
   stockQuantity: z.number().or(z.string().transform(Number)).optional(),
-  status: z.enum(['draft', 'published', 'archived']).optional(),
+  status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).optional(),
   type: z.string().optional(),
   tags: z.array(z.string()).optional(),
   seoTitle: z.string().optional(),
@@ -81,7 +81,7 @@ export async function GET(
     }
 
     // Check if this requires admin access (for draft/archived products)
-    if (product.status !== 'published') {
+    if (product.status !== 'PUBLISHED') {
       const session = await getServerSession(authOptions);
       
       if (!session?.user) {
@@ -231,7 +231,7 @@ export async function DELETE(
       where: { id: existingProduct.id },
       data: {
         deletedAt: new Date(),
-        status: 'archived'
+        status: 'ARCHIVED'
       }
     });
 

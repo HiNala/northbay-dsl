@@ -180,7 +180,7 @@ const ProductsPage = () => {
     <div className="overflow-x-hidden">
       <EnhancedHeader />
       
-      <div className="min-h-screen bg-warm-white-50">
+      <div className="min-h-screen bg-background">
         <ProductsHero />
         
         <main>

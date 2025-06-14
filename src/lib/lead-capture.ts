@@ -25,8 +25,8 @@ export interface LeadData {
   // Metadata
   timestamp: Date;
   leadId: string;
-  status: 'new' | 'contacted' | 'qualified' | 'converted' | 'lost';
-  priority: 'low' | 'medium' | 'high';
+  status: 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'WON' | 'LOST';
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
 }
 
 export interface LeadCaptureResult {
@@ -73,7 +73,7 @@ export const generateLeadId = (): string => {
 };
 
 // Determine lead priority based on project details
-export const calculateLeadPriority = (data: Partial<LeadData>): 'low' | 'medium' | 'high' => {
+export const calculateLeadPriority = (data: Partial<LeadData>): 'LOW' | 'MEDIUM' | 'HIGH' => {
   let score = 0;
 
   // Budget scoring
@@ -105,9 +105,9 @@ export const calculateLeadPriority = (data: Partial<LeadData>): 'low' | 'medium'
   }
 
   // Determine priority
-  if (score >= 4) return 'high';
-  if (score >= 2) return 'medium';
-  return 'low';
+  if (score >= 4) return 'HIGH';
+  if (score >= 2) return 'MEDIUM';
+  return 'LOW';
 };
 
 // Lead capture service
@@ -187,7 +187,7 @@ export class LeadCaptureService {
         utm_campaign: leadData.utm_campaign,
         timestamp: new Date(),
         leadId,
-        status: 'new',
+        status: 'NEW',
         priority
       };
 
@@ -320,12 +320,12 @@ export class LeadCaptureService {
 
     return {
       total: this.leads.length,
-      new: this.leads.filter(l => l.status === 'new').length,
-      contacted: this.leads.filter(l => l.status === 'contacted').length,
-      qualified: this.leads.filter(l => l.status === 'qualified').length,
-      converted: this.leads.filter(l => l.status === 'converted').length,
-      lost: this.leads.filter(l => l.status === 'lost').length,
-      highPriority: this.leads.filter(l => l.priority === 'high').length,
+      new: this.leads.filter(l => l.status === 'NEW').length,
+      contacted: this.leads.filter(l => l.status === 'CONTACTED').length,
+      qualified: this.leads.filter(l => l.status === 'QUALIFIED').length,
+      converted: this.leads.filter(l => l.status === 'WON').length,
+      lost: this.leads.filter(l => l.status === 'LOST').length,
+      highPriority: this.leads.filter(l => l.priority === 'HIGH').length,
       thisMonth: this.leads.filter(l => l.timestamp >= thisMonth).length,
     };
   }

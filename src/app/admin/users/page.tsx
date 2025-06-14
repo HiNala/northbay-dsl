@@ -666,15 +666,13 @@ function EditUserModal({
 
     try {
       // Filter out empty password
-      const updateData = { ...formData }
-      if (!updateData.password) {
-        delete updateData.password
-      }
+      const { password, ...updateData } = formData;
+      const finalData = password ? { ...updateData, password } : updateData;
 
       const response = await fetch(`/api/admin/users/${user.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(finalData)
       })
 
       if (response.ok) {

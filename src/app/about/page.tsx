@@ -1,7 +1,7 @@
 "use client";
 
 import EnhancedHeader from '@/components/layout/EnhancedHeader';
-import { cn, SPACING, TYPOGRAPHY, PATTERNS } from "@/lib/design-system";
+import { motion } from 'framer-motion';
 import { 
   Award, 
   Star, 
@@ -14,7 +14,8 @@ import {
   MapPin,
   Phone,
   Mail,
-  Clock
+  Clock,
+  ChevronRight
 } from "lucide-react";
 
 const teamMembers = [
@@ -128,157 +129,198 @@ const timeline = [
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-background-light overflow-x-hidden">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <EnhancedHeader />
 
       {/* Hero Section */}
-      <section className="relative pt-20 lg:pt-32 pb-16 bg-gradient-to-b from-navy-900 to-navy-800 text-white overflow-hidden">
-
-        <div className={cn(SPACING.container.default, "relative z-10")}>
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8">
-              <Award className="w-4 h-4 mr-3" />
-              <span className={cn(TYPOGRAPHY.accent, "text-white text-xs")}>
+      <section className="relative pt-20 lg:pt-32 pb-16 bg-gradient-to-b from-muted to-background text-foreground overflow-hidden">
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
+          <motion.div 
+            className="text-center max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="inline-flex items-center px-6 py-3 rounded-full bg-primary/10 border border-primary/20 mb-8">
+              <Award className="w-4 h-4 mr-3 text-primary" />
+              <span className="text-primary text-xs tracking-[0.3em] uppercase font-medium">
                 Award-Winning Design Studio
               </span>
             </div>
 
-            <h1 className={cn(TYPOGRAPHY.heading, "text-5xl md:text-6xl mb-6 font-serif")}>
+            <h1 className="text-5xl md:text-6xl mb-6 font-serif font-light text-foreground">
               Crafting Exceptional Spaces
             </h1>
-            <p className={cn(TYPOGRAPHY.bodyLarge, "text-gray-200 leading-relaxed max-w-3xl mx-auto")}>
+            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
               For over 15 years, North Bay Kitchen & Bath has been transforming homes throughout the Bay Area 
               with sophisticated design, premium materials, and uncompromising attention to detail.
             </p>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Company Story - Smooth gradient transition from hero */}
-      <section className="py-32 bg-gradient-to-b from-navy-800 via-white to-white">
-        <div className={cn(SPACING.container.default)}>
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
+      {/* Company Story */}
+      <section className="py-24 md:py-32 bg-background">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
             {/* Content */}
-            <div>
-              <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-6 font-serif")}>
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-4xl md:text-5xl text-foreground mb-6 font-serif font-light">
                 Our Story
               </h2>
-              <div className="w-24 h-1 bg-gold-600 mb-8" />
+              <div className="w-24 h-1 bg-primary mb-8" />
               
               <div className="space-y-6">
-                <p className={cn(TYPOGRAPHY.bodyLarge, "text-gray-700 leading-relaxed")}>
+                <p className="text-lg text-muted-foreground leading-relaxed">
                   North Bay Kitchen & Bath was born from a simple belief: that your home should be a reflection 
                   of your personal style and a sanctuary that enhances your daily life. Founded in 2008 by 
                   interior designer Sarah Mitchell, our studio has grown from a boutique consultancy to the 
                   Bay Area's premier destination for luxury kitchen and bath design.
                 </p>
                 
-                <p className={cn(TYPOGRAPHY.body, "text-gray-600 leading-relaxed")}>
+                <p className="text-base text-muted-foreground leading-relaxed">
                   What started as a passion project in Sarah's Napa Valley studio has evolved into a full-service 
                   design firm, trusted by discerning homeowners who appreciate the finest things in life. We've 
                   had the privilege of transforming over 500 homes, each one a unique expression of our client's 
                   vision brought to life through our expertise and craftsmanship.
                 </p>
 
-                <p className={cn(TYPOGRAPHY.body, "text-gray-600 leading-relaxed")}>
+                <p className="text-base text-muted-foreground leading-relaxed">
                   Today, we continue to push the boundaries of design excellence, combining timeless sophistication 
                   with innovative solutions to create spaces that are both beautiful and functional. Our commitment 
                   to quality, sustainability, and exceptional service remains unwavering as we look toward the future.
                 </p>
               </div>
-            </div>
+            </motion.div>
 
             {/* Image */}
-            <div className="relative">
-              <div className="aspect-[4/3] bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
+            <motion.div 
+              className="relative"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <div className="aspect-[4/3] bg-muted rounded-xl flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gold-600 rounded-full flex items-center justify-center mb-4 mx-auto">
-                    <Home className="w-8 h-8 text-white" />
+                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <Home className="w-8 h-8 text-primary-foreground" />
                   </div>
-                  <p className="text-gray-500 font-medium">Our Design Studio</p>
+                  <p className="text-muted-foreground font-medium">Our Design Studio</p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Company Values - Elegant gradient spacer */}
-      <section className="py-32 bg-gradient-to-b from-gray-50 to-white">
-        <div className={cn(SPACING.container.default)}>
-          <div className="text-center mb-20">
-            <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-8 font-serif")}>
+      {/* Company Values */}
+      <section className="py-24 md:py-32 bg-muted/30">
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div 
+            className="text-center mb-16 lg:mb-20"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl text-foreground mb-8 font-serif font-light">
               Our Values
             </h2>
-            <p className={cn(TYPOGRAPHY.bodyLarge, "text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed")}>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8 leading-relaxed">
               The principles that guide everything we do and every space we create.
             </p>
-            <div className="w-24 h-1 bg-gold-600 mx-auto" />
-          </div>
+            <div className="w-24 h-1 bg-primary mx-auto" />
+          </motion.div>
 
-          <div className={PATTERNS.grid.services}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             {companyValues.map((value, index) => (
-              <div key={index} className="text-center group">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-gold-100 rounded-full mb-6 group-hover:bg-gold-200 transition-colors duration-300">
-                  <value.icon className="w-10 h-10 text-gold-600" />
+              <motion.div 
+                key={index} 
+                className="text-center group"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-full mb-6 group-hover:bg-primary/20 transition-colors duration-300">
+                  <value.icon className="w-10 h-10 text-primary" />
                 </div>
-                <h3 className={cn(TYPOGRAPHY.subheading, "text-2xl text-navy-900 mb-4 font-serif")}>
+                <h3 className="text-2xl text-foreground mb-4 font-serif font-medium">
                   {value.title}
                 </h3>
-                <p className={cn(TYPOGRAPHY.body, "text-gray-600 leading-relaxed")}>
+                <p className="text-muted-foreground leading-relaxed">
                   {value.description}
                 </p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Team Section - Seamless white background */}
-      <section className="py-32 bg-white">
-        <div className={cn(SPACING.container.default)}>
-          <div className="text-center mb-20">
-            <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-8 font-serif")}>
+      {/* Team Section */}
+      <section className="py-24 md:py-32 bg-background">
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div 
+            className="text-center mb-16 lg:mb-20"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl text-foreground mb-8 font-serif font-light">
               Meet Our Team
             </h2>
-            <p className={cn(TYPOGRAPHY.bodyLarge, "text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed")}>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8 leading-relaxed">
               Passionate designers and craftspeople dedicated to bringing your vision to life.
             </p>
-            <div className="w-24 h-1 bg-gold-600 mx-auto" />
-          </div>
+            <div className="w-24 h-1 bg-primary mx-auto" />
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
             {teamMembers.map((member, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-lg p-8 border border-gold-100">
+              <motion.div 
+                key={index} 
+                className="bg-card rounded-xl shadow-sm border border-border p-8 hover:shadow-md transition-shadow duration-300"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
                 <div className="flex items-start space-x-6">
                   {/* Profile Image */}
-                  <div className="w-24 h-24 bg-gradient-to-br from-gold-400 to-gold-600 rounded-full flex-shrink-0 flex items-center justify-center">
-                    <Users className="w-12 h-12 text-white" />
+                  <div className="w-24 h-24 bg-primary rounded-full flex-shrink-0 flex items-center justify-center">
+                    <Users className="w-12 h-12 text-primary-foreground" />
                   </div>
 
                   {/* Member Info */}
                   <div className="flex-1">
-                    <h3 className={cn(TYPOGRAPHY.subheading, "text-xl text-navy-900 mb-1 font-serif")}>
+                    <h3 className="text-xl text-foreground mb-1 font-serif font-medium">
                       {member.name}
                     </h3>
-                    <p className={cn(TYPOGRAPHY.accent, "text-gold-600 mb-4")}>
+                    <p className="text-primary mb-4 text-sm tracking-wide">
                       {member.role}
                     </p>
                     
-                    <p className={cn(TYPOGRAPHY.body, "text-gray-600 mb-4 leading-relaxed")}>
+                    <p className="text-muted-foreground mb-4 leading-relaxed text-sm">
                       {member.bio}
                     </p>
 
                     {/* Credentials */}
                     <div className="mb-4">
-                      <h4 className={cn(TYPOGRAPHY.body, "font-semibold text-navy-700 mb-2")}>
+                      <h4 className="font-medium text-foreground mb-2 text-sm">
                         Credentials:
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {member.credentials.map((credential, credIndex) => (
                           <span 
                             key={credIndex}
-                            className="px-3 py-1 bg-gold-100 text-gold-700 rounded-full text-sm"
+                            className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs"
                           >
                             {credential}
                           </span>
@@ -288,14 +330,14 @@ export default function AboutPage() {
 
                     {/* Specialties */}
                     <div>
-                      <h4 className={cn(TYPOGRAPHY.body, "font-semibold text-navy-700 mb-2")}>
+                      <h4 className="font-medium text-foreground mb-2 text-sm">
                         Specialties:
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {member.specialties.map((specialty, specIndex) => (
                           <span 
                             key={specIndex}
-                            className="px-3 py-1 bg-navy-100 text-navy-700 rounded-full text-sm"
+                            className="px-3 py-1 bg-muted text-muted-foreground rounded-full text-xs"
                           >
                             {specialty}
                           </span>
@@ -304,112 +346,148 @@ export default function AboutPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Timeline - Subtle gradient transition */}
-      <section className="py-32 bg-gradient-to-b from-white to-gray-50">
-        <div className={cn(SPACING.container.default)}>
-          <div className="text-center mb-20">
-            <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-8 font-serif")}>
+      {/* Timeline */}
+      <section className="py-24 md:py-32 bg-muted/30">
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div 
+            className="text-center mb-16 lg:mb-20"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl text-foreground mb-8 font-serif font-light">
               Our Journey
             </h2>
-            <p className={cn(TYPOGRAPHY.bodyLarge, "text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed")}>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8 leading-relaxed">
               Key milestones in our growth and evolution as a design studio.
             </p>
-            <div className="w-24 h-1 bg-gold-600 mx-auto" />
-          </div>
+            <div className="w-24 h-1 bg-primary mx-auto" />
+          </motion.div>
 
-          <div className="relative">
+          <div className="relative max-w-4xl mx-auto">
             {/* Timeline line */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gold-200" />
+            <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-border" />
 
             <div className="space-y-16">
               {timeline.map((event, index) => (
-                <div key={index} className={cn(
-                  "relative flex items-center",
-                  index % 2 === 0 ? "justify-start" : "justify-end"
-                )}>
+                <motion.div 
+                  key={index} 
+                  className={`relative flex items-center ${
+                    index % 2 === 0 ? "justify-start" : "justify-end"
+                  }`}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                >
                   {/* Timeline dot */}
-                  <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-gold-600 rounded-full z-10" />
+                  <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-primary rounded-full z-10" />
 
-                  <div className={cn(
-                    "w-5/12 bg-white rounded-xl p-6 shadow-lg border border-gold-100",
+                  <div className={`w-5/12 bg-card rounded-xl p-6 shadow-sm border border-border ${
                     index % 2 === 0 ? "mr-auto" : "ml-auto"
-                  )}>
-                    <div className="text-2xl font-bold text-gold-600 mb-2 font-serif">{event.year}</div>
-                    <h3 className={cn(TYPOGRAPHY.subheading, "text-xl text-navy-900 mb-3 font-serif")}>
+                  }`}>
+                    <div className="text-2xl font-bold text-primary mb-2 font-serif">{event.year}</div>
+                    <h3 className="text-xl text-foreground mb-3 font-serif font-medium">
                       {event.title}
                     </h3>
-                    <p className={cn(TYPOGRAPHY.body, "text-gray-600 leading-relaxed")}>
+                    <p className="text-muted-foreground leading-relaxed">
                       {event.description}
                     </p>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Achievements - Elegant gradient */}
-      <section className="py-32 bg-gradient-to-b from-gray-50 to-white">
-        <div className={cn(SPACING.container.default)}>
-          <div className="text-center mb-20">
-            <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-navy-900 mb-8 font-serif")}>
+      {/* Achievements */}
+      <section className="py-24 md:py-32 bg-background">
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div 
+            className="text-center mb-16 lg:mb-20"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl text-foreground mb-8 font-serif font-light">
               By the Numbers
             </h2>
-            <p className={cn(TYPOGRAPHY.bodyLarge, "text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed")}>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8 leading-relaxed">
               The results of our commitment to excellence and client satisfaction.
             </p>
-            <div className="w-24 h-1 bg-gold-600 mx-auto" />
-          </div>
+            <div className="w-24 h-1 bg-primary mx-auto" />
+          </motion.div>
 
-          <div className={PATTERNS.grid.services}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             {achievements.map((achievement, index) => (
-              <div key={index} className="text-center">
-                <div className={cn(TYPOGRAPHY.heading, "text-5xl font-bold text-gold-600 mb-2 font-serif")}>
+              <motion.div 
+                key={index} 
+                className="text-center"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <div className="text-5xl font-bold text-primary mb-2 font-serif">
                   {achievement.number}
                 </div>
-                <h3 className={cn(TYPOGRAPHY.subheading, "text-xl text-navy-900 mb-3 font-serif")}>
+                <h3 className="text-xl text-foreground mb-3 font-serif font-medium">
                   {achievement.label}
                 </h3>
-                <p className={cn(TYPOGRAPHY.body, "text-gray-600 leading-relaxed")}>
+                <p className="text-muted-foreground leading-relaxed">
                   {achievement.description}
                 </p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Visit Our Showroom - Seamless dark transition */}
-      <section className="py-32 bg-gradient-to-b from-white to-navy-900">
-        <div className={cn(SPACING.container.default)}>
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
+      {/* Visit Our Showroom */}
+      <section className="py-24 md:py-32 bg-muted/30">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
             {/* Image */}
-            <div className="relative">
-              <div className="aspect-[4/3] bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
+            <motion.div 
+              className="relative order-2 lg:order-1"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <div className="aspect-[4/3] bg-muted rounded-xl flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gold-600 rounded-full flex items-center justify-center mb-4 mx-auto">
-                    <MapPin className="w-8 h-8 text-white" />
+                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <MapPin className="w-8 h-8 text-primary-foreground" />
                   </div>
-                  <p className="text-gray-500 font-medium">Napa Valley Showroom</p>
+                  <p className="text-muted-foreground font-medium">Napa Valley Showroom</p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Content */}
-            <div>
-              <h2 className={cn(TYPOGRAPHY.heading, "text-4xl md:text-5xl text-white mb-6 font-serif")}>
+            <motion.div 
+              className="order-1 lg:order-2"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-4xl md:text-5xl text-foreground mb-6 font-serif font-light">
                 Visit Our Showroom
               </h2>
-              <div className="w-24 h-1 bg-gold-600 mb-8" />
+              <div className="w-24 h-1 bg-primary mb-8" />
               
-              <p className={cn(TYPOGRAPHY.bodyLarge, "text-gray-300 mb-8 leading-relaxed")}>
+              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
                 Experience our curated collection of luxury fixtures, finishes, and materials in person. 
                 Our Napa Valley showroom features beautifully designed vignettes that showcase the 
                 quality and craftsmanship of our preferred brands.
@@ -417,33 +495,30 @@ export default function AboutPage() {
 
               <div className="space-y-4 mb-8">
                 <div className="flex items-center">
-                  <MapPin className="w-5 h-5 text-gold-600 mr-3 flex-shrink-0" />
-                  <span className={cn(TYPOGRAPHY.body, "text-gray-300")}>
+                  <MapPin className="w-5 h-5 text-primary mr-3 flex-shrink-0" />
+                  <span className="text-muted-foreground">
                     1234 Main Street, Napa, CA 94559
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <Phone className="w-5 h-5 text-gold-600 mr-3 flex-shrink-0" />
-                  <span className={cn(TYPOGRAPHY.body, "text-gray-300")}>
+                  <Phone className="w-5 h-5 text-primary mr-3 flex-shrink-0" />
+                  <span className="text-muted-foreground">
                     (707) 555-0123
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <Clock className="w-5 h-5 text-gold-600 mr-3 flex-shrink-0" />
-                  <span className={cn(TYPOGRAPHY.body, "text-gray-300")}>
+                  <Clock className="w-5 h-5 text-primary mr-3 flex-shrink-0" />
+                  <span className="text-muted-foreground">
                     Mon-Fri: 9am-6pm, Sat: 10am-4pm
                   </span>
                 </div>
               </div>
 
-              <button className={cn(
-                "inline-flex items-center px-8 py-4 bg-gold-600 hover:bg-gold-700 text-white rounded-md font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5",
-                TYPOGRAPHY.button
-              )}>
+              <button className="inline-flex items-center px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                 Schedule Showroom Visit
-                <MapPin className="ml-3 w-5 h-5" />
+                <ChevronRight className="ml-3 w-5 h-5" />
               </button>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>

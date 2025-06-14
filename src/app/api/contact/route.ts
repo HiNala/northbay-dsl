@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
         budgetMax: validatedData.budget ? parseInt(validatedData.budget.split('-')[1]?.replace(/[^0-9]/g, '') || '0') : null,
         timeline: validatedData.timeline,
         message: validatedData.message,
-        status: 'new',
-        priority: 'medium',
+        status: 'NEW',
+        priority: 'MEDIUM',
         source: 'website',
       }
     });
