@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { prisma } from './prisma';
 
 // Check if OpenAI is properly configured
 const isOpenAIConfigured = () => {
@@ -25,6 +26,18 @@ export interface ProductData {
   existingDescription?: string;
 }
 
+export interface ProjectData {
+  title: string;
+  category?: string;
+  style?: string;
+  budget?: number;
+  timeline?: string;
+  clientName?: string;
+  location?: string;
+  features?: string[];
+  existingDescription?: string;
+}
+
 export interface AIDescriptionOptions {
   type: 'short' | 'detailed' | 'seo' | 'luxury';
   tone: 'professional' | 'luxury' | 'technical' | 'friendly';
@@ -32,6 +45,123 @@ export interface AIDescriptionOptions {
   includeFeatures: boolean;
   includeBenefits: boolean;
   seoKeywords?: string[];
+}
+
+// Get AI prompt configuration from database
+async function getAIPrompt(promptType: 'product_description' | 'project_description' | 'blog_content' | 'general') {
+  try {
+    const promptSetting = await prisma.siteSetting.findUnique({
+      where: { key: `ai_prompt_${promptType}` }
+    });
+
+    if (promptSetting && promptSetting.value) {
+      const promptConfig = promptSetting.value as any;
+      if (promptConfig.isActive) {
+        return {
+          systemPrompt: promptConfig.systemPrompt,
+          userPromptTemplate: promptConfig.userPromptTemplate,
+          model: promptConfig.model || 'gpt-4o-mini',
+          temperature: promptConfig.temperature || 0.7,
+          maxTokens: promptConfig.maxTokens || 1000,
+        };
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to fetch AI prompt configuration:', error);
+  }
+
+  // Return fallback configuration
+  return getFallbackPromptConfig(promptType);
+}
+
+// Fallback prompt configurations
+function getFallbackPromptConfig(promptType: string) {
+  const configs = {
+    product_description: {
+      systemPrompt: `You are a luxury home design copywriter specializing in high-end kitchen and bath products. You write compelling, sophisticated product descriptions that capture the essence of luxury while being informative and SEO-friendly. Your tone is elegant, professional, and aspirational.
+
+BRAND VOICE for North Bay Kitchen & Bath:
+- Sophisticated and refined
+- Focus on craftsmanship and quality
+- Emphasize luxury lifestyle
+- Technical accuracy with elegant language
+- Aspirational but accessible
+
+Always return valid JSON with this exact structure:
+{
+  "description": "The main product description",
+  "seoTitle": "SEO-optimized title (60 chars or less)",
+  "seoDescription": "Meta description (150-160 chars)",
+  "quality_score": 85,
+  "word_count": 120
+}`,
+      userPromptTemplate: undefined,
+      model: 'gpt-4o-mini',
+      temperature: 0.7,
+      maxTokens: 1000,
+    },
+    project_description: {
+      systemPrompt: `You are a luxury interior design project specialist for North Bay Kitchen & Bath. You create compelling project descriptions that showcase the transformation, craftsmanship, and design excellence of completed renovations.
+
+BRAND VOICE:
+- Highlight the transformation journey
+- Emphasize design innovation and quality
+- Focus on the client's vision brought to life
+- Professional yet warm and inviting tone
+
+Always return valid JSON with this exact structure:
+{
+  "description": "The main project description",
+  "highlights": ["Key feature 1", "Key feature 2", "Key feature 3"],
+  "quality_score": 85,
+  "word_count": 150
+}`,
+      userPromptTemplate: undefined,
+      model: 'gpt-4o-mini',
+      temperature: 0.7,
+      maxTokens: 1000,
+    },
+    blog_content: {
+      systemPrompt: `You are a home design and renovation content expert for North Bay Kitchen & Bath. You create engaging, informative blog content that educates homeowners about luxury kitchen and bath design trends, tips, and insights.
+
+BRAND VOICE:
+- Educational and helpful
+- Luxury-focused but accessible
+- Trend-aware and forward-thinking
+- Authoritative yet approachable
+
+Always return valid JSON with this exact structure:
+{
+  "content": "The main blog content in HTML format",
+  "excerpt": "Brief excerpt (150 chars or less)",
+  "seoTitle": "SEO-optimized title",
+  "seoDescription": "Meta description",
+  "quality_score": 85,
+  "word_count": 800
+}`,
+      userPromptTemplate: undefined,
+      model: 'gpt-4o-mini',
+      temperature: 0.8,
+      maxTokens: 2000,
+    },
+    general: {
+      systemPrompt: `You are a professional content creator for North Bay Kitchen & Bath, a luxury kitchen and bathroom design company. Create high-quality, brand-consistent content that reflects our commitment to excellence, craftsmanship, and luxury lifestyle.
+
+BRAND VOICE:
+- Professional and sophisticated
+- Quality and craftsmanship focused
+- Luxury lifestyle oriented
+- Helpful and informative
+
+Always return valid JSON with appropriate structure for the content type requested.`,
+      userPromptTemplate: undefined,
+      model: 'gpt-4o-mini',
+      temperature: 0.7,
+      maxTokens: 1000,
+    }
+  };
+
+  return configs[promptType as keyof typeof configs] || configs.general;
 }
 
 // Generate fallback description when AI is not available
@@ -108,38 +238,24 @@ export async function generateProductDescription(
   }
 
   try {
-    const prompt = buildPrompt(productData, options);
+    // Get configurable prompt
+    const promptConfig = await getAIPrompt('product_description');
+    const prompt = buildProductPrompt(productData, options, promptConfig.userPromptTemplate);
     
     const response = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+      model: promptConfig.model,
       messages: [
         {
           role: 'system',
-          content: `You are a luxury home design copywriter specializing in high-end kitchen and bath products. You write compelling, sophisticated product descriptions that capture the essence of luxury while being informative and SEO-friendly. Your tone is elegant, professional, and aspirational.
-
-BRAND VOICE for North Bay Kitchen & Bath:
-- Sophisticated and refined
-- Focus on craftsmanship and quality
-- Emphasize luxury lifestyle
-- Technical accuracy with elegant language
-- Aspirational but accessible
-
-Always return valid JSON with this exact structure:
-{
-  "description": "The main product description",
-  "seoTitle": "SEO-optimized title (60 chars or less)",
-  "seoDescription": "Meta description (150-160 chars)",
-  "quality_score": 85,
-  "word_count": 120
-}`
+          content: promptConfig.systemPrompt
         },
         {
           role: 'user',
           content: prompt
         }
       ],
-      temperature: 0.7,
-      max_tokens: 1000,
+      temperature: promptConfig.temperature,
+      max_tokens: promptConfig.maxTokens,
     });
 
     const content = response.choices[0]?.message?.content;
@@ -175,27 +291,127 @@ Always return valid JSON with this exact structure:
   }
 }
 
-// Check AI configuration status
-export function getAIStatus(): {
-  configured: boolean;
-  available: boolean;
-  model: string;
-  message: string;
+// Generate project description
+export async function generateProjectDescription(
+  projectData: ProjectData,
+  options: AIDescriptionOptions = {
+    type: 'luxury',
+    tone: 'luxury',
+    length: 'medium',
+    includeFeatures: true,
+    includeBenefits: true
+  }
+): Promise<{
+  description: string;
+  highlights?: string[];
+  quality_score: number;
+  word_count: number;
+}> {
+  // Check if OpenAI is configured
+  if (!isOpenAIConfigured() || !openai) {
+    console.warn('⚠️ OpenAI not configured, using fallback project description generation');
+    return generateFallbackProjectDescription(projectData);
+  }
+
+  try {
+    // Get configurable prompt
+    const promptConfig = await getAIPrompt('project_description');
+    const prompt = buildProjectPrompt(projectData, options, promptConfig.userPromptTemplate);
+    
+    const response = await openai.chat.completions.create({
+      model: promptConfig.model,
+      messages: [
+        {
+          role: 'system',
+          content: promptConfig.systemPrompt
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      temperature: promptConfig.temperature,
+      max_tokens: promptConfig.maxTokens,
+    });
+
+    const content = response.choices[0]?.message?.content;
+    if (!content) {
+      throw new Error('No content returned from OpenAI');
+    }
+
+    // Parse the JSON response
+    const parsed = JSON.parse(content);
+    
+    return {
+      description: parsed.description,
+      highlights: parsed.highlights,
+      quality_score: parsed.quality_score || 75,
+      word_count: parsed.word_count || content.split(' ').length
+    };
+
+  } catch (error) {
+    console.error('AI Project Description Generation Error:', error);
+    return generateFallbackProjectDescription(projectData);
+  }
+}
+
+// Generate fallback project description
+function generateFallbackProjectDescription(projectData: ProjectData): {
+  description: string;
+  highlights?: string[];
+  quality_score: number;
+  word_count: number;
 } {
-  const configured = Boolean(isOpenAIConfigured());
+  const { title, category, style, clientName, location, features } = projectData;
+  
+  let description = `The ${title} project represents exceptional ${category || 'home'} design`;
+  
+  if (location) {
+    description += ` in ${location}`;
+  }
+  
+  if (clientName && !clientName.toLowerCase().includes('client')) {
+    description += ` for ${clientName}`;
+  }
+  
+  description += '. ';
+  
+  if (style) {
+    description += `This ${style.toLowerCase()} design showcases our commitment to luxury and functionality. `;
+  }
+  
+  description += 'Our team transformed the space with meticulous attention to detail, premium materials, and innovative design solutions. ';
+  
+  if (features && features.length > 0) {
+    description += `Key features include ${features.slice(0, 3).join(', ')}. `;
+  }
+  
+  description += 'The result is a stunning transformation that perfectly balances aesthetics and practicality, creating a space that truly reflects our client\'s vision and lifestyle.';
   
   return {
-    configured,
-    available: configured && !!openai,
-    model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-    message: configured 
-      ? 'AI features are enabled and ready to use'
-      : 'OpenAI API key not configured. AI features will use fallback descriptions.'
+    description,
+    highlights: features?.slice(0, 3) || ['Premium Materials', 'Custom Design', 'Expert Craftsmanship'],
+    quality_score: 70,
+    word_count: description.split(' ').length
   };
 }
 
-// Build the prompt based on product data and options
-function buildPrompt(productData: ProductData, options: AIDescriptionOptions): string {
+// Build product prompt
+function buildProductPrompt(productData: ProductData, options: AIDescriptionOptions, template?: string): string {
+  if (template) {
+    // Use custom template if provided
+    return template
+      .replace('{name}', productData.name)
+      .replace('{category}', productData.category || 'product')
+      .replace('{brand}', productData.brand || '')
+      .replace('{price}', productData.price ? formatPriceRange(productData.price) : '')
+      .replace('{specifications}', JSON.stringify(productData.specifications || {}))
+      .replace('{tags}', productData.tags?.join(', ') || '')
+      .replace('{tone}', options.tone)
+      .replace('{length}', options.length);
+  }
+
+  // Default product prompt
   const { name, category, brand, specifications, price, type, tags, existingDescription } = productData;
   
   let prompt = `Create a ${options.type} product description for this luxury ${category || 'home design'} product:\n\n`;
@@ -232,9 +448,75 @@ function buildPrompt(productData: ProductData, options: AIDescriptionOptions): s
     prompt += `- SEO Keywords to include: ${options.seoKeywords.join(', ')}\n`;
   }
   
-  prompt += `\nFocus on the luxury lifestyle this product enables, the craftsmanship quality, and why it's perfect for discerning homeowners who value both beauty and functionality.`;
+  return prompt;
+}
+
+// Build project prompt
+function buildProjectPrompt(projectData: ProjectData, options: AIDescriptionOptions, template?: string): string {
+  if (template) {
+    // Use custom template if provided
+    return template
+      .replace('{title}', projectData.title)
+      .replace('{category}', projectData.category || 'renovation')
+      .replace('{style}', projectData.style || '')
+      .replace('{location}', projectData.location || '')
+      .replace('{clientName}', projectData.clientName || '')
+      .replace('{features}', projectData.features?.join(', ') || '')
+      .replace('{tone}', options.tone)
+      .replace('{length}', options.length);
+  }
+
+  // Default project prompt
+  const { title, category, style, budget, timeline, clientName, location, features, existingDescription } = projectData;
+  
+  let prompt = `Create a compelling project description for this luxury ${category || 'renovation'} project:\n\n`;
+  
+  prompt += `PROJECT DETAILS:\n`;
+  prompt += `- Title: ${title}\n`;
+  if (category) prompt += `- Category: ${category}\n`;
+  if (style) prompt += `- Design Style: ${style}\n`;
+  if (location) prompt += `- Location: ${location}\n`;
+  if (clientName) prompt += `- Client: ${clientName}\n`;
+  if (budget) prompt += `- Budget Range: ${formatBudgetRange(budget)}\n`;
+  if (timeline) prompt += `- Timeline: ${timeline}\n`;
+  
+  if (features && features.length > 0) {
+    prompt += `\nKEY FEATURES:\n`;
+    features.forEach(feature => {
+      prompt += `- ${feature}\n`;
+    });
+  }
+  
+  if (existingDescription) {
+    prompt += `\nEXISTING DESCRIPTION (for reference): ${existingDescription}\n`;
+  }
+  
+  prompt += `\nREQUIREMENTS:\n`;
+  prompt += `- Tone: ${options.tone}\n`;
+  prompt += `- Length: ${options.length} (${getLengthGuidance(options.length)})\n`;
+  prompt += `- Focus on transformation and results\n`;
+  prompt += `- Highlight design innovation and quality\n`;
   
   return prompt;
+}
+
+// Check AI configuration status
+export function getAIStatus(): {
+  configured: boolean;
+  available: boolean;
+  model: string;
+  message: string;
+} {
+  const configured = Boolean(isOpenAIConfigured());
+  
+  return {
+    configured,
+    available: configured && !!openai,
+    model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+    message: configured 
+      ? 'AI features are enabled and ready to use'
+      : 'OpenAI API key not configured. AI features will use fallback descriptions.'
+  };
 }
 
 // Helper function to format price ranges
@@ -243,6 +525,14 @@ function formatPriceRange(price: number): string {
   if (price < 1500) return 'Luxury'; 
   if (price < 5000) return 'Ultra-Luxury';
   return 'Exclusive Collection';
+}
+
+// Helper function to format budget ranges
+function formatBudgetRange(budget: number): string {
+  if (budget < 25000) return 'Premium Renovation';
+  if (budget < 75000) return 'Luxury Transformation'; 
+  if (budget < 150000) return 'Ultra-Luxury Project';
+  return 'Exclusive Custom Design';
 }
 
 // Helper function to get length guidance
