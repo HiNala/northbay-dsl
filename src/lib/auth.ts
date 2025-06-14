@@ -8,10 +8,12 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
+    maxAge: 24 * 60 * 60, // 24 hours
   },
   pages: {
-    signIn: "/auth/login",
-    error: "/auth/error",
+    signIn: "/dashboard/login",
+    signOut: "/dashboard/login",
+    error: "/dashboard/login",
   },
   providers: [
     CredentialsProvider({
@@ -25,48 +27,70 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        // Find user by email with their roles
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
-          include: {
-            Profile: true,
-            roles: {
-              include: {
-                Role: true,
+        try {
+          // Find user by email with their roles
+          const user = await prisma.user.findUnique({
+            where: {
+              email: credentials.email,
+            },
+            include: {
+              Profile: true,
+              roles: {
+                include: {
+                  Role: true,
+                },
               },
             },
-          },
-        })
+          })
 
-        if (!user) {
+          if (!user || !user.password) {
+            return null
+          }
+
+          // Check if user has admin, employee, or manager role
+          const hasBusinessRole = user.roles.some(userRole => 
+            ['admin', 'employee', 'manager', 'super_admin'].includes(userRole.Role.name)
+          )
+
+          if (!hasBusinessRole) {
+            return null
+          }
+
+          // Check password
+          const isPasswordValid = await compare(credentials.password, user.password)
+          
+          if (!isPasswordValid) {
+            return null
+          }
+
+          // Update last login tracking
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { 
+              lastLoginAt: new Date(),
+              loginCount: { increment: 1 }
+            }
+          })
+
+          // Get user roles and level
+          const roles = user.roles.map(ur => ur.Role.name)
+          const level = Math.max(...user.roles.map(ur => ur.Role.level))
+
+          // Return user with all required properties
+          return {
+            id: user.id,
+            email: user.email || "",
+            name: user.Profile?.fullName || user.email || "",
+            roles,
+            level,
+            avatar: user.Profile?.avatarUrl || undefined,
+            // Backward compatibility
+            role: roles[0] || 'employee',
+            roleLevel: level,
+          }
+        } catch (error) {
+          console.error('Authorization error:', error)
           return null
-        }
-
-        // Check if user has admin, employee, or manager role
-        const hasBusinessRole = user.roles.some(userRole => 
-          ['admin', 'employee', 'manager', 'super_admin'].includes(userRole.Role.name)
-        )
-
-        if (!hasBusinessRole) {
-          return null
-        }
-
-        // For demo purposes, we'll use a simple password check
-        // In production, you'd compare hashed passwords
-        const isPasswordValid = await compare(credentials.password, user.password || "")
-        
-        if (!isPasswordValid) {
-          return null
-        }
-
-        return {
-          id: user.id,
-          email: user.email || "",
-          name: user.Profile?.fullName || user.email || "",
-          roles: user.roles.map(ur => ur.Role.name),
-          level: Math.max(...user.roles.map(ur => ur.Role.level)),
         }
       },
     }),
@@ -76,14 +100,22 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.roles = user.roles
         token.level = user.level
+        token.avatar = user.avatar
+        // Backward compatibility
+        token.role = user.role
+        token.roleLevel = user.roleLevel
       }
       return token
     },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.sub!
-        session.user.roles = token.roles as string[]
-        session.user.level = token.level as number
+        session.user.roles = token.roles
+        session.user.level = token.level
+        session.user.avatar = token.avatar
+        // Backward compatibility
+        session.user.role = token.role
+        session.user.roleLevel = token.roleLevel
       }
       return session
     },

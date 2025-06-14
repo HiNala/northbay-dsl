@@ -7,29 +7,40 @@ export default withAuth(
     const pathname = req.nextUrl.pathname
 
     // Allow access to login page
-    if (pathname.startsWith('/auth/login')) {
+    if (pathname.startsWith('/auth/login') || pathname.startsWith('/dashboard/login')) {
       return NextResponse.next()
     }
 
     // Protect admin routes
     if (pathname.startsWith('/admin')) {
-      const isAdmin = token?.roles?.includes('admin') || token?.roles?.includes('super_admin')
-      const isManager = token?.roles?.includes('manager')
+      const roles = token?.roles as string[] || []
+      const level = token?.level as number || 0
       
-      if (!isAdmin && !isManager) {
-        return NextResponse.redirect(new URL('/auth/login?error=unauthorized', req.url))
+      // Check if user has admin/manager level access (level 80+ or specific roles)
+      const hasAdminAccess = level >= 80 || 
+                           roles.includes('admin') || 
+                           roles.includes('super_admin') || 
+                           roles.includes('manager')
+      
+      if (!hasAdminAccess) {
+        return NextResponse.redirect(new URL('/dashboard/login?error=unauthorized', req.url))
       }
     }
 
     // Protect employee routes
-    if (pathname.startsWith('/employee')) {
-      const hasEmployeeAccess = token?.roles?.includes('employee') || 
-                               token?.roles?.includes('admin') || 
-                               token?.roles?.includes('manager') ||
-                               token?.roles?.includes('super_admin')
+    if (pathname.startsWith('/employee') || pathname.startsWith('/dashboard')) {
+      const roles = token?.roles as string[] || []
+      const level = token?.level as number || 0
+      
+      // Check if user has employee level access or higher (level 50+ or specific roles)
+      const hasEmployeeAccess = level >= 50 || 
+                               roles.includes('employee') || 
+                               roles.includes('manager') ||
+                               roles.includes('admin') || 
+                               roles.includes('super_admin')
       
       if (!hasEmployeeAccess) {
-        return NextResponse.redirect(new URL('/auth/login?error=unauthorized', req.url))
+        return NextResponse.redirect(new URL('/dashboard/login?error=unauthorized', req.url))
       }
     }
 
@@ -49,16 +60,19 @@ export default withAuth(
           pathname.startsWith('/services') ||
           pathname.startsWith('/portfolio') ||
           pathname.startsWith('/design-services') ||
+          pathname.startsWith('/search') ||
           pathname.startsWith('/auth/login') ||
+          pathname.startsWith('/dashboard/login') ||
           pathname.startsWith('/api/auth') ||
           pathname.startsWith('/_next') ||
-          pathname.startsWith('/favicon.ico')
+          pathname.startsWith('/favicon.ico') ||
+          pathname === '/favicon.ico'
         ) {
           return true
         }
 
         // Require authentication for protected routes
-        if (pathname.startsWith('/admin') || pathname.startsWith('/employee')) {
+        if (pathname.startsWith('/admin') || pathname.startsWith('/employee') || pathname.startsWith('/dashboard')) {
           return !!token
         }
 
