@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import { sampleProducts, productCategories } from '@/data/productsData';
+import { useProducts, type Product, type ProductFilters } from '@/hooks/useProducts';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,113 +19,68 @@ import {
   CheckCircle
 } from 'lucide-react';
 
-export interface Product {
-  id: string;
-  name: string;
-  category: string;
-  subcategory: string;
-  brand: string;
-  price: string;
-  availability: string;
-  leadTime: string;
-  status: 'draft' | 'published' | 'archived';
-  image: string;
-  description: string;
-  features: string[];
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
 const ProductsManager = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedStatus, setSelectedStatus] = useState('all');
-  const [sortBy, setSortBy] = useState('name');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(12);
+  const [filters, setFilters] = useState<ProductFilters>({
+    page: 1,
+    limit: 12,
+    sortBy: 'updatedAt',
+    sortOrder: 'desc'
+  });
+  
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [showProductModal, setShowProductModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
-  // Transform products data to match our interface
-  const products: Product[] = useMemo(() => {
-    return sampleProducts.map((product: any) => ({
-      id: product.id,
-      name: product.name,
-      category: product.category,
-      subcategory: product.subcategory,
-      brand: product.brand,
-      price: product.price.display,
-      availability: product.availability,
-      leadTime: product.leadTime,
-      status: 'published' as const,
-      image: product.images[0],
-      description: product.description,
-      features: product.features,
-      tags: product.tags || [],
-      createdAt: '2024-01-01',
-      updatedAt: '2024-01-01',
-    }));
-  }, []);
+  // Use the real API hook
+  const {
+    data: productsData,
+    loading,
+    error,
+    refetch,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+    bulkUpdateProducts,
+  } = useProducts(filters);
 
-  // Filter and sort products
-  const filteredProducts = useMemo(() => {
-    let filtered = products.filter(product => {
-      const matchesSearch = 
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-      
-      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-      const matchesStatus = selectedStatus === 'all' || product.status === selectedStatus;
+  const products = productsData?.products || [];
+  const pagination = productsData?.pagination;
 
-      return matchesSearch && matchesCategory && matchesStatus;
-    });
-
-    // Sort products
-    filtered.sort((a, b) => {
-      let comparison = 0;
-      
-      switch (sortBy) {
-        case 'name':
-          comparison = a.name.localeCompare(b.name);
-          break;
-        case 'category':
-          comparison = a.category.localeCompare(b.category);
-          break;
-        case 'brand':
-          comparison = a.brand.localeCompare(b.brand);
-          break;
-        case 'updatedAt':
-          comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
-          break;
-        default:
-          comparison = a.name.localeCompare(b.name);
-      }
-
-      return sortOrder === 'desc' ? -comparison : comparison;
-    });
-
-    return filtered;
-  }, [products, searchQuery, selectedCategory, selectedStatus, sortBy, sortOrder]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredProducts.length / pageSize);
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
-
-  // Get unique categories for filter
+  // Get unique categories for filter - from API data
   const categories = useMemo(() => {
-    const uniqueCategories = [...new Set(products.map(p => p.category))];
+    if (!products.length) return [];
+    const uniqueCategories = [...new Set(products.map(p => p.Category?.name).filter(Boolean))];
     return uniqueCategories.sort();
   }, [products]);
+
+  const handleSearchChange = (value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      search: value || undefined,
+      page: 1
+    }));
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setFilters(prev => ({
+      ...prev,
+      category: category === 'all' ? undefined : category,
+      page: 1
+    }));
+  };
+
+  const handleStatusChange = (status: string) => {
+    setFilters(prev => ({
+      ...prev,
+      status: status === 'all' ? undefined : status,
+      page: 1
+    }));
+  };
+
+  const handlePageChange = (page: number) => {
+    setFilters(prev => ({ ...prev, page }));
+  };
 
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
@@ -133,58 +88,100 @@ const ProductsManager = () => {
   };
 
   const handleDeleteProduct = async (productId: string) => {
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log('Delete product:', productId);
-    setIsLoading(false);
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      try {
+        await deleteProduct(productId);
+        // Remove from selected if it was selected
+        setSelectedProducts(prev => prev.filter(id => id !== productId));
+      } catch (error) {
+        // Error handled by the hook
+      }
+    }
   };
 
   const handleBulkAction = async (action: string) => {
     if (selectedProducts.length === 0) return;
     
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    console.log('Bulk action:', action, 'on products:', selectedProducts);
-    setSelectedProducts([]);
-    setIsLoading(false);
+    const actionLabels = {
+      publish: 'publish',
+      archive: 'archive',
+      delete: 'delete'
+    };
+    
+    const actionLabel = actionLabels[action as keyof typeof actionLabels] || action;
+    
+    if (window.confirm(`Are you sure you want to ${actionLabel} ${selectedProducts.length} product(s)?`)) {
+      try {
+        await bulkUpdateProducts(selectedProducts, action);
+        setSelectedProducts([]);
+      } catch (error) {
+        // Error handled by the hook
+      }
+    }
   };
 
   const handleSaveProduct = async (productData: Partial<Product>) => {
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log('Save product:', productData);
-    setShowProductModal(false);
-    setEditingProduct(null);
-    setIsLoading(false);
+    try {
+      if (editingProduct) {
+        await updateProduct(editingProduct.id, productData);
+      } else {
+        await createProduct(productData);
+      }
+      setShowProductModal(false);
+      setEditingProduct(null);
+    } catch (error) {
+      // Error handled by the hook
+    }
+  };
+
+  const handleSelectProduct = (productId: string, selected: boolean) => {
+    setSelectedProducts(prev => 
+      selected 
+        ? [...prev, productId]
+        : prev.filter(id => id !== productId)
+    );
+  };
+
+  const handleSelectAll = (selected: boolean) => {
+    setSelectedProducts(selected ? products.map(p => p.id) : []);
   };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      published: { 
+      PUBLISHED: { 
         class: 'bg-green-100 text-green-800 border-green-200', 
         icon: <CheckCircle className="h-3 w-3" /> 
       },
-      draft: { 
+      DRAFT: { 
         class: 'bg-yellow-100 text-yellow-800 border-yellow-200', 
         icon: <Edit className="h-3 w-3" /> 
       },
-      archived: { 
+      PENDING_APPROVAL: {
+        class: 'bg-blue-100 text-blue-800 border-blue-200',
+        icon: <Eye className="h-3 w-3" />
+      },
+      ARCHIVED: { 
         class: 'bg-gray-100 text-gray-800 border-gray-200', 
         icon: <Archive className="h-3 w-3" /> 
       },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.draft;
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.DRAFT;
 
     return (
       <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full border ${config.class}`}>
         {config.icon}
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {status.charAt(0).toUpperCase() + status.slice(1).toLowerCase().replace('_', ' ')}
       </span>
     );
+  };
+
+  const formatPrice = (price?: number) => {
+    if (!price) return 'N/A';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(price);
   };
 
   return (
@@ -204,11 +201,13 @@ const ProductsManager = () => {
             </div>
           </div>
           
-          <div className="bg-nb-neutral-100 px-3 py-1 rounded-full">
-            <span className="text-sm font-medium text-nb-neutral-700">
-              {filteredProducts.length} products
-            </span>
-          </div>
+          {pagination && (
+            <div className="bg-nb-neutral-100 px-3 py-1 rounded-full">
+              <span className="text-sm font-medium text-nb-neutral-700">
+                {pagination.totalCount} products
+              </span>
+            </div>
+          )}
         </div>
         
         <div className="flex items-center space-x-3">
@@ -222,7 +221,7 @@ const ProductsManager = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => handleBulkAction('publish')}
-                  loading={isLoading}
+                  loading={loading}
                 >
                   Publish
                 </Button>
@@ -230,7 +229,7 @@ const ProductsManager = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => handleBulkAction('archive')}
-                  loading={isLoading}
+                  loading={loading}
                 >
                   Archive
                 </Button>
@@ -238,7 +237,7 @@ const ProductsManager = () => {
                   variant="destructive"
                   size="sm"
                   onClick={() => handleBulkAction('delete')}
-                  loading={isLoading}
+                  loading={loading}
                 >
                   Delete
                 </Button>
@@ -265,8 +264,8 @@ const ProductsManager = () => {
             <div className="flex-1">
               <Input
                 placeholder="Search products, brands, or tags..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={filters.search || ''}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 leftIcon={<Search className="h-4 w-4" />}
                 variant="luxury"
               />
@@ -274,8 +273,8 @@ const ProductsManager = () => {
             
             <div className="flex gap-3">
               <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                value={filters.category || 'all'}
+                onChange={(e) => handleCategoryChange(e.target.value)}
                 className="px-3 py-2 border border-nb-neutral-300 rounded-md text-sm focus:ring-2 focus:ring-nb-gold-500 focus:border-transparent"
               >
                 <option value="all">All Categories</option>
@@ -285,14 +284,15 @@ const ProductsManager = () => {
               </select>
               
               <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
+                value={filters.status || 'all'}
+                onChange={(e) => handleStatusChange(e.target.value)}
                 className="px-3 py-2 border border-nb-neutral-300 rounded-md text-sm focus:ring-2 focus:ring-nb-gold-500 focus:border-transparent"
               >
                 <option value="all">All Status</option>
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-                <option value="archived">Archived</option>
+                <option value="DRAFT">Draft</option>
+                <option value="PENDING_APPROVAL">Pending Approval</option>
+                <option value="PUBLISHED">Published</option>
+                <option value="ARCHIVED">Archived</option>
               </select>
               
               <Button variant="outline" leftIcon={<Filter className="h-4 w-4" />}>
@@ -304,12 +304,12 @@ const ProductsManager = () => {
       </Card>
 
       {/* Products Grid */}
-      <LoadingOverlay isLoading={isLoading}>
+      <LoadingOverlay isLoading={loading}>
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">
-                Products ({filteredProducts.length})
+                Products {pagination && `(${pagination.totalCount})`}
               </CardTitle>
               
               <div className="flex items-center space-x-2">
@@ -333,11 +333,11 @@ const ProductsManager = () => {
           </CardHeader>
           
           <CardContent>
-            {isLoading ? (
-              <ProductGridSkeleton count={pageSize} />
-            ) : (
+            {loading ? (
+              <ProductGridSkeleton count={filters.limit || 12} />
+            ) : products.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {paginatedProducts.map((product) => (
+                {products.map((product) => (
                   <Card 
                     key={product.id} 
                     variant="luxury" 
@@ -345,12 +345,28 @@ const ProductsManager = () => {
                     padding="none"
                     className="group cursor-pointer overflow-hidden"
                   >
-                    <div className="aspect-square overflow-hidden">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
+                    <div className="aspect-square overflow-hidden relative">
+                      {product.Images && product.Images.length > 0 ? (
+                        <img
+                          src={product.Images[0].url}
+                          alt={product.Images[0].alt || product.name}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-nb-neutral-100 flex items-center justify-center">
+                          <Package className="h-12 w-12 text-nb-neutral-400" />
+                        </div>
+                      )}
+                      
+                      {/* Selection checkbox */}
+                      <div className="absolute top-2 left-2">
+                        <input
+                          type="checkbox"
+                          checked={selectedProducts.includes(product.id)}
+                          onChange={(e) => handleSelectProduct(product.id, e.target.checked)}
+                          className="h-4 w-4 text-nb-gold-600 rounded border-nb-neutral-300 focus:ring-nb-gold-500"
+                        />
+                      </div>
                     </div>
                     
                     <div className="p-4 space-y-3">
@@ -358,12 +374,14 @@ const ProductsManager = () => {
                         <h4 className="font-semibold text-nb-neutral-900 line-clamp-2">
                           {product.name}
                         </h4>
-                        <p className="text-sm text-nb-neutral-600">{product.brand}</p>
+                        <p className="text-sm text-nb-neutral-600">
+                          {product.Brand?.name || 'No Brand'} • {product.Category?.name || 'Uncategorized'}
+                        </p>
                       </div>
                       
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium text-nb-gold-600">
-                          {product.price}
+                          {formatPrice(product.price)}
                         </span>
                         {getStatusBadge(product.status)}
                       </div>
@@ -400,21 +418,19 @@ const ProductsManager = () => {
                   </Card>
                 ))}
               </div>
-            )}
-            
-            {!isLoading && filteredProducts.length === 0 && (
+            ) : (
               <div className="text-center py-12">
                 <Package className="h-12 w-12 text-nb-neutral-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-nb-neutral-900 mb-2">
                   No products found
                 </h3>
                 <p className="text-nb-neutral-600 mb-6">
-                  {searchQuery || selectedCategory !== 'all' || selectedStatus !== 'all'
+                  {filters.search || filters.category || filters.status
                     ? 'Try adjusting your search or filters'
                     : 'Get started by adding your first product'
                   }
                 </p>
-                {(!searchQuery && selectedCategory === 'all' && selectedStatus === 'all') && (
+                {(!filters.search && !filters.category && !filters.status) && (
                   <Button
                     onClick={() => setShowProductModal(true)}
                     leftIcon={<Plus className="h-4 w-4" />}
@@ -429,32 +445,32 @@ const ProductsManager = () => {
       </LoadingOverlay>
 
       {/* Pagination */}
-      {totalPages > 1 && !isLoading && (
+      {pagination && pagination.totalPages > 1 && !loading && (
         <Card>
           <CardContent className="flex items-center justify-between">
             <div className="text-sm text-nb-neutral-600">
-              Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, filteredProducts.length)} of {filteredProducts.length} results
+              Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.totalCount)} of {pagination.totalCount} results
             </div>
             
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={!pagination.hasPrev}
               >
                 Previous
               </Button>
               
               <span className="px-3 py-1 text-sm font-medium">
-                Page {currentPage} of {totalPages}
+                Page {pagination.page} of {pagination.totalPages}
               </span>
               
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={!pagination.hasNext}
               >
                 Next
               </Button>
@@ -486,9 +502,9 @@ const ProductsManager = () => {
                 {editingProduct && (
                   <div className="mt-6 space-y-2 text-left bg-nb-neutral-50 p-4 rounded-lg">
                     <p><strong>Name:</strong> {editingProduct.name}</p>
-                    <p><strong>Category:</strong> {editingProduct.category}</p>
-                    <p><strong>Brand:</strong> {editingProduct.brand}</p>
-                    <p><strong>Price:</strong> {editingProduct.price}</p>
+                    <p><strong>Category:</strong> {editingProduct.Category?.name}</p>
+                    <p><strong>Brand:</strong> {editingProduct.Brand?.name}</p>
+                    <p><strong>Price:</strong> {formatPrice(editingProduct.price)}</p>
                     <p><strong>Status:</strong> {editingProduct.status}</p>
                   </div>
                 )}
@@ -507,7 +523,7 @@ const ProductsManager = () => {
               </Button>
               <Button
                 onClick={() => handleSaveProduct({})}
-                loading={isLoading}
+                loading={loading}
               >
                 {editingProduct ? 'Update Product' : 'Create Product'}
               </Button>
