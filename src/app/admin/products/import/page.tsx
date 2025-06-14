@@ -69,9 +69,7 @@ export default function BulkImportPage() {
       return;
     }
 
-    const hasAccess = session.user.roles?.some(role => 
-      ['admin', 'manager', 'employee', 'super_admin'].includes(role)
-    );
+    const hasAccess = ['admin', 'manager', 'employee', 'super_admin'].includes(session.user.role);
 
     if (!hasAccess) {
       router.push('/');
