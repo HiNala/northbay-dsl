@@ -2,30 +2,74 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
 const HeroSection = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Hero background images
+  const heroImages = [
+    {
+      src: '/website_images/Home Images/LakeHouse _QSWO-Cashew-Putty_01.jpg',
+      alt: 'Luxury Kitchen Design - Lake House'
+    },
+    {
+      src: '/website_images/Home Images/Peacock09.jpg',
+      alt: 'Modern Kitchen Design - Peacock Project'
+    },
+    {
+      src: '/website_images/Home Images/photos47.jpg',
+      alt: 'Contemporary Kitchen Design'
+    },
+    {
+      src: '/website_images/Home Images/Petaluma Bath8.jpg',
+      alt: 'Luxury Bathroom Design - Petaluma'
+    },
+    {
+      src: '/website_images/Home Images/GaleForce&HickoryKitchen (2)-FULL-OVERLAY.jpg',
+      alt: 'Premium Kitchen Design - Gale Force'
+    }
+  ];
 
   useEffect(() => {
     setIsLoaded(true);
-  }, []);
+    
+    // Auto-advance slides every 5 seconds
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
+      {/* Background Image Slider */}
       <div className="absolute inset-0">
-        <Image
-          src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
-          alt="Luxury Kitchen Design"
-          fill
-          className="object-cover"
-          priority
-          quality={90}
-        />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 1, ease: "easeInOut" }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={heroImages[currentSlide].src}
+              alt={heroImages[currentSlide].alt}
+              fill
+              className="object-cover"
+              priority={currentSlide === 0}
+              quality={90}
+            />
+          </motion.div>
+        </AnimatePresence>
+        
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-charcoal-900/70 via-charcoal-800/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-charcoal-900/75 via-charcoal-800/50 to-transparent" />
       </div>
 
       {/* Content */}
@@ -72,6 +116,24 @@ const HeroSection = () => {
               </Button>
             </div>
           </motion.div>
+        </div>
+      </div>
+
+      {/* Slide Indicators */}
+      <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-20">
+        <div className="flex space-x-3">
+          {heroImages.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                index === currentSlide 
+                  ? 'bg-luxury-gold-400 scale-125' 
+                  : 'bg-warm-white-50/30 hover:bg-warm-white-50/50'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
         </div>
       </div>
 

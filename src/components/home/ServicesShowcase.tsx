@@ -14,21 +14,21 @@ const ServicesShowcase = () => {
       title: "Kitchen Design",
       subtitle: "Culinary Sanctuaries",
       description: "Transform your kitchen into a sophisticated culinary sanctuary where form meets function in perfect harmony.",
-      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      image: "/website_images/Projects/San Rafael Project- Modern Kitchen/Peacock02.jpg",
       features: ["Custom Cabinetry", "Premium Appliances", "Stone Countertops"]
     },
     {
       title: "Bathroom Design", 
       subtitle: "Spa-Like Retreats",
       description: "Create a luxurious bathroom retreat that serves as your personal spa sanctuary for daily rejuvenation.",
-      image: "https://images.unsplash.com/photo-1620626011761-996317b8d101?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      image: "/website_images/Projects/Petaluma - Bathroom Remodel/Petaluma Bath1.jpg",
       features: ["Walk-in Showers", "Freestanding Tubs", "Heated Floors"]
     },
     {
       title: "Design Consultation",
       subtitle: "Expert Guidance", 
       description: "Comprehensive design consultation to bring your vision to life with expert guidance and attention to detail.",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      image: "/website_images/Design Services/Design Services Website (1).jpeg",
       features: ["3D Visualization", "Material Selection", "Project Planning"]
     }
   ];

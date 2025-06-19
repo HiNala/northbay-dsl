@@ -51,25 +51,25 @@ export const processSteps = [
     id: 1,
     title: 'DESIGN CONSULTATION',
     description: 'We begin with an in-depth conversation about your vision, lifestyle, and budget. Our designers will assess your space and discuss possibilities, ensuring we understand every detail of your dream kitchen or bathroom.',
-    image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'
+    image: '/website_images/Design Services/Photo Jun 16 2025, 1 39 36 PM.jpg'
   },
   {
     id: 2,
     title: 'MATERIAL SELECTION',
     description: 'Visit our showroom to experience materials firsthand. From countertops to cabinet finishes, we guide you through selections that balance beauty, durability, and your budget requirements.',
-    image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1558&q=80'
+    image: '/website_images/Design Services/Showroom_BathroomPlanning (2).JPG'
   },
   {
     id: 3,
     title: 'DESIGN DEVELOPMENT',
     description: 'Our team creates detailed 3D renderings and technical drawings, allowing you to visualize your space before construction begins. We refine every detail until the design perfectly matches your vision.',
-    image: 'https://images.unsplash.com/photo-1620626011761-996317b8d101?ixlib=rb-4.0.3&auto=format&fit=crop&w=1587&q=80'
+    image: '/website_images/Design Services/Showroom_InKitchenDisplay (1).JPG'
   },
   {
     id: 4,
     title: 'PROJECT COORDINATION',
     description: 'We manage every aspect of your renovation, coordinating with contractors, handling permits, and ensuring timeline adherence. You can relax while we handle the details.',
-    image: 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'
+    image: '/website_images/Design Services/Design Services Website (5).jpeg'
   },
   {
     id: 5,
@@ -80,12 +80,12 @@ export const processSteps = [
 ];
 
 export const materialImages = [
-  { src: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', alt: 'Quartz Countertops' },
-  { src: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', alt: 'Custom Cabinetry' },
-  { src: 'https://images.unsplash.com/photo-1620626011761-996317b8d101?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', alt: 'Designer Tiles' },
-  { src: 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', alt: 'Premium Hardware' },
-  { src: 'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', alt: 'Natural Stone' },
-  { src: 'https://images.unsplash.com/photo-1584622781564-1d987f7333c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', alt: 'Wood Finishes' },
-  { src: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', alt: 'Mosaic Patterns' },
-  { src: 'https://images.unsplash.com/photo-1600210492493-0946911123ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', alt: 'Luxury Fixtures' }
+  { src: '/website_images/Projects/San Rafael Project- Modern Kitchen/Peacock02.jpg', alt: 'Modern Kitchen Design' },
+  { src: '/website_images/Projects/Petaluma - Bathroom Remodel/Petaluma Bath1.jpg', alt: 'Luxury Bathroom' },
+  { src: '/website_images/Projects/Kenwood Project/Primary Bath photos5.jpg', alt: 'Premium Materials' },
+  { src: '/website_images/Projects/Guerneville Project/Bath photos30.jpg', alt: 'Custom Finishes' },
+  { src: '/website_images/Design Services/Design Services Website (1).jpeg', alt: 'Design Process' },
+  { src: '/website_images/Design Services/Design Services Website (3).jpeg', alt: 'Material Selection' },
+  { src: '/website_images/Design Services/Design Services Website (4).jpeg', alt: 'Showroom Experience' },
+  { src: '/website_images/Design Services/Design Services Website (6).jpeg', alt: 'Luxury Fixtures' }
 ]; 

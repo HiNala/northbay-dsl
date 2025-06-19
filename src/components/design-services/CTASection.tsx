@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
 const CTASection = () => {
@@ -11,10 +12,18 @@ const CTASection = () => {
   ];
 
   return (
-    <section className="min-h-screen flex items-center bg-warm-brown-900 relative overflow-hidden">
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-accent-gold/20 to-transparent" />
+    <section className="min-h-screen flex items-center relative overflow-hidden">
+      {/* Background Banner Image */}
+      <div className="absolute inset-0">
+        <Image
+          src="/website_images/Design Services/Design Services Website (2).jpeg"
+          alt="North Bay Kitchen & Bath Banner"
+          fill
+          className="object-cover object-center"
+          quality={90}
+        />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-warm-brown-900/90 via-warm-brown-900/80 to-warm-brown-900/90" />
       </div>
       
       <div className="max-w-5xl mx-auto px-6 text-center relative z-10">

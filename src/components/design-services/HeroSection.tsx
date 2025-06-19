@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
@@ -12,17 +13,26 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="min-h-screen flex items-center justify-center bg-warm-brown-900 text-cream relative overflow-hidden">
-      {/* Background texture/pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-gradient-to-br from-warm-brown-800 to-warm-brown-900" />
+    <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <Image
+          src="/website_images/Design Services/Brochures (3).JPG"
+          alt="North Bay Kitchen & Bath Design Services"
+          fill
+          className="object-cover"
+          priority
+          quality={90}
+        />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-warm-brown-900/85 via-warm-brown-800/75 to-warm-brown-900/85" />
       </div>
       
       <div className={`max-w-5xl mx-auto px-6 text-center relative z-10 transition-all duration-1000 ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
       }`}>
         <motion.h1 
-          className="text-4xl md:text-6xl lg:text-7xl font-light tracking-wide mb-8 leading-tight font-serif"
+          className="text-4xl md:text-6xl lg:text-7xl font-light tracking-wide mb-8 leading-tight font-serif text-cream"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2 }}
@@ -32,7 +42,7 @@ const HeroSection = () => {
         </motion.h1>
         
         <motion.p 
-          className="text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed mb-12 opacity-90 font-light"
+          className="text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed mb-12 text-cream/90 font-light"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4 }}

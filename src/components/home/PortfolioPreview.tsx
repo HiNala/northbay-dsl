@@ -10,25 +10,25 @@ const PortfolioPreview = () => {
 
   const projects = [
     {
-      title: "Pacific Heights Penthouse",
-      category: "Kitchen & Bath Renovation",
-      description: "A stunning transformation featuring custom millwork, premium finishes, and breathtaking city views.",
-      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      stats: { sqft: "2,500", timeline: "8 months", budget: "$180K" }
+      title: "San Rafael Modern Kitchen",
+      category: "Kitchen Renovation",
+      description: "A stunning contemporary kitchen transformation featuring sleek lines, premium finishes, and thoughtful design that perfectly balances form and function.",
+      image: "/website_images/Projects/San Rafael Project- Modern Kitchen/Peacock06.jpg",
+      stats: { sqft: "800", timeline: "8 weeks", budget: "$125K" }
     },
     {
-      title: "Napa Valley Estate", 
-      category: "Full Home Design",
-      description: "Luxury estate featuring wine country elegance with modern sophistication throughout.",
-      image: "https://images.unsplash.com/photo-1620626011761-996317b8d101?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      stats: { sqft: "5,000", timeline: "12 months", budget: "$400K" }
+      title: "Petaluma Bathroom Remodel", 
+      category: "Luxury Bath Design",
+      description: "An elegant bathroom renovation creating a spa-like retreat with luxurious materials and modern amenities for ultimate relaxation.",
+      image: "/website_images/Projects/Petaluma - Bathroom Remodel/Petaluma Bath5.jpg",
+      stats: { sqft: "450", timeline: "6 weeks", budget: "$85K" }
     },
     {
-      title: "Sonoma Retreat",
+      title: "Kenwood Estate Project",
       category: "Master Suite Design", 
-      description: "A serene master suite transformation creating the ultimate private sanctuary.",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      stats: { sqft: "800", timeline: "4 months", budget: "$85K" }
+      description: "A sophisticated master bathroom transformation featuring custom tile work, premium fixtures, and thoughtful lighting design.",
+      image: "/website_images/Projects/Kenwood Project/Primary Bath photos5.jpg",
+      stats: { sqft: "600", timeline: "10 weeks", budget: "$150K" }
     }
   ];
 

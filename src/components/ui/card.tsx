@@ -44,19 +44,19 @@ export interface CardProps
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant, padding, hover, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? React.Fragment : "div"
-    
+  ({ className, variant, padding, hover, asChild = false, children, ...props }, ref) => {
     if (asChild) {
-      return <React.Fragment {...props} />
+      return <>{children}</>
     }
     
     return (
-      <Comp
+      <div
         ref={ref}
         className={cn(cardVariants({ variant, padding, hover }), className)}
         {...props}
-      />
+      >
+        {children}
+      </div>
     )
   }
 )

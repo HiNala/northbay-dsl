@@ -1,0 +1,39 @@
+{
+  "timestamp": "2025-06-19T05:26:29.603Z",
+  "config": {
+    "inputDir": "./public/website_images",
+    "outputDir": "./public/website_images_optimized",
+    "quality": {
+      "jpeg": 85,
+      "webp": 90,
+      "png": 9
+    },
+    "maxWidth": 2400,
+    "formats": [
+      "jpg",
+      "jpeg",
+      "png",
+      "webp",
+      "tiff",
+      "bmp"
+    ]
+  },
+  "stats": {
+    "totalFiles": 86,
+    "optimizedFiles": 84,
+    "skippedFiles": 1,
+    "totalOriginalSize": 401733846,
+    "totalOptimizedSize": 39228853,
+    "errors": [
+      {
+        "file": "public\\website_images\\Projects\\San Rafael Project- Modern Kitchen\\Peacock10.jpg",
+        "error": "VipsJpeg: Corrupt JPEG data: 65536 extraneous bytes before marker 0xe1\nVipsJpeg: Corrupt JPEG data: 65536 extraneous bytes before marker 0xe1"
+      }
+    ]
+  },
+  "summary": {
+    "totalSavings": "345.71 MB",
+    "overallCompression": "90.2%",
+    "avgCompressionPerFile": "4214.39 KB saved per file"
+  }
+}

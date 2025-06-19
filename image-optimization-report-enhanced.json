@@ -1,0 +1,57 @@
+{
+  "timestamp": "2025-06-19T05:30:07.362Z",
+  "config": {
+    "inputDir": "./public/website_images",
+    "outputDir": "./public/website_images_optimized",
+    "quality": {
+      "jpeg": 85,
+      "webp": 90,
+      "png": 9
+    },
+    "maxWidth": 2400,
+    "imageFormats": [
+      "jpg",
+      "jpeg",
+      "png",
+      "webp",
+      "tiff",
+      "bmp"
+    ],
+    "videoFormats": [
+      "mov",
+      "mp4",
+      "avi",
+      "mkv",
+      "wmv",
+      "flv"
+    ],
+    "skipFormats": [
+      "mov",
+      "mp4",
+      "avi",
+      "mkv",
+      "wmv",
+      "flv"
+    ],
+    "corruptionRecovery": true
+  },
+  "stats": {
+    "totalFiles": 86,
+    "optimizedFiles": 85,
+    "skippedFiles": 1,
+    "videoFiles": 1,
+    "repairedFiles": 1,
+    "totalOriginalSize": 406103186,
+    "totalOptimizedSize": 39663989,
+    "errors": [],
+    "warnings": [],
+    "successRate": "50.3%",
+    "avgSavingsPerImage": "4.11 MB"
+  },
+  "summary": {
+    "totalSavings": "349.46 MB",
+    "overallCompression": "90.2%",
+    "perfection": "ACHIEVED",
+    "repairCount": 1
+  }
+}
