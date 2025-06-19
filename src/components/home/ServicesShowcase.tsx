@@ -14,14 +14,14 @@ const ServicesShowcase = () => {
       title: "Kitchen Design",
       subtitle: "Culinary Sanctuaries",
       description: "Transform your kitchen into a sophisticated culinary sanctuary where form meets function in perfect harmony.",
-      image: "/website_images/Projects/San Rafael Project- Modern Kitchen/Peacock02.jpg",
+      image: "/website_images/San Rafael Project- Modern Kitchen/Peacock02.jpg",
       features: ["Custom Cabinetry", "Premium Appliances", "Stone Countertops"]
     },
     {
       title: "Bathroom Design", 
       subtitle: "Spa-Like Retreats",
       description: "Create a luxurious bathroom retreat that serves as your personal spa sanctuary for daily rejuvenation.",
-      image: "/website_images/Projects/Petaluma - Bathroom Remodel/Petaluma Bath1.jpg",
+      image: "/website_images/Petaluma - Bathroom Remodel/Petaluma Bath1.jpg",
       features: ["Walk-in Showers", "Freestanding Tubs", "Heated Floors"]
     },
     {
@@ -129,7 +129,7 @@ const ServicesShowcase = () => {
             ))}
           </div>
 
-          {/* Service Image */}
+          {/* Service Image - Enhanced with lazy loading */}
           <motion.div 
             className="relative"
             initial={{ opacity: 0, x: 30 }}
@@ -144,6 +144,10 @@ const ServicesShowcase = () => {
                 fill
                 className="object-cover transition-all duration-700 group-hover:scale-105"
                 sizes="(max-width: 1024px) 100vw, 50vw"
+                loading="lazy"
+                quality={85}
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
               />
               <div className="absolute inset-0 bg-gradient-to-t from-charcoal-900/40 to-transparent" />
               

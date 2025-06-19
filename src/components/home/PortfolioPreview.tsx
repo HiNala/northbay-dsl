@@ -13,21 +13,21 @@ const PortfolioPreview = () => {
       title: "San Rafael Modern Kitchen",
       category: "Kitchen Renovation",
       description: "A stunning contemporary kitchen transformation featuring sleek lines, premium finishes, and thoughtful design that perfectly balances form and function.",
-      image: "/website_images/Projects/San Rafael Project- Modern Kitchen/Peacock06.jpg",
+      image: "/website_images/San Rafael Project- Modern Kitchen/Peacock06.jpg",
       stats: { sqft: "800", timeline: "8 weeks", budget: "$125K" }
     },
     {
       title: "Petaluma Bathroom Remodel", 
       category: "Luxury Bath Design",
       description: "An elegant bathroom renovation creating a spa-like retreat with luxurious materials and modern amenities for ultimate relaxation.",
-      image: "/website_images/Projects/Petaluma - Bathroom Remodel/Petaluma Bath5.jpg",
+      image: "/website_images/Petaluma - Bathroom Remodel/Petaluma Bath8.jpg",
       stats: { sqft: "450", timeline: "6 weeks", budget: "$85K" }
     },
     {
       title: "Kenwood Estate Project",
       category: "Master Suite Design", 
       description: "A sophisticated master bathroom transformation featuring custom tile work, premium fixtures, and thoughtful lighting design.",
-      image: "/website_images/Projects/Kenwood Project/Primary Bath photos5.jpg",
+      image: "/website_images/Kenwood Project/Primary Bath photos5.jpg",
       stats: { sqft: "600", timeline: "10 weeks", budget: "$150K" }
     }
   ];
@@ -57,7 +57,7 @@ const PortfolioPreview = () => {
 
         {/* Project Showcase */}
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Project Image */}
+          {/* Project Image - Enhanced with lazy loading */}
           <motion.div 
             className="relative order-2 lg:order-1"
             initial={{ opacity: 0, x: -30 }}
@@ -72,6 +72,10 @@ const PortfolioPreview = () => {
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                 sizes="(max-width: 1024px) 100vw, 50vw"
+                loading="lazy"
+                quality={85}
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
               />
               <div className="absolute inset-0 bg-gradient-to-t from-charcoal-900/60 to-transparent" />
               

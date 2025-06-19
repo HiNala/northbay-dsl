@@ -3,16 +3,41 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
+// Professional SVG Icons
+const ProjectsIcon = () => (
+  <svg className="w-12 h-12 text-luxury-gold-400" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm5 6.5h-2v2h2v-2zm-6 0h-2v2h2v-2z"/>
+  </svg>
+);
+
+const ExperienceIcon = () => (
+  <svg className="w-12 h-12 text-luxury-gold-400" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+  </svg>
+);
+
+const SatisfactionIcon = () => (
+  <svg className="w-12 h-12 text-luxury-gold-400" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+  </svg>
+);
+
+const AwardsIcon = () => (
+  <svg className="w-12 h-12 text-luxury-gold-400" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M7 4V2C7 1.45 7.45 1 8 1h8c.55 0 1 .45 1 1v2h4v4c0 1.1-.9 2-2 2h-1.17L19 12l-1.17 2H19c1.1 0 2 .9 2 2v4h-4v2c0 .55-.45 1-1 1H8c-.55 0-1-.45-1-1v-2H3v-4c0-1.1.9-2 2-2h1.17L5 12l1.17-2H5c-1.1 0-2-.9-2-2V4h4zm2 0h6v12h-6V4zm0 14h6v2H9v-2z"/>
+  </svg>
+);
+
 const StatsSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [counts, setCounts] = useState({ projects: 0, years: 0, satisfaction: 0, awards: 0 });
   const sectionRef = useRef(null);
 
   const finalStats = {
-    projects: 500,
+    projects: 494,
     years: 15,
-    satisfaction: 98,
-    awards: 50
+    satisfaction: 97,
+    awards: 49
   };
 
   useEffect(() => {
@@ -61,28 +86,28 @@ const StatsSection = () => {
 
   const stats = [
     { 
-      icon: '🏡',
+      icon: <ProjectsIcon />,
       number: counts.projects, 
       suffix: '+', 
       label: 'Projects Completed',
       description: 'Luxury transformations across Napa Valley'
     },
     { 
-      icon: '⭐',
+      icon: <ExperienceIcon />,
       number: counts.years, 
       suffix: '+', 
       label: 'Years Experience',
       description: 'Decades of design excellence'
     },
     { 
-      icon: '💯',
+      icon: <SatisfactionIcon />,
       number: counts.satisfaction, 
       suffix: '%', 
       label: 'Client Satisfaction',
       description: 'Exceeding expectations consistently'
     },
     { 
-      icon: '🏆',
+      icon: <AwardsIcon />,
       number: counts.awards, 
       suffix: '+', 
       label: 'Design Awards',
@@ -129,7 +154,7 @@ const StatsSection = () => {
               viewport={{ once: true }}
               whileHover={{ scale: 1.05 }}
             >
-              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
+              <div className="mb-6 group-hover:scale-110 transition-transform duration-300 flex justify-center">
                 {stat.icon}
               </div>
               <div className="text-5xl lg:text-6xl font-light text-luxury-gold-400 mb-2 font-serif">

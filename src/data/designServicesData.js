@@ -80,10 +80,10 @@ export const processSteps = [
 ];
 
 export const materialImages = [
-  { src: '/website_images/Projects/San Rafael Project- Modern Kitchen/Peacock02.jpg', alt: 'Modern Kitchen Design' },
-  { src: '/website_images/Projects/Petaluma - Bathroom Remodel/Petaluma Bath1.jpg', alt: 'Luxury Bathroom' },
-  { src: '/website_images/Projects/Kenwood Project/Primary Bath photos5.jpg', alt: 'Premium Materials' },
-  { src: '/website_images/Projects/Guerneville Project/Bath photos30.jpg', alt: 'Custom Finishes' },
+  { src: '/website_images/San Rafael Project- Modern Kitchen/Peacock02.jpg', alt: 'Modern Kitchen Design' },
+  { src: '/website_images/Petaluma - Bathroom Remodel/Petaluma Bath1.jpg', alt: 'Luxury Bathroom' },
+  { src: '/website_images/Kenwood Project/Primary Bath photos5.jpg', alt: 'Premium Materials' },
+  { src: '/website_images/Guerneville Project/Bath photos30.jpg', alt: 'Custom Finishes' },
   { src: '/website_images/Design Services/Design Services Website (1).jpeg', alt: 'Design Process' },
   { src: '/website_images/Design Services/Design Services Website (3).jpeg', alt: 'Material Selection' },
   { src: '/website_images/Design Services/Design Services Website (4).jpeg', alt: 'Showroom Experience' },

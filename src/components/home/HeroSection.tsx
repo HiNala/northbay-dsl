@@ -36,25 +36,36 @@ const HeroSection = () => {
   useEffect(() => {
     setIsLoaded(true);
     
-    // Auto-advance slides every 5 seconds
+    // Auto-advance slides every 6 seconds (slightly slower)
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroImages.length);
-    }, 5000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [heroImages.length]);
 
+  // Smooth scroll to next section
+  const scrollToNextSection = () => {
+    const nextSection = document.querySelector('section:nth-of-type(2)');
+    if (nextSection) {
+      nextSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image Slider */}
+      {/* Background Image Slider - Improved transitions */}
       <div className="absolute inset-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 1, ease: "easeInOut" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
             className="absolute inset-0"
           >
             <Image
@@ -62,8 +73,9 @@ const HeroSection = () => {
               alt={heroImages[currentSlide].alt}
               fill
               className="object-cover"
-              priority={currentSlide === 0}
+              priority={currentSlide <= 1} // Prioritize first 2 images
               quality={90}
+              sizes="100vw"
             />
           </motion.div>
         </AnimatePresence>
@@ -119,8 +131,8 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Slide Indicators */}
-      <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-20">
+      {/* Slide Indicators - Moved up to avoid overlap */}
+      <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 z-20">
         <div className="flex space-x-3">
           {heroImages.map((_, index) => (
             <button
@@ -137,25 +149,32 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <motion.div 
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+      {/* Functional Scroll Indicator - Moved down and improved */}
+      <motion.button
+        onClick={scrollToNextSection}
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer group"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1 }}
+        transition={{ duration: 1, delay: 1.5 }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
       >
         <motion.div 
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ y: [0, 6, 0] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         >
           <div className="w-px h-16 bg-warm-white-50/20 relative">
-            <div className="absolute top-0 w-px h-8 bg-warm-white-50 animate-pulse" />
+            <motion.div 
+              className="absolute top-0 w-px h-8 bg-warm-white-50"
+              animate={{ y: [0, 24, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            />
           </div>
         </motion.div>
-        <div className="text-xs tracking-[0.2em] text-warm-white-50/60 mt-4 uppercase text-center">
+        <div className="text-xs tracking-[0.2em] text-warm-white-50/60 mt-4 uppercase text-center group-hover:text-warm-white-50/80 transition-colors duration-300">
           Scroll
         </div>
-      </motion.div>
+      </motion.button>
     </section>
   );
 };
