@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Alert } from '@/components/ui/alert'
+import { ImageUpload } from '@/components/ui/image-upload'
 import {
   ArrowLeft,
   Save,
@@ -60,6 +61,13 @@ export default function NewProductPage() {
     type: 'physical',
     seoTitle: '',
     seoDescription: '',
+    images: [] as Array<{
+      id: string
+      url: string
+      alt?: string
+      position: number
+      isHero?: boolean
+    }>
   })
   
   const [tagInput, setTagInput] = useState('')
@@ -287,6 +295,12 @@ export default function NewProductPage() {
         type: formData.type,
         seoTitle: formData.seoTitle.trim() || undefined,
         seoDescription: formData.seoDescription.trim() || undefined,
+        images: formData.images.map(img => ({
+          url: img.url,
+          alt: img.alt || undefined,
+          position: img.position,
+          isHero: img.isHero || false,
+        })),
       }
 
       const response = await fetch('/api/products', {
@@ -411,6 +425,17 @@ export default function NewProductPage() {
                 </div>
               </div>
             </div>
+          </Card>
+
+          {/* Images */}
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">📸 Product Images</h3>
+            <ImageUpload
+              images={formData.images}
+              onImagesChange={(images) => handleInputChange('images', images)}
+              maxImages={15}
+              maxFileSizeMB={10}
+            />
           </Card>
 
           {/* Pricing */}

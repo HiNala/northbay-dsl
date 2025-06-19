@@ -209,6 +209,50 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Create project images if provided
+    if (body.images && Array.isArray(body.images) && body.images.length > 0) {
+      const imageData = body.images.map((img: any, index: number) => ({
+        projectId: project.id,
+        url: img.url,
+        alt: img.alt || null,
+        position: img.position || index,
+        isHero: img.isHero || false,
+        room: img.room || null,
+        beforeAfter: img.beforeAfter || null,
+      }));
+
+      await prisma.projectImage.createMany({
+        data: imageData
+      });
+
+      // Fetch the updated project with images
+      const updatedProject = await prisma.project.findUnique({
+        where: { id: project.id },
+        include: {
+          Images: {
+            orderBy: { position: 'asc' }
+          },
+          Manager: {
+            include: {
+              Profile: true,
+            },
+          },
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        project: {
+          ...updatedProject,
+          manager: updatedProject?.Manager ? {
+            id: updatedProject.Manager.id,
+            name: updatedProject.Manager.Profile?.fullName || updatedProject.Manager.email,
+            email: updatedProject.Manager.email,
+          } : null,
+        },
+      });
+    }
+
     return NextResponse.json({
       success: true,
       project: {

@@ -207,8 +207,43 @@ export async function POST(request: NextRequest) {
       include: {
         Brand: true,
         Category: true,
+        Images: {
+          orderBy: { position: 'asc' }
+        }
       }
     });
+
+    // Create product images if provided
+    if (body.images && Array.isArray(body.images) && body.images.length > 0) {
+      const imageData = body.images.map((img: any, index: number) => ({
+        productId: product.id,
+        url: img.url,
+        alt: img.alt || null,
+        position: img.position || index,
+        isHero: img.isHero || false,
+      }));
+
+      await prisma.productImage.createMany({
+        data: imageData
+      });
+
+      // Fetch the updated product with images
+      const updatedProduct = await prisma.product.findUnique({
+        where: { id: product.id },
+        include: {
+          Brand: true,
+          Category: true,
+          Images: {
+            orderBy: { position: 'asc' }
+          }
+        }
+      });
+
+      return NextResponse.json({
+        success: true,
+        product: updatedProduct
+      }, { status: 201 });
+    }
 
     return NextResponse.json({
       success: true,
