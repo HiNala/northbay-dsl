@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
-import ProductsPage from '@/components/products/ProductsPage';
+import { Suspense } from 'react';
+import DynamicProductsPage from '@/components/products/DynamicProductsPage';
 
 export const metadata: Metadata = {
   title: 'Products | Northbay Kitchen & Bath | Luxury Kitchen & Bathroom Products',
@@ -20,6 +21,21 @@ export const metadata: Metadata = {
   },
 };
 
+function ProductsLoading() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-warm-white-50 to-stone-100 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-8 h-8 border-2 border-luxury-gold-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-charcoal-600">Loading products...</p>
+      </div>
+    </div>
+  );
+}
+
 export default function Products() {
-  return <ProductsPage />;
+  return (
+    <Suspense fallback={<ProductsLoading />}>
+      <DynamicProductsPage />
+    </Suspense>
+  );
 } 

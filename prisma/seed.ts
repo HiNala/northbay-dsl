@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { hash } from 'bcryptjs'
+import { seedProducts } from './seeds/products-seed'
 
 const prisma = new PrismaClient()
 
@@ -472,6 +473,10 @@ async function main() {
   }
 
   console.log('✅ Sample products created successfully!')
+
+  console.log('🌱 Seeding comprehensive product catalog...')
+  await seedProducts()
+
   console.log('Login credentials:')
   console.log('   - admin@nbkb.com / password123 (Admin)')
   console.log('   - manager@nbkb.com / password123 (Manager)')

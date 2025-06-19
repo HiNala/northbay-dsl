@@ -81,15 +81,13 @@ const MaterialExperience = () => {
 
   const fadeInUpVariants = {
     hidden: { opacity: 0, y: 30 },
-    visible: (i: number) => ({
+    visible: {
       opacity: 1,
       y: 0,
       transition: {
-        delay: i * 0.1,
-        duration: 0.8,
-        ease: [0.22, 1, 0.36, 1]
+        duration: 0.8
       }
-    })
+    }
   };
 
   const staggerContainerVariants = {
@@ -122,7 +120,7 @@ const MaterialExperience = () => {
           className="text-center mb-20 md:mb-28"
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8 }}
         >
           <div className="text-luxury-gold-600 text-sm tracking-[0.3em] uppercase font-medium mb-4">
             Material Experience
@@ -141,7 +139,7 @@ const MaterialExperience = () => {
           className="mb-28"
           initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-          transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1, delay: 0.2 }}
         >
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Featured Image */}
@@ -176,7 +174,7 @@ const MaterialExperience = () => {
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
-              transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.8, delay: 0.4 }}
             >
               <div className="text-luxury-gold-600 text-sm tracking-wide uppercase font-medium mb-4">
                 {featuredExperience.subtitle}
@@ -220,7 +218,6 @@ const MaterialExperience = () => {
               <motion.div
                 key={category.id}
                 variants={fadeInUpVariants}
-                custom={index}
                 className={`cursor-pointer transition-all duration-500 ${
                   activeCategory === category.id ? 'opacity-100' : 'opacity-80 hover:opacity-95'
                 }`}
@@ -270,7 +267,7 @@ const MaterialExperience = () => {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8, delay: 0.4 }}
         >
           <div className="text-center mb-16">
             <h3 className="text-2xl lg:text-3xl font-light text-charcoal-900 mb-4 font-serif tracking-tight">

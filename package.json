@@ -12,7 +12,10 @@
     "db:pull": "prisma db pull",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:seed": "npx tsx prisma/seed.ts"
+    "db:seed": "npx tsx prisma/seed.ts",
+    "seed:products": "npx tsx -r dotenv/config prisma/seeds/products-seed.ts",
+    "delete-seed-data": "npx tsx -r dotenv/config scripts/delete-seed-data.ts",
+    "delete-seed-data:execute": "npx tsx -r dotenv/config scripts/delete-seed-data.ts --execute --confirm=DELETE_NORTHBAY_SEED_DATA_ONLY"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
@@ -21,6 +24,7 @@
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-progress": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-switch": "^1.2.5",
     "@types/bcryptjs": "^2.4.6",
@@ -31,7 +35,7 @@
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "framer-motion": "^12.17.0",
+    "framer-motion": "^12.18.1",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.513.0",
     "multer": "^2.0.1",

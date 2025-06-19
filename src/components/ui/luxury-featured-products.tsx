@@ -70,11 +70,6 @@ function LuxuryProductCard({
     hover: { 
       scale: 1.02, 
       y: -8,
-      transition: { 
-        type: "spring", 
-        stiffness: 300, 
-        damping: 30,
-      }
     },
   };
 
@@ -91,13 +86,6 @@ function LuxuryProductCard({
     hover: { 
       y: "0%", 
       opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 28,
-        staggerChildren: 0.1,
-        delayChildren: 0.1,
-      },
     },
   };
 
@@ -109,11 +97,6 @@ function LuxuryProductCard({
     hover: { 
       opacity: 1, 
       y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 25,
-      },
     },
   };
 

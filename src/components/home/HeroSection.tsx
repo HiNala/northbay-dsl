@@ -96,20 +96,20 @@ const HeroSection = () => {
               Napa Valley's Premier Design Studio
             </div>
             
-            <h1 className="text-hero font-light text-warm-white-50 mb-8 leading-none font-serif">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-light text-warm-white-50 mb-6 lg:mb-8 leading-tight lg:leading-none font-serif">
               Luxury Kitchens<br />
               & <span className="text-luxury-gold-400">Bathrooms</span>
             </h1>
             
-            <p className="text-body-large text-warm-white-100/90 max-w-2xl mb-12 font-light leading-relaxed">
+            <p className="text-base sm:text-lg lg:text-xl text-warm-white-100/90 max-w-2xl mb-8 lg:mb-12 font-light leading-relaxed">
               We create extraordinary spaces that blend timeless elegance with modern sophistication. 
               From concept to completion, every detail reflects your unique lifestyle and vision.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-6">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
               <Button 
                 size="lg"
-                className="group bg-luxury-gold-500 text-charcoal-900 px-10 py-4 text-sm tracking-wide font-semibold hover:bg-luxury-gold-600 transition-all duration-300 transform hover:scale-105 border-0"
+                className="group bg-luxury-gold-500 text-charcoal-900 px-8 sm:px-10 py-3 sm:py-4 text-sm tracking-wide font-semibold hover:bg-luxury-gold-600 transition-all duration-300 transform hover:scale-105 border-0"
               >
                 <span className="flex items-center justify-center">
                   START YOUR PROJECT
@@ -122,7 +122,7 @@ const HeroSection = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-2 border-warm-white-50/30 text-warm-white-50 px-10 py-4 text-sm tracking-wide font-medium hover:bg-warm-white-50 hover:text-charcoal-900 transition-all duration-300 bg-transparent"
+                className="border-2 border-warm-white-50/30 text-warm-white-50 px-8 sm:px-10 py-3 sm:py-4 text-sm tracking-wide font-medium hover:bg-warm-white-50 hover:text-charcoal-900 transition-all duration-300 bg-transparent"
               >
                 VIEW PORTFOLIO
               </Button>
@@ -131,8 +131,8 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Slide Indicators - Moved up to avoid overlap */}
-      <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 z-20">
+      {/* Slide Indicators - Positioned higher to avoid overlap */}
+      <div className="absolute bottom-44 left-1/2 transform -translate-x-1/2 z-20">
         <div className="flex space-x-3">
           {heroImages.map((_, index) => (
             <button
@@ -149,10 +149,10 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Functional Scroll Indicator - Moved down and improved */}
+      {/* Functional Scroll Indicator - Properly spaced */}
       <motion.button
         onClick={scrollToNextSection}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer group"
+        className="absolute bottom-6 left-1/2 transform -translate-x-1/2 cursor-pointer group"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.5 }}
@@ -163,15 +163,15 @@ const HeroSection = () => {
           animate={{ y: [0, 6, 0] }}
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         >
-          <div className="w-px h-16 bg-warm-white-50/20 relative">
+          <div className="w-px h-12 bg-warm-white-50/20 relative">
             <motion.div 
-              className="absolute top-0 w-px h-8 bg-warm-white-50"
-              animate={{ y: [0, 24, 0] }}
+              className="absolute top-0 w-px h-6 bg-warm-white-50"
+              animate={{ y: [0, 18, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
           </div>
         </motion.div>
-        <div className="text-xs tracking-[0.2em] text-warm-white-50/60 mt-4 uppercase text-center group-hover:text-warm-white-50/80 transition-colors duration-300">
+        <div className="text-xs tracking-[0.2em] text-warm-white-50/60 mt-3 uppercase text-center group-hover:text-warm-white-50/80 transition-colors duration-300">
           Scroll
         </div>
       </motion.button>
