@@ -7,6 +7,8 @@ import { Search as SearchIcon, Filter, Star, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
+// Temporary fix for React.Children.only issues
+
 export default function SearchPage() {
   const [query, setQuery] = React.useState("");
 
@@ -174,12 +176,12 @@ export default function SearchPage() {
                                 <p className="text-muted-foreground mb-4">
                                   {page.description}
                                 </p>
-                                <Button variant="outline" size="sm" asChild>
-                                  <a href={page.href}>
+                                <a href={page.href}>
+                                  <Button variant="outline" size="sm" className="flex items-center">
                                     Visit Page
                                     <ArrowRight className="w-4 h-4 ml-2" />
-                                  </a>
-                                </Button>
+                                  </Button>
+                                </a>
                               </div>
                               <div className="ml-4">
                                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
@@ -216,17 +218,17 @@ export default function SearchPage() {
               Our design experts are here to help. Contact us directly for personalized assistance.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
-                <a href="/contact">
+              <a href="/contact">
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center">
                   Contact Us
                   <ArrowRight className="w-5 h-5 ml-2" />
-                </a>
-              </Button>
-              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground" asChild>
-                <a href="/design-services">
+                </Button>
+              </a>
+              <a href="/design-services">
+                <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground flex items-center">
                   Schedule Consultation
-                </a>
-              </Button>
+                </Button>
+              </a>
             </div>
           </motion.div>
         </div>
