@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -25,15 +27,11 @@ export async function GET(request: NextRequest) {
           in: ['NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL']
         }
       },
-      include: {
-        AssignedTo: {
-          include: { Profile: true }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      take: 10
     });
 
-    // Get recent leads
+    // Get recent leads assigned this week
     const recentLeads = await prisma.designLead.findMany({
       where: {
         assignedTo: userId,
@@ -43,7 +41,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Get monthly performance data
+    // Get monthly sales performance
     const monthlyLeads = await prisma.designLead.findMany({
       where: {
         assignedTo: userId,
@@ -54,24 +52,34 @@ export async function GET(request: NextRequest) {
     });
 
     const convertedLeads = monthlyLeads.filter(lead => lead.status === 'WON');
+    const potentialValue = myLeads.reduce((sum, lead) => sum + (lead.budgetMin || 0), 0);
+    const convertedValue = convertedLeads.reduce((sum, lead) => sum + (lead.budgetMin || 0), 0);
+
+    // Follow-ups needed
     const followUpsNeeded = myLeads.filter(lead => 
       lead.followUpAt && new Date(lead.followUpAt) <= today
     );
 
-    // Calculate stats
-    const stats = {
-      activeLeads: myLeads.length,
-      recentLeads: recentLeads.length,
-      followUpsDue: followUpsNeeded.length,
-      monthlyConversions: convertedLeads.length,
-      monthlyGoalProgress: Math.min((convertedLeads.length / 10) * 100, 100), // Assuming goal of 10 conversions per month
-      appointmentsToday: 0, // This would come from a calendar integration
-    };
+    // Lead priority breakdown
+    const highPriorityLeads = myLeads.filter(lead => lead.priority === 'HIGH').length;
+    const mediumPriorityLeads = myLeads.filter(lead => lead.priority === 'MEDIUM').length;
 
-    // Get recent activities
+    // Calculate personal performance metrics
+    const totalContactedLeads = monthlyLeads.filter(lead => 
+      ['CONTACTED', 'QUALIFIED', 'PROPOSAL', 'WON'].includes(lead.status)
+    ).length;
+
+    const conversionRate = monthlyLeads.length > 0 ? 
+      (convertedLeads.length / monthlyLeads.length * 100) : 0;
+
+    const responseRate = monthlyLeads.length > 0 ? 
+      (totalContactedLeads / monthlyLeads.length * 100) : 0;
+
+    // Get recent sales activities
     const recentActivities = await prisma.auditLog.findMany({
       where: {
         userId: userId,
+        tableName: 'design_leads',
         createdAt: {
           gte: startOfWeek
         }
@@ -80,20 +88,89 @@ export async function GET(request: NextRequest) {
       take: 10
     });
 
-    // Return employee dashboard data
+    // Lead source performance
+    const leadSources = await prisma.designLead.groupBy({
+      by: ['source'],
+      where: {
+        assignedTo: userId,
+        createdAt: {
+          gte: startOfMonth
+        }
+      },
+      _count: {
+        source: true
+      }
+    });
+
+    // Sales quota tracking (assuming monthly quota of 10 conversions)
+    const monthlyQuota = 10;
+    const quotaProgress = (convertedLeads.length / monthlyQuota) * 100;
+
+    // Calculate stats
+    const stats = {
+      activeLeads: myLeads.length,
+      recentLeads: recentLeads.length,
+      followUpsDue: followUpsNeeded.length,
+      monthlyConversions: convertedLeads.length,
+      conversionRate: Math.round(conversionRate),
+      potentialValue,
+      convertedValue,
+      quotaProgress: Math.min(quotaProgress, 100),
+      highPriorityCount: highPriorityLeads
+    };
+
+    // Return employee dashboard data focused on sales performance
     return NextResponse.json({
       success: true,
       data: {
+        // Personal Sales Metrics
         stats,
-        myLeads: myLeads.slice(0, 5), // Latest 5 leads
-        recentActivities,
-        appointments: [], // This would come from calendar integration
-        tasks: [], // This would come from task management system
+        
+        // Current Active Leads
+        myLeads: myLeads.slice(0, 5).map(lead => ({
+          id: lead.id,
+          fullName: lead.fullName,
+          email: lead.email,
+          phone: lead.phone,
+          projectType: lead.projectType,
+          budgetMin: lead.budgetMin,
+          budgetMax: lead.budgetMax,
+          status: lead.status,
+          priority: lead.priority,
+          followUpAt: lead.followUpAt,
+          createdAt: lead.createdAt
+        })),
+        
+        // Recent Sales Activities
+        recentActivities: recentActivities.map(activity => ({
+          id: activity.id,
+          action: activity.action,
+          details: activity.newValues,
+          createdAt: activity.createdAt
+        })),
+        
+        // Lead Sources Performance
+        leadSources: leadSources.map(source => ({
+          source: source.source || 'Direct',
+          count: source._count.source
+        })),
+        
+        // Performance Summary
         performance: {
-          leadsConverted: convertedLeads.length,
-          goalTarget: 10,
-          responseRate: myLeads.length > 0 ? Math.round((convertedLeads.length / myLeads.length) * 100) : 0,
-          averageResponseTime: '2.3 hours' // This would be calculated from actual data
+          monthlyConversions: convertedLeads.length,
+          monthlyQuota,
+          conversionRate: Math.round(conversionRate),
+          responseRate: Math.round(responseRate),
+          totalLeadsHandled: monthlyLeads.length,
+          averageLeadValue: monthlyLeads.length > 0 ? 
+            Math.round(potentialValue / monthlyLeads.length) : 0
+        },
+        
+        // Priority Breakdown
+        priorities: {
+          high: highPriorityLeads,
+          medium: mediumPriorityLeads,
+          low: myLeads.length - highPriorityLeads - mediumPriorityLeads
         }
       }
     });

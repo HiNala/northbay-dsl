@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -29,163 +31,170 @@ export async function GET(request: NextRequest) {
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
     const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+    const startOfWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    // Get monthly revenue from orders
+    // Revenue Analytics
     const monthlyOrders = await prisma.order.findMany({
       where: {
-        createdAt: {
-          gte: startOfMonth
-        },
-        status: {
-          in: ['paid', 'processing', 'shipped', 'delivered']
-        }
+        createdAt: { gte: startOfMonth },
+        status: { in: ['paid', 'processing', 'shipped', 'delivered'] }
       }
     });
 
     const lastMonthOrders = await prisma.order.findMany({
       where: {
-        createdAt: {
-          gte: lastMonth,
-          lte: endOfLastMonth
-        },
-        status: {
-          in: ['paid', 'processing', 'shipped', 'delivered']
-        }
+        createdAt: { gte: lastMonth, lte: endOfLastMonth },
+        status: { in: ['paid', 'processing', 'shipped', 'delivered'] }
+      }
+    });
+
+    const weeklyOrders = await prisma.order.findMany({
+      where: {
+        createdAt: { gte: startOfWeek },
+        status: { in: ['paid', 'processing', 'shipped', 'delivered'] }
       }
     });
 
     const monthlyRevenue = monthlyOrders.reduce((sum, order) => sum + Number(order.total), 0);
     const lastMonthRevenue = lastMonthOrders.reduce((sum, order) => sum + Number(order.total), 0);
+    const weeklyRevenue = weeklyOrders.reduce((sum, order) => sum + Number(order.total), 0);
     const revenueGrowth = lastMonthRevenue > 0 ? ((monthlyRevenue - lastMonthRevenue) / lastMonthRevenue * 100) : 0;
 
-    // Get active leads
-    const activeLeads = await prisma.designLead.findMany({
-      where: {
-        status: {
-          in: ['NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL']
-        }
-      }
-    });
-
-    // Get team performance
-    const teamMembers = await prisma.user.findMany({
-      where: {
-        roles: {
-          some: {
-            Role: {
-              name: {
-                in: ['employee', 'manager']
-              }
-            }
-          }
-        },
-        status: 'active'
+    // Sales Pipeline Analytics
+    const salesPipeline = await prisma.designLead.groupBy({
+      by: ['status'],
+      _count: {
+        status: true
       },
-      include: {
-        Profile: true,
-        DesignLeads: {
-          where: {
-            createdAt: {
-              gte: startOfMonth
-            }
-          }
-        },
-        ManagedProjects: {
-          where: {
-            status: {
-              in: ['IN_PROGRESS', 'COMPLETED']
-            }
-          }
-        }
+      _sum: {
+        budgetMin: true
       }
     });
 
-    // Get active projects
-    const activeProjects = await prisma.project.findMany({
+    const pipelineValue = salesPipeline.reduce((sum, stage) => 
+      sum + (Number(stage._sum.budgetMin) || 0), 0
+    );
+
+    // Lead Conversion Analytics
+    const totalLeads = await prisma.designLead.count();
+    const convertedLeads = await prisma.designLead.count({
+      where: { status: 'WON' }
+    });
+    const conversionRate = totalLeads > 0 ? (convertedLeads / totalLeads * 100) : 0;
+
+    // Product Performance
+    const topProducts = await prisma.orderItem.groupBy({
+      by: ['productId'],
+      _count: { productId: true },
+      _sum: { quantity: true },
+      orderBy: { _count: { productId: 'desc' } },
+      take: 5
+    });
+
+    const productDetails = await prisma.product.findMany({
       where: {
-        status: {
-          in: ['PLANNING', 'IN_PROGRESS']
-        }
+        id: { in: topProducts.map(p => p.productId) }
       },
-      include: {
-        Manager: {
-          include: { Profile: true }
-        }
-      }
+      select: { id: true, name: true, price: true }
     });
 
-    // Calculate team stats
-    const teamStats = teamMembers.map(member => {
-      const leadsThisMonth = member.DesignLeads.length;
-      const projectsManaged = member.ManagedProjects.length;
-      const rating = Math.min(4.9, 3.5 + (leadsThisMonth * 0.1) + (projectsManaged * 0.2)); // Simulated rating
-
+    const topProductsWithDetails = topProducts.map(item => {
+      const product = productDetails.find(p => p.id === item.productId);
       return {
-        id: member.id,
-        name: member.Profile?.fullName || member.email || 'Unknown',
-        role: 'Team Member', // Would come from role relationship
-        leadsThisMonth,
-        projectsManaged,
-        rating: Number(rating.toFixed(1))
+        ...item,
+        name: product?.name || 'Unknown Product',
+        price: product?.price || 0
       };
     });
 
-    // Get recent activities
+    // Recent High-Value Activities
     const recentActivities = await prisma.auditLog.findMany({
       where: {
-        createdAt: {
-          gte: new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000) // Last 7 days
-        }
+        createdAt: { gte: startOfWeek },
+        OR: [
+          { tableName: 'orders' },
+          { tableName: 'design_leads' },
+          { tableName: 'products' }
+        ]
       },
       include: {
-        User: {
-          include: { Profile: true }
-        }
+        User: { include: { Profile: true } }
       },
       orderBy: { createdAt: 'desc' },
       take: 10
     });
 
-    // Calculate goal progress
+    // Inventory Alerts
+    const lowStockCount = await prisma.product.count({
+      where: {
+        trackInventory: true,
+        stockQuantity: { lte: 10 },
+        status: 'PUBLISHED'
+      }
+    });
+
+    // Monthly Goals (Business-focused)
     const goals = {
       revenue: {
         current: monthlyRevenue,
         target: 150000,
         progress: Math.min((monthlyRevenue / 150000) * 100, 100)
       },
-      leads: {
-        current: activeLeads.length,
-        target: 40,
-        progress: Math.min((activeLeads.length / 40) * 100, 100)
+      conversion: {
+        current: Math.round(conversionRate),
+        target: 25,
+        progress: Math.min((conversionRate / 25) * 100, 100)
       },
-      teamTraining: {
-        current: 6,
-        target: 8,
-        progress: (6 / 8) * 100
+      orders: {
+        current: monthlyOrders.length,
+        target: 50,
+        progress: Math.min((monthlyOrders.length / 50) * 100, 100)
       }
     };
 
-    // Return manager dashboard data
+    // Return manager dashboard data focused on business operations
     return NextResponse.json({
       success: true,
       data: {
+        // Core Business Metrics
         metrics: {
           monthlyRevenue,
+          weeklyRevenue,
           revenueGrowth: Number(revenueGrowth.toFixed(1)),
-          activeLeads: activeLeads.length,
-          teamPerformance: teamStats.length > 0 ? Math.round(teamStats.reduce((sum, member) => sum + member.rating, 0) / teamStats.length * 20) : 85,
-          activeProjects: activeProjects.length
+          totalOrders: monthlyOrders.length,
+          pipelineValue,
+          conversionRate: Number(conversionRate.toFixed(1)),
+          lowStockAlerts: lowStockCount
         },
+        
+        // Business Goals
         goals,
-        teamStats: teamStats.slice(0, 5), // Top 5 team members
+        
+        // Sales Pipeline
+        salesPipeline: salesPipeline.map(stage => ({
+          status: stage.status,
+          count: stage._count.status,
+          value: Number(stage._sum.budgetMin) || 0
+        })),
+        
+        // Top Performing Products
+        topProducts: topProductsWithDetails,
+        
+        // Recent Business Activities
         recentActivities: recentActivities.map(activity => ({
           id: activity.id,
           action: activity.action,
-          tableName: activity.tableName,
+          table: activity.tableName,
           user: activity.User ? activity.User.Profile?.fullName || activity.User.email || 'Unknown' : 'System',
           createdAt: activity.createdAt
         })),
-        projects: activeProjects.slice(0, 5) // Latest 5 active projects
+        
+        // Revenue Trend Data (last 7 days)
+        revenuetrend: {
+          weekly: weeklyRevenue,
+          daily: Math.round(weeklyRevenue / 7),
+          growth: revenueGrowth
+        }
       }
     });
 
